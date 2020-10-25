@@ -1,0 +1,10 @@
+git clone <link>
+git add (-u)
+git rm
+git push (-u origin <branch_name>)
+git commit
+git pull
+git branch (-a)
+git checkout <Revision id>/<file>
+git log (--stat)
+git diff (--staged)
