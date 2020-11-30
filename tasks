@@ -1,0 +1,34 @@
+1. Add checks, one for dir existence.
+2. Create script which outputs numbers from 0 to 10 by using for loop.
+3. Create script which created 'test_files' dir and puts in it 10 files with
+   names 0.a, 1.a, ..., 9.a and by ONE command 'chmod' give them 644 permission.
+
+NOTE: for implementing 'for' loop in bash language use google.com
+
+Result: 90%
+
+#26.09 
+
+1. Read about:
+    - ls 
+    - mv 
+    - cp 
+    - rm 
+    - cd 
+   and all their options
+
+2. Read about:
+    - bash functions 
+    - passing arguments to bash functions 
+
+3. implement bash script which receives two arguments and outputs their sum .
+   use function .
+
+
+Result: 50%
+
+#25.10
+
+1. Search about git command described in the 'git_cheat_sheet' file.
+2. Read again about Bash commands, bash functions, passing arguments. 
+
