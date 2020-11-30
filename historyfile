@@ -1,0 +1,1000 @@
+   31  mkdir scripts
+   32  mv *.sh scripts/
+   33  ls
+   34  cd scripts/
+   35  ls
+   36  cd ..
+   37  scp lusine@172.17.1.57:/home/lusine/.vimrc ~/.vimrc
+   38  scp lusine@172.17.1.57:/home/lusine/.bashrc ~/.bashrc
+   39  exit
+   40  vim ~/.bashrc
+   41  exit
+   42  cd
+   43  ssh lusine@172.17.1.57
+   44  sudo apt install ssh
+   45  ls
+   46  ssh lusine@172.17.1.57
+   47  ssh -X lusine@172.17.1.57
+   48  man echo
+   49  vim askf.sh
+   50  cd script
+   51  cd scripts
+   52  vim askf.sh
+   53  ./askf.sh
+   54  vim askf.sh
+   55  vim task.sh
+   56  man od
+   57  a
+   58  exit
+   59  cd
+   60  vim file1
+   61  vim file7
+   62  ls
+   63  cd
+   64  ls
+   65  cd /workspace
+   66  cd workspace
+   67  vim task.sh
+   68  vim scripts/task.sh
+   69  ./task.sh
+   70  cd scripts
+   71  ./task.sh
+   72  cat sortfile
+   73  ./task.sh
+   74  vim askf.sh
+   75  ./task.sh
+   76  vim task.sh
+   77  vim askf.sh
+   78  vim task.sh
+   79  ./task.sh
+   80  vim askf.sh
+   81  ./askf.sh
+   82  vim askf.sh
+   83  vim task.sh
+   84  vim askf.sh
+   85  vim task.sh
+   86  vim askf.sh
+   87  vim task.sh
+   88  ./task.sh
+   89  vim task.sh
+   90  vim askf.sh
+   91  vim task.sh
+   92  ./task.sh
+   93  vim askf.sh
+   94  ./askf.sh
+   95  ./task.sh
+   96  vim askf.sh
+   97  vim task.sh
+   98  vim askf.sh
+   99  ./askf.sh
+  100  vim askf.sh
+  101  ./askf.sh
+  102  vim askf.sh
+  103  ./askf.sh
+  104  chmod a+x askf.sh
+  105  ./askf.sh
+  106  vim askf.sh
+  107  vim task.sh
+  108  ./task.sh
+  109  cat sortfile
+  110  ./task.sh
+  111  cat sortfile
+  112  vim askf.sh
+  113  ./task.sh
+  114  vim askf.sh
+  115  ./askf.sh
+  116  vim askf.sh
+  117  ./askf.sh
+  118  vim askf.sh
+  119  ./task.sh
+  120  vim askf.sh
+  121  ./task.sh
+  122  cat sortfile
+  123  vim task.sh
+  124  vim askf.sh
+  125  vim task.sh
+  126  ./task.sh
+  127  vim askf.sh
+  128  vim task.sh
+  129  vim askf.sh
+  130  vim task.sh
+  131  ./task.sh
+  132  vim askf.sh
+  133  vim task.sh
+  134  vim askf.sh
+  135  vim task.sh
+  136  ./task.sh
+  137  vim askf.sh
+  138  ./askf.sh
+  139  vim askf.sh
+  140  ./task.sh
+  141  vim askf.sh
+  142  ./task.sh
+  143  vim askf.sh
+  144  ./task.sh
+  145  cat sortfile
+  146  vim askf.sh
+  147  ./task.sh
+  148  cat sortfile
+  149  vim task.sh
+  150  vim askf.sh
+  151  vim task.sh
+  152  ./task.sh
+  153  cat sortfile
+  154  vim task.sh
+  155  ./task.sh
+  156  vim task.sh
+  157  ./task.sh
+  158  vim task.sh
+  159  ./task.sh
+  160  vim task.sh
+  161  ./task.sh
+  162  vim task.sh
+  163  ./task.sh
+  164  vim askf.sh
+  165  vim task.sh
+  166  ./task.sh
+  167  vim task.sh
+  168  ./task.sh
+  169  vim task.sh
+  170  ./task.sh
+  171  vim task.sh
+  172  ./task.sh
+  173  vim task.sh
+  174  vim askf.sh
+  175  ./task.sh
+  176  vim askf.sh
+  177  ./task.sh
+  178  vim askf.sh
+  179  ./task.sh
+  180  vim askf.sh
+  181  ./task.sh
+  182  cat sortfile
+  183  ./task.sh
+  184  vim askf.sh
+  185  ./task.sh 
+  186  vim askf.sh
+  187  vim task.sh 
+  188  vim askf.sh
+  189  vim task.sh 
+  190  vim askf.sh
+  191  ./askf.sh
+  192  vim askf.sh
+  193  ./askf.sh
+  194  vim askf.sh
+  195  ./askf.sh
+  196  vim askf.sh
+  197  ./askf.sh
+  198  vim askf.sh
+  199  ./askf.sh
+  200  vim task.sh
+  201  vim askf.sh
+  202  vim task.sh
+  203  vim askf.sh
+  204  vim task.sh
+  205  ./task.sh
+  206  vim askf.sh
+  207  ./task.sh
+  208  ./task.sh
+  209  vim task.sh
+  210  ./task.sh
+  211  vim task.sh
+  212  ./task.sh
+  213  vim task.sh
+  214  rm sortfile
+  215  ./task.sh
+  216  rm sortfile
+  217  vim task.sh
+  218  vim askf.sh
+  219  ./task.sh
+  220  vim askf.sh
+  221  [A
+  222  bash
+  223  a
+  224  vim askf.sh
+  225  vim task.sh
+  226  ./task.sh
+  227  vim task.sh
+  228  ./task.sh
+  229  vim task.sh
+  230  ./task.sh
+  231  vim task.sh
+  232  ./task.sh
+  233  vim task.sh
+  234  ./task.sh
+  235  vim task.sh
+  236  ./task.sh
+  237  vim task.sh
+  238  ./task.sh
+  239  vim task.sh
+  240  touch sortfile
+  241  ./task.sh
+  242  vim task.sh
+  243  ./task.sh
+  244  vim task.sh
+  245  scp workspace/repos/convolutional lusin@172.17.1.198:/home/lusin
+  246  scp workspace/repos/aa lusin@172.17.1.198:/home/lusin
+  247  scp /workspace/repos/convolutional lusin@172.17.1.198:/home/lusin
+  248  scp workspace/repos/Cmatrix lusin@172.17.1.198:/home/lusin
+  249  scp workspace/repos/Cmatric lusin@172.17.1.198:/home/lusin
+  250  scp workspace/repos/Cmatrix lusin@172.17.1.198:/home/lusin
+  251  scp workspace/repos/Cmatrix lusin@172.17.1.198:/home/lusin
+  252  history
+  253  scp lusine@172.17.1.57:/home/lusine/workspace/repos/Cmatrix
+  254  exit
+  255  vimtutor
+  256  vim fvim1
+  257  ls
+  258  cd scripts
+  259  vim *
+  260  ls
+  261  vim task.sh
+  262  ./task.sh
+  263  vim task.sh
+  264  ./task.sh
+  265  vim task.sh
+  266  ./task.sh
+  267  vim task.sh
+  268  ./task.sh
+  269  vim task.sh
+  270  ./task.sh
+  271  vim task.sh
+  272  ./task.sh
+  273  vim task.sh
+  274  ./task.sh
+  275  cat ff
+  276  ./task.sh
+  277  ls
+  278  cat sortfile
+  279  vim task.sh
+  280  ./task.sh
+  281  vim task.sh
+  282  ./task.sh
+  283  vim task.sh
+  284  ./task.sh
+  285  vim task.sh
+  286  ./task.sh
+  287  vim askf.sh
+  288  ./task.sh
+  289  vim askf.sh
+  290  vim task.sh
+  291  ./task.sh
+  292  vim task.sh
+  293  ./task.sh
+  294  vim task.sh
+  295  ./task.sh
+  296  vim task.sh
+  297  vim askf.sh
+  298  ./task.sh
+  299  vim askf.sh
+  300  ./task.sh
+  301  vim askf.sh
+  302  vim task.sh
+  303  vim askf.sh
+  304  ./task.sh
+  305  vim askf.sh
+  306  ./task.sh
+  307  cat sortfile
+  308  vim askf.sh
+  309  ./task.sh
+  310  vim askf.sh
+  311  rm sortfile
+  312  ./task.sh
+  313  ls
+  314  vim task.sh 
+  315  rm sortfile 
+  316  ./task.sh 
+  317  ls
+  318  rm :\:wq 
+  319  rm :wq
+  320  ls
+  321  vim task.sh 
+  322  ./task.sh 
+  323  vim task.sh 
+  324  vim askf.sh
+  325  ./task.sh 
+  326  vim askf.sh
+  327  vim task.sh 
+  328  ./task.sh 
+  329  vim task.sh 
+  330  ./task.sh 
+  331  vim task.sh 
+  332  ./task.sh 
+  333  vim task.sh 
+  334  ./task.sh 
+  335  vim task.sh 
+  336  ./task.sh 
+  337  vim task.sh 
+  338  vim askf.sh
+  339  ./task.sh 
+  340  vim askf.sh
+  341  ./task.sh 
+  342  vim askf.sh
+  343  ./task.sh 
+  344  vim askf.sh
+  345  vim task.sh
+  346  ./task.sh 
+  347  cat sortfile
+  348  vim task.sh
+  349  ifconfig
+  350  history
+  351  lear
+  352  clear
+  353  vim task.sh
+  354  ./task.sh 
+  355  vim task.sh
+  356  ./task.sh 
+  357  vim task.sh
+  358  ./task.sh 
+  359  vim task.sh
+  360  ./task.sh 
+  361  n
+  362  ./task.sh 
+  363  vim task.sh
+  364  ./task.sh 
+  365  vim task.sh
+  366  ./task.sh 
+  367  vim task.sh
+  368  ./task.sh 
+  369  vim task.sh
+  370  ./task.sh 
+  371  vim task.sh
+  372  ./task.sh 
+  373  vim task.sh
+  374  ./task.sh 
+  375  vim task.sh
+  376  ./task.sh 
+  377  cat sortfile 
+  378  ./task.sh 
+  379  vim task.sh
+  380  vim askf.sh
+  381  ./task.sh 
+  382  vim askf.sh
+  383  ./task.sh 
+  384  vim askf.sh
+  385  vim task.sh
+  386  ./task.sh 
+  387  history
+  388  cl
+  389  vim task.sh
+  390  vim askf.sh
+  391  ls
+  392  mv splitfile.sh find_files.sh
+  393  ./find_files.sh 
+  394  ./find_files.sh .
+  395  ./find_files.sh . f
+  396  ./find_files.sh /a f
+  397  ./find_files.sh a f
+  398  ./find_files.sh a/ f
+  399  ./scripts/
+  400  ls
+  401  chmod +x find_files.sh 
+  402  ./find_files.sh 
+  403  ./find_files.sh . f
+  404  ./find_files.sh a/ f
+  405  ./find_files.sh /mnt f
+  406  ./find_files.sh /mnt d
+  407  ls
+  408  rm *_file 
+  409  ls
+  410  ./find_files.sh /mnt d
+  411  ls /mnt/
+  412  ./find_files.sh .
+  413  ./find_files.sh /mnt d
+  414  ls
+  415  cat d_paths 
+  416  ls /mnt/
+  417  ./find_files.sh / d
+  418  cat d_paths 
+  419  ./find_files.sh . d
+  420  cat d_paths 
+  421  ls
+  422  vim f
+  423  rm f
+  424  cat fvim
+  425  cat fvim*
+  426  rm fvim*
+  427  ls
+  428  cat a/
+  429  ls a/
+  430  ./find_files.sh . p
+  431  cat p_paths 
+  432  ./find_files.sh . l
+  433  cat l_paths 
+  434  ./find_files.sh . 5
+  435  ./find_files.sh . L
+  436  ./find_files.sh .. L
+  437  ./find_files.sh ..
+  438  ./find_files.sh .. f
+  439  cat f
+  440  cat f_paths 
+  441  cleart
+  442  exit
+  443  vim find_files.sh
+  444  ./find_files.sh .. f
+  445  ls
+  446  vim find_files.sh
+  447  rm f_paths 
+  448  ./find_files.sh .. f
+  449  cat f_paths 
+  450  vim find_files.sh
+  451  help local
+  452  vim find_files1.sh
+  453  ls
+  454  vim find_files.sh 
+  455  ./find_files.sh
+  456  histpry
+  457  history
+  458  ./find_files.sh /home/workspace/a f l p 
+  459  ls
+  460  cd output_file
+  461  ls
+  462  cd ..
+  463  rmdir output_file
+  464  vim find_files.sh 
+  465  ./find_files.sh /home/lusin/workspace/a f l p 
+  466  cd output_file
+  467  ls
+  468  cat f_paths 
+  469  vim find_files.sh 
+  470  cd ..
+  471  vim find_files.sh 
+  472  vim find_files1.sh 
+  473  vim find_files.sh 
+  474  cp find_files.sh find_files1.sh 
+  475  vim find_files1.sh 
+  476  ./find_files.sh /home/lusin/workspace/a f l
+  477  wq
+  478  vim find_files1.sh 
+  479  ./find_files.sh /home/lusin/workspace/a f l
+  480  vim find_files1.sh 
+  481  ./find_files.sh /home/lusin/workspace/a f l
+  482  vim find_files1.sh 
+  483  ls -la
+  484  chmod +wx find_files1.sh 
+  485  rm .find_files1.sh.swp 
+  486  vim find_files1.sh 
+  487  ./find_files.sh /home/lusin/workspace/a f l
+  488  ./find_files1.sh /home/lusin/workspace/a f l
+  489  vim find_files1.sh 
+  490  ./find_files1.sh /home/lusin/workspace/a f l
+  491  vim find_files1.sh 
+  492  ./find_files1.sh /home/lusin/workspace/a f l
+  493  vim find_files1.sh 
+  494  ./find_files1.sh
+  495  vim find_files1.sh 
+  496  ./find_files1.sh
+  497  vim find_files1.sh 
+  498  ./find_files1.sh
+  499  dirname 
+  500  dirname a/
+  501  basname a/
+  502  basename a/
+  503  vim find_files1.sh 
+  504  ./find_files1.sh 
+  505  realpath a/
+  506  realpath Lfile
+  507  vim find_files1.sh 
+  508  ./find_files1.sh /home/lusin/workspace/a f l
+  509  ls
+  510  cd newfolderpath
+  511  ls
+  512  vim find_files1.sh 
+  513  cd ..
+  514  vim find_files1.sh 
+  515  find a
+  516  find Lfile
+  517  cd ..
+  518  find Lfile
+  519  realpath Lfile
+  520  cd workspace/
+  521  realpath Lfile
+  522  find -name Lfile
+  523  find -name a
+  524  find -name Lfile
+  525  find -depth Lfile
+  526  find ~ -depth Lfile
+  527  find -depth -name Lfile
+  528  find -depth -name a
+  529  find -depth -type d a
+  530  find -depth -type d Lfile
+  531  find ~ -depth -type d Lfile
+  532  find -type d Lfile
+  533  find / -type d -name Lfile
+  534  цршср Дашду
+  535  which Lfile
+  536  find / -type d -name 
+  537  find / -type d -name workspace
+  538  find / -type d -name "workspace"
+  539  find / -type d -name "Lfile"
+  540  find . -type d -name "Lfile"
+  541  find / -type d -iname "Lfile"
+  542  find -type d -iname "Lfile"
+  543  find / -type d -name "Lfile" -ls
+  544  ls
+  545  find / -type d -name "Lfile"
+  546  find ~ -type d -name "a" 
+  547  find ~ -type d -name "Lfile" 
+  548  vim find_files1.sh 
+  549  chmod +wx find_files1.sh 
+  550  vim find_files1.sh 
+  551  ./find_files1.sh /home/lusin/workspace/a f l
+  552  vim find_files1.sh 
+  553  ./find_files1.sh /home/lusin/workspace/a f l
+  554  vim find_files1.sh 
+  555  ./find_files1.sh /home/lusin/workspace/a f l
+  556  cd a
+  557  ls
+  558  cd f_paths
+  559  cat f_paths
+  560  ./find_files1.sh /home/lusin/workspace/a f l
+  561  cd ..
+  562  ./find_files1.sh /home/lusin/workspace/a f l
+  563  cd ..
+  564  cd Lfile
+  565  ls
+  566  ./find_files1.sh /home/lusin/workspace/a f l
+  567  cd ..
+  568  cd workspace/
+  569  ./find_files1.sh /home/lusin/workspace/a f l
+  570  cd a
+  571  cd b
+  572  ls
+  573  cd ..
+  574  ./find_files1.sh /home/lusin/workspace/a f l
+  575  cd ..
+  576  ls
+  577  cd Lfile
+  578  ls
+  579  vim find_files1.sh 
+  580  cd ..
+  581  cd workspace
+  582  vim find_files1.sh 
+  583  ./find_files1.sh /home/lusin/workspace/a f l
+  584  ls
+  585  vim find_files1.sh 
+  586  ./find_files1.sh /home/lusin/workspace/a f l
+  587  cd ..
+  588  cd Lfile
+  589  ls
+  590  cat f_paths
+  591  cd ..
+  592  cd workspace/
+  593  ./find_files1.sh /home/lusin/workspace/a f l
+  594  cd ..
+  595  cd Lfile/
+  596  ls
+  597  rm *_paths
+  598  cd ../workspace/
+  599  ./find_files1.sh /home/lusin/workspace/a f l D
+  600  ./find_files1.sh /home/lusin/workspace/a f l d
+  601  ls
+  602  cd AFile/
+  603  ls
+  604  cd ../
+  605  ./find_files1.sh /home/lusin/workspace/a f l d
+  606  ls ../Lfile/
+  607  ./find_files1.sh /home/lusin/workspace/a f l d
+  608  ls
+  609  rm *_paths
+  610  ls
+  611  ./find_files1.sh /home/lusin/workspace/a f l d
+  612  ls
+  613  ./find_files1.sh /home/lusin/workspace/a f l d
+  614  vim find_files1.sh
+  615  cd .
+  616  cd /
+  617  ls
+  618  cl
+  619  vim find_files1.sh
+  620  cd
+  621  cd workspace/
+  622  vim find_files1.sh
+  623  ./find_files1.sh /home/lusin/workspace/a f l d
+  624  ls
+  625  vim find_files1.sh
+  626  ./find_files1.sh /home/lusin/workspace/a f l d
+  627  history
+  628  ./find_files1.sh /home/lusin/workspace/a f l d
+  629  cd /
+  630  ls
+  631  cd bin
+  632  ls
+  633  cd
+  634  cd workspace
+  635  vim find_files1.sh
+  636  ls
+  637  ls -la
+  638  rm .find_files1.sh.swp 
+  639  vim find_files
+  640  vim find_files1.sh 
+  641  ls
+  642  rm verification_function
+  643  rm verification_funcion
+  644  vim verification_functions
+  645  vim find_files1.sh 
+  646  vim main_find_files1.sh 
+  647  ls
+  648  vim main_find_files1.sh 
+  649  vim main_find_files1.sh
+  650  vim main_find_files1
+  651  vim verification_functions 
+  652  ls
+  653  vim main_find_files1
+  654  clear
+  655  cl
+  656  cd ..
+  657  sudo apt-get install svn
+  658  svn
+  659  sudo apt-get install subversion
+  660  svn
+  661  svn help
+  662  svn checkout https://yoursite.ru/svn/project/
+  663  svn up
+  664  cl
+  665  svn checkout file:/
+  666  cl
+  667  echo $SVN_EDITOR
+  668  cl
+  669  mkdir filesvn
+  670  cd filesvn/
+  671  svnadmin create filesvn
+  672  ls
+  673  cd filesvn/
+  674  ls
+  675  cd conf
+  676  ls
+  677  cd //
+  678  cd
+  679  svn
+  680  cd filesvn/
+  681  svn
+  682  svn --help
+  683  svn help
+  684  svn helpcl
+  685  cl
+  686  svn helpcl
+  687  svn help
+  688  ршыещкн
+  689  history
+  690  svn info
+  691  cd ..
+  692  svn info
+  693  cd workspace
+  694  ls
+  695  vim main_find_files1 
+  696  ./main_find_files1 /home/lusin/workspace/a f l
+  697  chmod +x main_find_files1 
+  698  ./main_find_files1 /home/lusin/workspace/a f l
+  699  vim main_find_files1 
+  700  vim verification_functions 
+  701  vim main_find_files1 
+  702  ./main_find_files1 /home/lusin/workspace/a f l
+  703  vim main_find_files1 
+  704  ./main_find_files1 /home/lusin/workspace/a f l
+  705  vim main_find_files1 
+  706  ./main_find_files1 /home/lusin/workspace/a f l
+  707  vim main_find_files1 
+  708  ./main_find_files1 /home/lusin/workspace/a f l
+  709  ls
+  710  vim main_find_files1 
+  711  ./main_find_files1 /home/lusin/workspace/a f l
+  712  ls
+  713  cd b
+  714  ls
+  715  cd ../
+  716  vim main_find_files1 
+  717  cd ../
+  718  cd workspace/
+  719  ./main_find_files1 /home/lusin/workspace/a f l
+  720  vim main_find_files1 
+  721  ls
+  722  firefox&
+  723  cd
+  724  firefox
+  725  bg
+  726  fg
+  727  jobs
+  728  bg
+  729  CD /
+  730  cd /
+  731  ls
+  732  sudo shutdown -P
+  733  sudo shutdown -c
+  734  Q
+  735  exit
+  736  sudo apt-get install git
+  737  git clone htts://github.com/SergeyVasilyan/TestingRepo.git
+  738  git clone https://github.com/SergeyVasilyan/TestingRepo.git
+  739  ls
+  740  mkdir moon
+  741  cd moon/
+  742  git clone https://github.com/SergeyVasilyan/TestingRepo.git
+  743  ls
+  744  cd ..
+  745  rmdir TestingRepo/
+  746  cd moon/
+  747  ls
+  748  git status
+  749  cd TestingRepo/
+  750  LS
+  751  ls
+  752  cat a.sh
+  753  cat helo.sh
+  754  git status
+  755  git checkout -b lusin
+  756  git status
+  757  git log
+  758  ls
+  759  touch  ll
+  760  git status
+  761  git add ll
+  762  git status
+  763  git checkout master
+  764  git status
+  765  git checkout lusin
+  766  git status
+  767  git commit
+  768  git log
+  769  git commit -m "Add a ll"
+  770  git config --global
+  771  git commit -m "Add a ll"
+  772  git config --global user.name
+  773  git config --global user.name "Lusin"
+  774  git commit -m "Add a ll"
+  775  firefox
+  776  git config --global
+  777  git config --global user.name 
+  778  git config --global 
+  779  git config --global name.email "lusin@example.com
+  780  git config --global name.email "lusin@example.com"
+  781  git commit -m "Add a ll"
+  782  cl
+  783  git commit -m "Add a ll"
+  784  firefox$
+  785  firefox&
+  786  cd
+  787  ls
+  788  cd workspace/moon/TestingRepo/
+  789  ls
+  790  git status
+  791  git commit -m "Added the ll file"
+  792  cd /
+  793  ls
+  794  cd etc
+  795  ls
+  796  cd gitconfig
+  797  ls
+  798  cd git\
+  799  cd git
+  800  git config --global user.name "LusineManukyan"
+  801  exit
+  802  man git
+  803  ды
+  804  ls
+  805  cd TestingRepo/
+  806  ls
+  807  cd ..
+  808  cd moon
+  809  cd TestingRepo/
+  810  LS
+  811  ls
+  812  git branch
+  813  git rm aaa
+  814  git status
+  815  ls
+  816  rm newl
+  817  git status
+  818  git add newl
+  819  git status
+  820  git commit -m "delete newl"
+  821  git push
+  822  git status
+  823  ls
+  824  fit branch -b
+  825  fit branch 
+  826  git branch -b
+  827  cl
+  828  git branch 
+  829  git add newlhistory
+  830  history
+  831  cl
+  832  git branch -a
+  833  git merge hasmiks_homework
+  834  git merge origin/hasmiks_homework
+  835  git status
+  836  git log
+  837  git status
+  838  ls
+  839* 
+  840  ls
+  841  git status
+  842  git push
+  843  git branch
+  844  git push
+  845  ls
+  846  gi tlog
+  847  git log
+  848  ld
+  849  ls
+  850  git list
+  851  git trre
+  852  git tree
+  853  man git
+  854  git ls-tree -r master --name-only
+  855  git status
+  856  git branch -a
+  857  git checkout lusin
+  858  git ls-tree -r lusin --name-only
+  859  git ls-tree -r hasmik --name-only
+  860  git ls-tree -r hasmik_homework --name-only
+  861  git ls-tree -r hasmiks_homework --name-only
+  862  git ls-tree -r origin/hasmiks_homework --name-only
+  863  git log --stat
+  864  clear
+  865  git ls-tree -r origin/hasmiks_homework
+  866  man git
+  867  history
+  868  cd ..
+  869  mkdir moon1
+  870  cd moon1
+  871  git clone https://github.com/SergeyVasilyan/TestingRepo.git
+  872  ls
+  873  cd TestingRepo/
+  874  ls
+  875  vim helo.sh
+  876  git status
+  877  git add helo.sh 
+  878  git status
+  879  git commit -m "change helo.sh"
+  880  ls
+  881  git status
+  882  git push
+  883  ls
+  884  git status
+  885  git log
+  886  cd ../../
+  887  cd moon
+  888  cd TestingRepo/
+  889  ls
+  890  git checkout master
+  891  git branch
+  892  ls
+  893  vim helo.sh
+  894  git status
+  895  git add helo.sh
+  896  git status
+  897  git commit -m "change helo.sh"
+  898  git push
+  899  git pull
+  900  git push
+  901  ls
+  902  vim helo.sh
+  903  git push
+  904  git add helo.sh
+  905  git commit -m "change helo.sh"
+  906  git push
+  907  git log
+  908  vim helo.sh
+  909  cd ../../
+  910  cd moon1
+  911  cd TestingRepo/
+  912  ls
+  913  vim helo.sh
+  914  git pull
+  915  vim helo.sh
+  916  man git
+  917  history
+  918  pwd
+  919  git conglig -l
+  920  git conflig -l
+  921  git config -l
+  922  vim helo.sh
+  923  git diff
+  924  git diff >>a
+  925  ls
+  926  git reset helo.sh
+  927  git diff
+  928* git reset 
+  929  git diff
+  930  man git
+  931  git checkout -- helo.sh
+  932  git diff
+  933  git status
+  934  vim helo.sh
+  935  git diff
+  936  git checkout -- helo.sh
+  937  git diff
+  938  vim helo.sh
+  939  touch statusfile
+  940  ls
+  941  git status
+  942  git add statusfile 
+  943  git status
+  944  git commit -m "added a file"
+  945  git status
+  946  git add a
+  947  git status
+  948  git push
+  949  git add statusfile
+  950  git status
+  951  git push
+  952  git status
+  953  git reset HEAD a
+  954  git status
+  955  git status -s
+  956  git add a
+  957  git status -s
+  958  git commit -m "added a file"
+  959  git status -s
+  960  git add *
+  961  git status -s
+  962  git status 
+  963  git reset HEAD * 
+  964  git status 
+  965  git reset HEAD * a
+  966  git status 
+  967  touch aaaa
+  968  git add aaaa
+  969  git diff --staged
+  970  git diff --cached
+  971  ls
+  972  vim a
+  973  git status
+  974  git add a
+  975  git status
+  976  git commit -m "change a file"
+  977  git push
+  978  ls
+  979  cd ../../
+  980  cd moon/TestingRepo/
+  981  ls
+  982  git branch 
+  983  git branch -b lusin
+  984  git checkout -b lusin
+  985  ls
+  986  cd ../../
+  987  cd moon1/TestingRepo/
+  988  ls
+  989  cat a
+  990  git status
+  991  git diff --staged
+  992  touch ssss
+  993  git add ssss
+  994  git diff --staged
+  995  touch jj
+  996  git add jj
+  997  git diff --staged
+  998  ls
+  999  vim helo.sh
+ 1000  git diff --staged
+ 1001  git add helo.sh
+ 1002  git diff --staged
+ 1003  cd ../../
+ 1004  cd moon/TestingRepo/
+ 1005  ls
+ 1006  vim a.sh
+ 1007  git diff
+ 1008  git diff >> changea
+ 1009  ls
+ 1010  cd ../..
+ 1011  cd moon1/TestingRepo/
+ 1012  git pull
+ 1013  ls
+ 1014  mv /home/lusin/workspace/moon/TestingRepo/changea /home/lusin/workspace/moon1/TestingRepo/
+ 1015  ls
+ 1016  cat changea 
+ 1017  git apply changea
+ 1018  ls
+ 1019  git diff
+ 1020  git log
+ 1021  git checkout 95448e44c36d7e2a4dd1b35491cba2357c5d7763
+ 1022  ls
+ 1023  git pull
+ 1024  git checkout master
+ 1025  git branch -a
+ 1026  git checkout branch1
+ 1027  ls
+ 1028  git log
+ 1029  history
+ 1030  history >> historyfile
