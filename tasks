@@ -1,4 +1,4 @@
-1. Add checks, one for dir existence.
+1. Add checks, one for dfffffir existence.
 2. Create script which outputs numbers from 0 to 10 by using for loop.
 3. Create script which created 'test_files' dir and puts in it 10 files with
    names 0.a, 1.a, ..., 9.a and by ONE command 'chmod' give them 644 permission.
