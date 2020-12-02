@@ -1,15 +1,22 @@
 #!/usr/bin/python3
 import sys
-if len(sys.argv)==5:
+
+def compare_strings(string1, string2):
+	if string1 == string2:
+		print("Strings are equal")
+	else:
+		print("The strings are different")
+
+def actions_with_numbers(num1,num2):
 	try:
-		number1=int(sys.argv[1])
-		number2=int(sys.argv[2])
+		number1=int(num1)
+		number2=int(num2)
 		if number1==number2 :
-			print("1-st and 2-d arguments are equal")
+			print("1-st and 2-nd arguments are equal")
 		elif number1<number2 :
-			print("1-st argument lesser than 2-d")
-		else :
-			print("1-st greater than 2-d")
+			print("1-st argument lesser than 2-nd")
+		else:
+			print("1-st greater than 2-nd")
 		summ=number1+number2
 		mul=number1*number2
 		power=number1**number2
@@ -21,20 +28,26 @@ if len(sys.argv)==5:
 		except:
 			print("Division on 0,NO NO NO!")
 	except:
-		print("Can't cast to int") 
-	string1=sys.argv[3]
-	string2=sys.argv[4]
-	if string1 == string2:
-		print("Strings are equal")
-	else:
-		print("The strings are different")
+			print("Can't cast to int") 
+
+def actions_with_strings(string1,string2):
 	if len(string1) == len(string2):
 		print("The length of strings are equal")
 	elif len(string1) > len(string2):
 		print("First string is longer then second")
-	else :
+	else:
 		print("Second string is longer than first")
 	print("First string in uppercase are: "+string1.upper())
 	print("Second string in lowercase are: "+string2.lower())
-else :
-	print("Invalid argument count")
+	
+def main(args):
+	if len(args)==5:
+		actions_with_numbers(args[1],args[2])
+		string1=args[3]
+		string2=args[4]
+		compare_strings(string1,string2)
+		actions_with_strings(string1,string2)
+	else:
+		print("Invalid argument count")
+
+main(sys.argv)
