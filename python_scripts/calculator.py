@@ -1,75 +1,92 @@
 #! /usr/bin/python3
-def sum(arg1,arg2):
-    return arg1 + arg2
 
-def subtract(arg1,arg2):
-    return arg1 - arg2
+# I do not see the descriptions of any functions.
+def add(number_one, number_two):
+    return number_one + number_two
 
-def division(arg1,arg2):
+# Bla bla bla
+def subtract(number_one, number_two):
+    return number_one - number_two
+
+# Bla bla bla
+def divide(number_one, number_two):
     try:
-        div=arg1/arg2
-        return div
+        result = number_one / number_two
+        return result
     except ZeroDivisionError:
         print("Cannot divide by zero!")
 
-def mult(arg1,arg2):
-    return arg1 * arg2
+# Bla bla bla
+def multiply(number_one, number_two):
+    return number_one * number_two
 
-def factorial(n): 
-   if n == 1:
-    return n
+# Bla bla bla
+def factorial(number): 
+   if number == 1: # What if number == 0 or number < 0?
+    return number
    else:
-    return n*factorial(n-1)
+    return number * factorial(number - 1)
 
-def check_int(number):
+# Bla bla bla
+def check_number_is_integer(number):
         return int(number) == float(number)
-def arithmetic_operations(num1,num2,sign):
-    if sign == '+':
-       if check_int(sum(num1,num2))== True:
-           print("The result of the action: {}".format(int(sum(num1,num2))))
-       else:
-           print("The result of the action: {}".format(sum(num1,num2)))
 
-    elif sign == '-':
-        if check_int(subtract(num1,num2)) == True:
-            print("The result of the action: {}".format(int(subtract(num1,num2))))
-
+# Bla bla bla 
+def arithmetic_operations(number_one, number_two, operator):
+    if operator == '+':
+       if check_number_is_integer(add(number_one, number_two)) == True: # What is the purpose of checking the result is integer or not????
+#                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^ 
+           print("The result of the action: {}".format(int(add(number_one, number_two))))
+       else:                                          #^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           print("The result of the action: {}".format(add(number_one, number_two)))
+#                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    elif operator == '-':
+        if check_number_is_integer(subtract(number_one, number_two)) == True:
+#                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            print("The result of the action: {}".format(int(subtract(number_one, number_two))))
+#                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         else:
-            print("The result of the action: {}".format(sum(num1,num2)))
-
-    elif sign == '*':
-        if check_int(mult(num1,num2)) == True:
-            print("The result of the action: {}".format(int(mult(num1,num2))))
+            print("The result of the action: {}".format(add(number_one, number_two))) # Why we summing number instead of subtracting????
+#                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    elif operator == '*':
+        if check_number_is_integer(multiply(number_one, number_two)) == True:
+#                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            print("The result of the action: {}".format(int(multiply(number_one, number_two))))
+#                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
         else:
-            print("The result of the action: {}".format(mult(num1,num2)))
+            print("The result of the action: {}".format(multiply(number_one, number_two)))
+#                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     else:
-       if check_int(division(num1,num2)) == True:
-           print("The result of the action: {}".format(int(divisin(num1,num2))))
+       if check_number_is_integer(divide(number_one, number_two)) == True:
+#                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           print("The result of the action: {}".format(int(divide(number_one, number_two))))
+#                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
        else:
-           print("The result of the action: {}".format(division(num1,num2)))
+           print("The result of the action: {}".format(divide(number_one, number_two)))
+#                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+# Bla bla bla
 def main():
     list=['+','-','/','!','*']
     try:
-        num1 = float(input("Enter the first number: "))
-        sign = input("Enter sign of action: ")
-        while list.count(sign) == 0:
-            print("Sorry,but there is no operation for this sign,choose from these('+','-','/','!','*')")
-            sign=input("Enter sign of action:  ")
-        if sign == '!' :
-            if int(num1) == 0:
-                print("The result of the action: 1")
-                return
-            elif int(num1) < 0:
-                print("Sorry, factorial does not exist for negative numbers")
-                return
+        number_one = float(input("Enter the first number: "))
+        operator = input("Enter the operator: ")
+        while list.count(operator) == 0: # Actually it works, but i don't like the logic. RE-IMPLEMENT!!!
+            print("Invalid operator is given\nChoose from ('+','-','/','!','*')")
+            operator = input("Enter the operator: ")
+        if operator == '!' :
+            if int(number_one) == 0:
+                print("The result of the action: 1") # ????????????  Is not this be the result of the function ???????????
+                return # <----- Change to 'break' statement.
+            elif int(number_one) < 0:
+                print("Error: negative number is given for factorial calculation.")
+                return # <----- This too.
             else:
-                factorial(int(num1))
-                print("The result of the action: {}".format(int(factorial(num1))))
-                return
-
-        num2 = float(input("Enter the second number: "))
-        arithmetic_operations(num1,num2,sign)
+                factorial(int(number_one)) # What is the purpose of this call??????
+                print("Result: {}".format(int(factorial(number_one))))
+                return # <----- aaaaand this too. :)
+        number_two = float(input("Enter the second number: "))
+        arithmetic_operations(number_one, number_two, operator)
     except:
-        print("Invalid type") 
+        print("Invalid operator.") 
 main()
