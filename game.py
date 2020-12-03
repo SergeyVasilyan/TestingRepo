@@ -2,35 +2,38 @@
 import random
 
 def game(randNum,head,tail,helper):
-	while True:
-		ourNum=input("Please enter number from {}-{} \n" .format(head,tail))
-		if ourNum=="exit":
-			return
-		elif ourNum=="help":
-			print(helper)
-			continue
-		else:
-			try:
-				ourNum=int(ourNum)
-				if ourNum<100 and ourNum>999:
-					print("Please enter number from {}-{}" .format(head,tail))
-					continue
-				if ourNum==randNum:
-					print("Congratulations You guess the magic number! The number is {}" .format(ourNum))
-					break
-				elif ourNum<head or ourNum>tail:
-					print("Magic number is in {}-{} range!" .format(head,tail))
-					continue
-				elif ourNum<randNum:
-					head=ourNum
-					print("Magic number is in {}-{} range!" .format(head,tail))
-					continue
-				else:
-					tail=ourNum
-					print("Magic number is in {}-{} range!" .format(head,tail))
-					continue
-			except:
-				print("Please enter integer from 100-999 range")
+	try:
+		while True:
+			ourNum=input("Please enter number from {}-{} \n" .format(head,tail))
+			if ourNum=="exit":
+				return
+			elif ourNum=="help":
+				print(helper)
+				continue
+			else:
+				try:
+					ourNum=int(ourNum)
+					if ourNum<100 and ourNum>999:
+						print("Please enter number from {}-{}" .format(head,tail))
+						continue
+					if ourNum==randNum:
+						print("Congratulations You guess the magic number! The number is {}" .format(ourNum))
+						break
+					elif ourNum<head or ourNum>tail:
+						print("Magic number is in {}-{} range!" .format(head,tail))
+						continue
+					elif ourNum<randNum:
+						head=ourNum
+						print("Magic number is in {}-{} range!" .format(head,tail))
+						continue
+					else:
+						tail=ourNum
+						print("Magic number is in {}-{} range!" .format(head,tail))
+						continue
+				except:
+					print("Invalid type error!Make your chose from 100-999 range")
+	except KeyboardInterrupt:
+		print("\n Game was closed")
 
 def main():
 	randNum=random.randrange(100,1000)
@@ -39,6 +42,7 @@ def main():
 	helper="""
 Hello dear friend!
 For playing this game please enter number from 100 to 999.
-Your aim is to guess the magic number which our program is keep in mind"""
+Your aim is to guess the magic number which our program is keep in mind.
+For closing game enter exit or Ctrl+C."""
 	game(randNum,head,tail,helper)
 main()
