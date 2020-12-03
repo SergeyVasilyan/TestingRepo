@@ -7,10 +7,7 @@ def compare_strings(string1, string2):
 	else:
 		print("The strings are different")
 
-def actions_with_numbers(num1,num2):
-	try:
-		number1=int(num1)
-		number2=int(num2)
+def actions_with_numbers(number1,number2):
 		if number1==number2 :
 			print("1-st and 2-nd arguments are equal")
 		elif number1<number2 :
@@ -27,8 +24,6 @@ def actions_with_numbers(num1,num2):
 			print("Division is "+str(div))	
 		except:
 			print("Division on 0,NO NO NO!")
-	except:
-			print("Can't cast to int") 
 
 def actions_with_strings(string1,string2):
 	if len(string1) == len(string2):
@@ -40,14 +35,21 @@ def actions_with_strings(string1,string2):
 	print("First string in uppercase are: "+string1.upper())
 	print("Second string in lowercase are: "+string2.lower())
 	
-def main(args):
-	if len(args)==5:
-		actions_with_numbers(args[1],args[2])
-		string1=args[3]
-		string2=args[4]
-		compare_strings(string1,string2)
-		actions_with_strings(string1,string2)
-	else:
-		print("Invalid argument count")
+def main():	
+	while True:
+		try:
+			number1=input("Enter first integer ")
+			number2=input("Enter second integer ")
+			number1=int(number1)
+			number2=int(number2)
+		except:
+			print("Please enter only numbers!")
+			continue
+		break
+	actions_with_numbers(number1,number2)
+	string1=input("Enter first string ")
+	string2=input("Enter second string ")
+	compare_strings(string1,string2)
+	actions_with_strings(string1,string2)
 
-main(sys.argv)
+main()
