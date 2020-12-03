@@ -1,82 +1,91 @@
 #!/usr/bin/python3
 
-def adding(arg1,arg2):
-    summ=arg1+arg2
-    print("{} + {} = {}" .format(arg1,arg2,summ))
+# Where is the comments, descriptions???
+def add(number_one, number_two):
+    result = number_one + number_two
+    print("{} + {} = {}" .format(number_one, number_two, result))
 
-def difference(arg1,arg2):
-    diff=arg1-arg2
-    print("{} - {} = {}" .format(arg1,arg2,dif))
+# la bla bla
+def substract(number_one, number_two):
+    result = number_one - number_two
+    print("{} - {} = {}" .format(number_one, number_two, result))
 
-def mul(arg1,arg2):
-    mul=arg1*arg2
-    print("{} * {} = {}" .format(arg1,arg2,mul))
+# la bla bla
+def multiply(number_one, number_two):
+    result = number_one * number_two
+    print("{} * {} = {}" .format(number_one, number_two, result))
 
-def division(arg1,arg2):
+# la bla bla
+def divide(number_one, number_two):
     try:
-        arg1=float(arg1)
-        arg2=float(arg2)
-        div=arg1/arg2
-        print("{} / {} = {}" .format(arg1,arg2,div))
+        number_one = float(number_one)  # <------ does not get it why
+        number_two = float(number_two)  # <------ this one too
+        result = number_one / number_two
+        print("{} / {} = {}" .format(number_one , number_two, result))
     except ZeroDivisionError:
-        print("Invalid action! Division on ZERO!")
+        print("Can not dive by zero.")
 
-def power(arg1,arg2):
-    power=arg1**arg2
-    print("{} ** {} = {}" .format(arg1,arg2,power))
+# la bla bla
+def power(number_one, number_two):
+    result = number_one ** number_two
+    print("{} ** {} = {}" .format(number_one, number_two, result))
 
-def modd(arg1,arg2):
-    mod=arg1%arg2
-    print("{} % {} = {}" .format(arg1,arg2,mod))
+# la bla bla
+def mod(number_one, number_two):
+    result = number_one % number_two
+    print("{} % {} = {}" .format(number_one, number_two, result))
 
-def factor(arg1):
-    if arg1==0 or arg1==1:
+# la bla bla
+def factorial(number):
+    if number == 0 or number == 1: # If i pass negative number, what should be the behavior of the application?
         return 1
-    fact=arg1*factor(arg1-1)
-    return fact
+    result = number * factorial(number - 1)
+    print("{}!" .format(result))
+    return result
 
-def factorial(arg1):
-    fact=factor(arg1)
-    print("{}!" .format(fact))
+# WTH IS THIS FOR??????
+#def factorial(arg1):
+#    fact=factor(arg1)
+#    print("{}!" .format(fact))
 
-def choose_func(arg1,arg2,action):
-    if action=="+":
-        adding(arg1,arg2)
-    elif action=="-":
-        difference(arg1,arg2)
-    elif action=="*":
-        mul(arg1,arg2)
-    elif action=="**":
-        power(arg1,arg2)
-    elif action=="/":
-        division(arg1,arg2)
+# la bla bla
+def operation(numebr_one, number_two, operator):
+    if operator == "+":
+        add(number_one, number_two)
+    elif operator == "-":
+        substract(number_one, number_two)
+    elif operator == "*":
+        multiply(number_one, number_two)
+    elif operator == "**":
+        power(number_one, number_two)
+    elif operator == "/":
+        divide(number_one, number_two)
     else:
-        modd(arg1,arg2)
+        mod(number_one, number_two)
 
+# Bla bla bla
 def main():
-    while True:
-        actions=["+", "-", "*", "/", "**", "%"]
+    while True: # When application should exit this gorgeous while loop?
+        operators=["+", "-", "*", "/", "**", "%"]
         try:
-            num1=input("Enter first number: ")
-            num1=float(num1)
-            action=input("Input action: ")
-            if action=="!" and num1==int(num1):
-                factorial(num1)
+            number_one = float(input("Enter first number: "))
+            operator = input("Input action: ")
+            if action == "!" and number_one == int(number_two): 
+                factorial(number_one)
                 continue
             else:
-                print("Invalid type error")
+                print("Error: float is given.") 
                 continue
-            num2=input("Enter second number: ")
-            num2=float(num2)
-            if num1==int(num1) and num2==int(num2) :
-                num1=int(num1)
-                num2=int(num2)
-            if action in actions:
-                choose_func(num1,num2,action)
+            number_two = float(input("Enter second number: "))
+            if number_one == int(number_two) and number_two == int(number_two) :
+                number_one = int(number_one)
+                number_two = int(number_two)
+            if operator in operators:
+                operation(number_one, number_two, operator)
             else:
-               print("Invalid action")
+               print("Invalid operator entered.")
                continue
         except:
-            print("Enter integer or float numbers")
+            print("Enter: Non number is given.")
             continue
 main()
