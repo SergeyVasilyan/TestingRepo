@@ -1,57 +1,62 @@
 #!/usr/bin/python3
 
-def adding(arg1,arg2):
-    summ=arg1+arg2
-    print("{} + {} = {}" .format(arg1,arg2,summ))
+# This function add two numbers and print result.
+def add(number_one, number_two):
+    result=number_one+number_two
+    print("{} + {} = {}" .format(number_one, number_two, result))
 
-def difference(arg1,arg2):
-    diff=arg1-arg2
-    print("{} - {} = {}" .format(arg1,arg2,dif))
+# This function subtract two numbers and print result.
+def substract(number_one, number_two):
+    result=number_one-number_two
+    print("{} - {} = {}" .format(number_one, number_two, result))
 
-def mul(arg1,arg2):
-    mul=arg1*arg2
-    print("{} * {} = {}" .format(arg1,arg2,mul))
+# This function multiply two numbers and print result.
+def multiply(number_one, number_two):
+    result=number_one*number_two
+    print("{} * {} = {}" .format(number_one, number_two, result))
 
-def division(arg1,arg2):
+# This function divide two numbers and print result.
+def divide(number_one, number_two):
     try:
-        arg1=float(arg1)
-        arg2=float(arg2)
-        div=arg1/arg2
-        print("{} / {} = {}" .format(arg1,arg2,div))
+        result=number_one/number_two
+        print("{} / {} = {}" .format(number_one , number_two, result))
     except ZeroDivisionError:
-        print("Invalid action! Division on ZERO!")
+        print("Can not divide by zero.")
 
-def power(arg1,arg2):
-    power=arg1**arg2
-    print("{} ** {} = {}" .format(arg1,arg2,power))
+# This function is calculate first number in second number degree and print result.
+def power(number_one, number_two):
+    result=number_one**number_two
+    print("{} ** {} = {}" .format(number_one, number_two, result))
 
-def modd(arg1,arg2):
-    mod=arg1%arg2
-    print("{} % {} = {}" .format(arg1,arg2,mod))
+# This function is calculate residue of division numbers and print result.
+def mod(number_one, number_two):
+    result=number_one%number_two
+    print("{} % {} = {}" .format(number_one, number_two, result))
 
-def factor(arg1):
-    if arg1==0 or arg1==1:
+# This function is calculate factorial of given number and print result.
+def factorial(number):
+    if number==0 or number==1:
         return 1
-    fact=arg1*factor(arg1-1)
-    return fact
+    result = number*factorial(number-1)
+    print("{}! = {}" .format(number,result))
+    return result
 
-def factorial(arg1):
-    fact=factor(arg1)
-    print("{}!" .format(fact))
-
-def choose_func(arg1,arg2,action):
-    if action=="+":
-        adding(arg1,arg2)
-    elif action=="-":
-        difference(arg1,arg2)
-    elif action=="*":
-        mul(arg1,arg2)
-    elif action=="**":
-        power(arg1,arg2)
-    elif action=="/":
-        division(arg1,arg2)
+# This function is choose which operation function is call
+def operation(number_one, number_two, operator):
+    if operator=="+":
+        add(number_one, number_two)
+    elif operator=="-":
+        substract(number_one, number_two)
+    elif operator=="*":
+        multiply(number_one, number_two)
+    elif operator=="**":
+        power(number_one, number_two)
+    elif operator=="/":
+        divide(number_one, number_two)
     else:
-        modd(arg1,arg2)
+        mod(number_one,number_two)
+
+#This function is print how to use this program.
 def helper():
     print("""
             *******************************************************
@@ -63,31 +68,43 @@ def helper():
             *******************************************************
            """)
 
+
+# This is main function which organize steps of program.
 def main():
-    try:
         while True:
-            actions=["+", "-", "*", "/", "**", "%"]
+            operators=["+", "-", "*", "/", "**", "%"]
             try:
-                num1=input("Enter first number: ")
-                num1=float(num1)
-                action=input("Input action: ")
-                if action=="!" and num1==int(num1):
-                    factorial(num1)
+                number_one=input("Enter first number: ")
+                if number_one=="exit":
+                    return
+                number_one=float(number_one)
+                operator=input("Input operation: ")
+                if operator=="exit":
+                    return
+                if operator=="!" and number_one==int(number_one) and number_one>=0:
+                    number_one=int(number_one)
+                    factorial(number_one)
                     continue
-                num2=input("Enter second number: ")
-                num2=float(num2)
-                if num1==int(num1) and num2==int(num2) :
-                    num1=int(num1)
-                    num2=int(num2)
-                if action in actions:
-                    choose_func(num1,num2,action)
+                elif operator=="!":
+                    print("Invalid type input for factorial!")
+                    continue
+                number_two=input("Enter second number: ")
+                if number_two=="exit":
+                    return
+                number_two=float(number_two)
+                if number_one==int(number_one) and number_two==int(number_two):
+                    number_one=int(number_one)
+                    number_two=int(number_two)
+                if operator in operators:
+                    operation(number_one,number_two,operator)
                 else:
-                   print("Invalid action")
-                   continue
+                    print("Invalid action")
+                    continue
+            except KeyboardInterrupt:
+                print("\nClosing calculator")
+                return
             except:
                 print("Enter integer or float numbers")
                 continue
-    except KeyboardInterrupt:
-        print("\nClosing calculator")
-        return   
+  
 main()
