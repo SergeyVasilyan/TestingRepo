@@ -52,31 +52,42 @@ def choose_func(arg1,arg2,action):
         division(arg1,arg2)
     else:
         modd(arg1,arg2)
+def helper():
+    print("""
+            *******************************************************
+            *  Welcome to calculator master v 0.00.0000.000.001!  *
+            *  This program calculate some actions with numbers.  *
+            *  Enter float or integer numbers only.               *
+            *  For closing this program please enter Ctrl+c or    *
+            *  exit!                                              *
+            *******************************************************
+           """)
 
 def main():
-    while True:
-        actions=["+", "-", "*", "/", "**", "%"]
-        try:
-            num1=input("Enter first number: ")
-            num1=float(num1)
-            action=input("Input action: ")
-            if action=="!" and num1==int(num1):
-                factorial(num1)
+    try:
+        while True:
+            actions=["+", "-", "*", "/", "**", "%"]
+            try:
+                num1=input("Enter first number: ")
+                num1=float(num1)
+                action=input("Input action: ")
+                if action=="!" and num1==int(num1):
+                    factorial(num1)
+                    continue
+                num2=input("Enter second number: ")
+                num2=float(num2)
+                if num1==int(num1) and num2==int(num2) :
+                    num1=int(num1)
+                    num2=int(num2)
+                if action in actions:
+                    choose_func(num1,num2,action)
+                else:
+                   print("Invalid action")
+                   continue
+            except:
+                print("Enter integer or float numbers")
                 continue
-            else:
-                print("Invalid type error")
-                continue
-            num2=input("Enter second number: ")
-            num2=float(num2)
-            if num1==int(num1) and num2==int(num2) :
-                num1=int(num1)
-                num2=int(num2)
-            if action in actions:
-                choose_func(num1,num2,action)
-            else:
-               print("Invalid action")
-               continue
-        except:
-            print("Enter integer or float numbers")
-            continue
+    except KeyboardInterrupt:
+        print("\nClosing calculator")
+        return   
 main()
