@@ -77,10 +77,16 @@ def main():
                 number_one=input("Enter first number: ")
                 if number_one=="exit":
                     return
+                elif number_one=="help":
+                    helper()
+                    continue
                 number_one=float(number_one)
                 operator=input("Input operation: ")
                 if operator=="exit":
                     return
+                elif operator=="help":
+                    helper()
+                    continue
                 if operator=="!" and number_one==int(number_one) and number_one>=0:
                     number_one=int(number_one)
                     factorial(number_one)
@@ -91,6 +97,9 @@ def main():
                 number_two=input("Enter second number: ")
                 if number_two=="exit":
                     return
+                elif number_two=="help":
+                    helper()
+                    continue
                 number_two=float(number_two)
                 if number_one==int(number_one) and number_two==int(number_two):
                     number_one=int(number_one)
