@@ -4,10 +4,10 @@
 # WRONG CONCEPT OF DICT
 # MAIN LOGIC IS RIGTH BUT WILL NOT WORK.
 
-#import class -this class has not been written yet ։)(
+import role_class
 
 users= {
-    "user": class_object
+    "user": "class_object"
        }
 
 def register():
@@ -44,18 +44,18 @@ def register():
         else:
             break
     if role == "admin":
-        users[username] = Admin(username,password,email)
+        users[username] = role_class.Admin(username,password,email)
     elif role == "employee":
-        users[username] = Employee(username,password,email)
+        users[username] = role_class.Employee(username,password,email)
     else:
-        users[username] = Guest(username,password,emai)
+        users[username] = role_class.Guest(username,password,emai)
 
 
     print("Account has been created")
 
 def login_auth(username, password):
     if username in users:
-        if password == users[username].getpassword:
+        if password == users[username].get_password:
             print("Login successful")
             return True
     return False
@@ -80,13 +80,12 @@ def login():
     else:
         print("Invalid username or password")
 
-#def in_system(username):
+def in_system(username):
 
-   # bla bla bla
-
+# blaaaaaaaaaa
 
 def main():
-    count = 1
+    count = 5
     while count != 0:
         register()
         count -= 1
@@ -94,6 +93,5 @@ def main():
         print("Sign in system")
         login()
         count += 1
-
 
 main()
