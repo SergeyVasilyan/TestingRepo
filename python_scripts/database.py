@@ -1,5 +1,9 @@
 #! /usr/bin/python3
 
+# SPLIT FUNCTION NAMES WITH '_' CHARS
+# WRONG CONCEPT OF DICT
+# MAIN LOGIC IS RIGTH BUT WILL NOT WORK.
+
 #import class -this class has not been written yet ։)(
 users= {
         "user": {
