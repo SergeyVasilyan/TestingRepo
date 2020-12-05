@@ -8,7 +8,7 @@
 
 users= {
     "user": class_object
-    }
+       }
 
 def register():
     list=["admin","employee","guest"]
@@ -43,13 +43,13 @@ def register():
             continue
         else:
             break
-    if role == admin
+    if role == "admin":
         users[username] = Admin(username,password,email)
-    elif role == employee
+    elif role == "employee":
         users[username] = Employee(username,password,email)
     else:
         users[username] = Guest(username,password,emai)
-}
+
 
     print("Account has been created")
 
@@ -80,19 +80,20 @@ def login():
     else:
         print("Invalid username or password")
 
-def in_system(username):
+#def in_system(username):
 
    # bla bla bla
 
-def main():
 
+def main():
     count = 1
     while count != 0:
         register()
         count -= 1
-        while count != 5
+    while count != 5:
         print("Sign in system")
         login()
         count += 1
+
 
 main()
