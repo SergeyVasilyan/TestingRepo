@@ -5,12 +5,9 @@
 # MAIN LOGIC IS RIGTH BUT WILL NOT WORK.
 
 #import class -this class has not been written yet ։)(
+
 users= {
-        "user": {
-            "password": "password",
-            "mail": "email",
-            "role": "role"
-        }
+    "user": class_object
     }
 
 def register():
@@ -46,18 +43,19 @@ def register():
             continue
         else:
             break
-
-    users[username] = {
-    "password": password,
-    "email": email,
-    "role": role
+    if role == admin
+        users[username] = Admin(username,password,email)
+    elif role == employee
+        users[username] = Employee(username,password,email)
+    else:
+        users[username] = Guest(username,password,emai)
 }
 
     print("Account has been created")
 
-def loginauth(username, password):
+def login_auth(username, password):
     if username in users:
-        if password == users[username]["password"]:
+        if password == users[username].getpassword:
             print("Login successful")
             return True
     return False
@@ -76,13 +74,13 @@ def login():
         else:
             break
 
-    if  loginauth(username,password):
+    if  login_auth(username,password):
         print("Welcome to your account " + username)
-        return insystem(username) #this function has not been written yet
+        return in_system(username) #this function has not been written yet
     else:
         print("Invalid username or password")
 
-def insystem(username):
+def in_system(username):
 
    # bla bla bla
 
@@ -92,9 +90,9 @@ def main():
     while count != 0:
         register()
         count -= 1
-    while count != 5
-    print("Sign in system")
-    login()
-    count += 1
+        while count != 5
+        print("Sign in system")
+        login()
+        count += 1
 
 main()
