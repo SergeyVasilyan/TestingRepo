@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# NICE, BUT WRTIE A TASK THAT YOU WERE GIVEN NOT FROM ME.
+
 class Human:
     def __init__(self,name,weight,hight,age):
         self.name=name
