@@ -7,13 +7,13 @@ class data_user:
         self.__email = email
 
     def set_name(self,name):
-        set.__name=name
+        self.__name=name
 
     def get_name(self):
         return self.__name
 
     def __set_password(self,password):
-        set.__password=password
+        self.__password=password
 
     def __get_password(self):
         return self.__password
