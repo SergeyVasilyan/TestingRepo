@@ -30,16 +30,20 @@ class Employ(ABC):
 class User(Employ):
     password=""
     #This is constructor of user class.
-    def __init__(self,name,password,email):
+    def __init__(self,name,email,password):
         self.name=name
-        self.password=password
         self.email=email
+        self.password=password
     #This function get password.
     def __get_password(self):
         return self.password
     #This function set new password.
     def __set_password(self, new_pass):
         self.password=new_pass
+    def get_salary(self):
+        pass
+    def set_salary(self):
+        pass
     #This function is change user password after checking available password!
     #Function has 3 local variables(password,new_passw and rep_passw) for checking.
     def change_acsses_info(self):
@@ -77,10 +81,20 @@ class Admin(User):
     def __set_password(self,new_password):
         self.password=new_password
 
-
+    def add_user(self,list_of_users):
+        name=input("Name: ")
+        email=input("email")
+        password=input("password")
+        new_user=User(name,email,password)
+        list_of_users[name]=email
 #This is a main function which organize our program!
 def main():
+    luser=User("popk","pnduk@yahoo.kyanq","1010botas")
     user=Admin("vazgen", "khkf@jam.com", "1234",45000)
     print(user.get_name())
     user.change_acsses_info() 
+    users_list={}
+    user.add_user(users_list)
+    for i in users_list:
+        print("User name: {} and email: {}" .format(i,users_list[i]))
 main()
