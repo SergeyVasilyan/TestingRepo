@@ -1,29 +1,39 @@
 #!/usr/bin/python3
+from abc import ABC, abstractmethod
 #Employ class
-class Employ:
+class Employ(ABC):
     name=""
-    password=""
     email=""
-    salary=0     
+    salary=0
+    #This method get name.
+    def get_name(self):
+        return self.name
+    #This method set new name.
+    def set_name(self,new_name):
+        self.name=new_name
+    #This method get available email.
+    def get_email(self):
+        return self.email
+    #This method set new email address.
+    def set_email(self,new_email):
+        self.email=new_email
+    #This method is abstract. It is get salary.
+    @abstractmethod
+    def get_salary(self):
+        pass
+    #This is abstract method. It is set new salary.
+    @abstractmethod
+    def set_salary(self,new_salary):
+        pass
+
 #User class which inherits Employ class.        
 class User(Employ):
+    password=""
     #This is constructor of user class.
     def __init__(self,name,password,email):
         self.name=name
         self.password=password
         self.email=email
-    #This function get name of user.
-    def get_name(self):
-        return self.name
-    #This function set new name.
-    def set_name(self,new_name):
-        self.name=new_name
-    #This function get available email.
-    def get_email(self):
-        return self.email
-    #This function set new email address.
-    def set_email(self,new_email):
-        self.email=new_email
     #This function get password.
     def __get_password(self):
         return self.password
@@ -53,11 +63,24 @@ class User(Employ):
 
 #Admin class which inherits User class. 
 class Admin(User):
-    pass
+    def __init__(self,name,email,password,salary):
+        self.name=name
+        self.email=email
+        self.password=password
+        self.salary=salary
+    def get_salary(self):
+        return self.salary
+    def set_salary(self,new_salary):
+        self.salary=new_salary
+    def __get_password(self):
+        return self.password
+    def __set_password(self,new_password):
+        self.password=new_password
 
 #This is a main function which organize our program!
 def main():
-    user=User("vazgen", "khkfj", "jhdh@asd.com")
+    user=Admin("vazgen", "khkfj", "jhdh@asd.com",45000)
+#    change_acsses_info()
     print(user.get_email())
 
 main()
