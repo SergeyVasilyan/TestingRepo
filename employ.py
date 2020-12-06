@@ -45,13 +45,13 @@ class User(Employ):
     def change_acsses_info(self):
         for i in range(1,4):
             password=input("Please input your password: ")
-            if password==__get_password():
+            if password==self.__get_password():
                 while True:
                     try:
                         new_passw=input("Enter new password: ")
                         rep_passw=input("Repeat your new password: ")
                         if new_passw==rep_passw:
-                            __set_password(new_passw)
+                            self.__set_password(new_passw)
                             return
                         else:
                             print("Invalid repeat of new password please try again!")
@@ -77,10 +77,10 @@ class Admin(User):
     def __set_password(self,new_password):
         self.password=new_password
 
+
 #This is a main function which organize our program!
 def main():
-    user=Admin("vazgen", "khkfj", "jhdh@asd.com",45000)
-#    change_acsses_info()
-    print(user.get_email())
-
+    user=Admin("vazgen", "khkf@jam.com", "1234",45000)
+    print(user.get_name())
+    user.change_acsses_info() 
 main()
