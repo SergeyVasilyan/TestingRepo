@@ -1,7 +1,7 @@
 #! /usr/bin/python3
 
 class data_user:
-    def __init__(self, name, password,email):
+    def __init__(self, name, password, email):
         self.__name = name
         self.__password = password
         self.__email = email
@@ -24,6 +24,7 @@ class data_user:
     def get_email(self):
         return self.__email
 
+# Make password minimum 8 chars.
     def change_password(self): #function is defective
         password = input ("Please, input your password ")
         if password == self.__get_password():
@@ -35,9 +36,11 @@ class data_user:
 class Admin(data_user):
     pass
 
+# Is not this must be the abstract one like 'data_user'?
 class Employee(Admin):
     # def __init__(self):
     # super().__init__()
     pass
+
 class Guest(Employee):
     pass
