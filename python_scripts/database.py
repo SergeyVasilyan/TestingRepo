@@ -6,11 +6,7 @@
 
 import re
 import role_class
-
-users= {
-    "user": "class_object"
-       }
-
+users=[[],[],[]]
 def register():
     regex = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
     list=["admin","employee","guest"]
@@ -43,43 +39,50 @@ def register():
         else:
             break
     if role == "admin":
-        dict[username] = role_class.Admin(username, password, email)  #I know it's wrong ,I don't understand how to keep a class object under the dictionary value
-        users.update(dict) # Is this work properly? 
+        user = role_class.Admin(username, password, email)
+        users[0].append(user)
     elif role == "employee":
-        dict[username] = role_class.Employee(username, password, email) }
-        users.update(dict)
+        user = role_class.Employee(username, password, email) }
+        users[1].append(user)
     else:
-        dict[username] = role_class.Guest(username, password, email) }
-        users.update(dict)
+        user = role_class.Guest(username, password, email) }
+        users[2].append(user)
 
     print("Account has been created")
 
-def login_auth(username, password):
-    if username in users: #Is this work?
-        if password == users[username].get_password: # Dict is not a List.
-            print("Login successful")
-            return True
-    return False
+def chenge_name_or_passwd(data_str, char):
 
+    found = False
+    if char == 'name'
+        for user in users:
+            if user.get_name() == data_str:
+                found = True
+                return False
+        if not found:
+            print("User with name {} not found".format(username))
+            print("Please,enter valid username ")
+            return True
+    else:
+        for user in users:
+            if user.get_password() == data_str:
+                found = True
+                return False
+        if not found:
+            print("Please,enter valid password ")
+            return True
 def login():
     while True:
         username = input("Username: ")
-        if not len(username) == 0: #bla bla bla + check for exitence imediately.
-            print("Username can't be blank")
-        else:
-            break
+        if not len(username) == 0:
+            if chenge_name_or_passwd(username,'name') == False
     while True:
         password = input("Password: ")
-        if not len(password) ==  0: #bla bla bla
-            print("Password can't be blank")
-        else:
-            break
+        if not len(password) ==  0:
+            if chenge_name_or_passwd(password,'psw') == False
 
-    if login_auth(username, password):
-        print("Welcome to your account {}".format(username)) # use 'format'.+
-        return in_system(username) #this function has not been written yet
-    else:
-        print("Invalid username or password")
+    print("Welcom in system")
+    return in_system(username) #this function has not been written yet
+
 
 def in_system(username):
 
@@ -90,7 +93,7 @@ def main():
     while count != 0: # You can only check for count, as when count equals to 0, it will automatically break the loop.
         register()
         count -= 1
-   while True 
+    while True 
         print("Sign in system")
         if login() == False
             break
