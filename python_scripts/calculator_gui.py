@@ -69,7 +69,5 @@ for row in range(4):
                 command=lambda row=row, col=col: click(buttons[row][col]))
         button.grid(row=row + 2, column=col, sticky="nsew")
 
-root.grid_rowconfigure(6, weight=1)
-root.grid_columnconfigure(4, weight=1)
 
 root.mainloop()
