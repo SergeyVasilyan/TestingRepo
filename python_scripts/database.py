@@ -96,10 +96,11 @@ def in_system():
                 slave = input("Enter the username of a user whose password you want to change: ")
                 slave = output_object_of_class(slave)
                 if slave != None:
-                    user.change_password(slave)
+                    if slave.get_name() == user.get_name():
+                        user.change_password()
+                    else:
+                        user.change_password(slave)
                     continue
-                elif slave.get_name() == user.get_name():
-                    user.change_password()
                 else:
                     print("User not found.\nTry again.\n")
                     continue
