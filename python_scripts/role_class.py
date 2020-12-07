@@ -12,10 +12,10 @@ class data_user:
     def get_name(self):
         return self.__name
 
-    def __set_password(self,password):
+    def set_password(self,password):
         self.__password=password
 
-    def __get_password(self):
+    def get_password(self):
         return self.__password
 
     def set_email(self,email):
@@ -24,23 +24,53 @@ class data_user:
     def get_email(self):
         return self.__email
 
-# Make password minimum 8 chars.
-    def change_password(self): #function is defective
+    def change_password(self):
+        pass
+
+class Admin(data_user):
+    def change_password(self):
         password = input ("Please, input your password ")
-        if password == self.__get_password():
-            new_password = input("Enter new password ")
-            self.__set_password(new_password)
+        if password == self.get_password():
+             new_password = input("Enter new password ")
+            if len(new_password) >= 8
+                 self.__set_password(new_password)
+            else:
+                print("Password must contain at least 8 characters ,please try again.")
+                 continue
         else:
             print ("You input wrong password.")
 
-class Admin(data_user):
-    pass
 
-# Is not this must be the abstract one like 'data_user'?
-class Employee(Admin):
-    # def __init__(self):
-    # super().__init__()
-    pass
 
-class Guest(Employee):
-    pass
+class Employee(data_user):
+
+    def change_password(self):
+        #stex piti tipi stugum katarem,bayc chgidem vonc 
+        password = input ("Please, input your password ")
+        if password == self.get_password():
+            new_password = input("Enter new password ")
+            if len(new_password) >= 8
+                 self.__set_password(new_password)
+            else:
+                print("Password must contain at least 8 characters ,please try again.")
+                continue
+        else:
+            print ("You input wrong password.")
+
+
+
+class Guest(data_user):
+    def change_password(self):
+        #stex piti tipi stugum katarem,bayc chgidem vonc 
+        password = input ("Please, input your password ")
+        if password == self.get_password():
+            new_password = input("Enter new password ")
+            if len(new_password) >= 8
+                 self.__set_password(new_password)
+            else:
+                print("Password must contain at least 8 characters ,please try again.")
+                continue
+        else:
+            print ("You input wrong password.")
+
+
