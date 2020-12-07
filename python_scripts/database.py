@@ -81,11 +81,29 @@ def login():
             if chenge_name_or_passwd(password,'psw') == False:
                 break
 
-    print("Welcom in system")
     return in_system(username) #this function has not been written yet
 
 
-#def in_system(username):
+def in_system(username):
+    print("Welcome in system {}".format(username))
+    print("Options: change password | logout.")
+    while True:
+        if option= "change password":
+            bla bla bla 
+
+
+            
+        elif option == "logout":
+              print(Logging out .) 
+            answer= input("Do any of the users what to log in?(yes)") 
+            if answer == "yes":
+                return True
+            break    
+        else:
+            print ("{} is not an option".format(option))
+            continue        
+
+
 
 
 
