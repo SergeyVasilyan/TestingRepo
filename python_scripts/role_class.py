@@ -12,7 +12,7 @@ class data_user:
     def get_name(self):
         return self.__name
 
-    def set_password(self,password):
+    def __set_password(self,password):
         self.__password=password
 
     def get_password(self):
@@ -30,27 +30,29 @@ class data_user:
 class Admin(data_user):
     def change_password(self,type): 
         while True:
-            password = input ("Please, input your password ")
-            if password == self.get_password():
-                 new_password = input("Enter new password ")
-                if len(new_password) >= 8
-                     self.__set_password(new_password)
-                     break
+            if type == Admin:
+                password = input ("Please, input your password ")
+                if password == self.get_password():
+                     new_password = input("Enter new password ")
+                    if len(new_password) >= 8
+                         self.__set_password(new_password)
+                         break
+                    else:
+                        print("Password must contain at least 8 characters ,please try again.")
+                         continue
                 else:
-                    print("Password must contain at least 8 characters ,please try again.")
-                     continue
-            else:
-                print ("You input wrong password.")
-                continue
+                    print ("You input wrong password.")
+                    continue
+             else:
+                 print ("Employee eb Guest cannot change the Admin password")       
 
 
 
 class Employee(data_user):
 
     def change_password(self,type):
-        #type-i masy chgidem chishtem arel ,te avelorda
         while True:
-            if type == employee and type ==  guest:
+            if type == "employee" and type ==  "admin":
                 password = input ("Please, input your password ")
                 if password == self.get_password():
                     new_password = input("Enter new password ")
@@ -64,7 +66,7 @@ class Employee(data_user):
                     print ("You input wrong password.")
                     continue
             else:
-                print("Employee cannot change the  Admin password!")
+                print("Guest cannot change the  Employee password!")
                 break       
 
 
@@ -72,22 +74,17 @@ class Employee(data_user):
 class Guest(data_user):
  
     def change_password(self,type):
-        #nuyny
         while True:
-            if type ==  guest:
-                password = input ("Please, input your password ")
-                if password == self.get_password():
-                    new_password = input("Enter new password ")
-                    if len(new_password) >= 8
-                         self.__set_password(new_password)
-                         break
-                    else:
-                        print("Password must contain at least 8 characters ,please try again.")
-                        continue
+            password = input ("Please, input your password ")
+            if password == self.get_password():
+                new_password = input("Enter new password ")
+                if len(new_password) >= 8
+                     self.__set_password(new_password)
+                     break
                 else:
-                    print ("You input wrong password.")
+                    print("Password must contain at least 8 characters ,please try again.")
                     continue
             else:
-                print("Guest cannot change Admin and Employee passwords!")
-                break       
+                print ("You input wrong password.")
+                continue
 
