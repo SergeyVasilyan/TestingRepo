@@ -38,13 +38,13 @@ def register():
         else:
             break
     if role == "admin":
-        user = role_class.Admin(username, password, email)
+        user = role_class.Admin(username, password, email,role)
         users[0].append(user)
     elif role == "employee":
-        user = role_class.Employee(username, password, email)
+        user = role_class.Employee(username, password, email,role)
         users[1].append(user)
     else:
-        user = role_class.Guest(username, password, email) 
+        user = role_class.Guest(username, password, email, role) 
         users[2].append(user)
 
     print("Account has been created")
@@ -83,29 +83,53 @@ def login():
 
     return in_system(username) #this function has not been written yet
 
+def  output_object_class(username):
+    i=0
+    for elem in users[0]:
+       if elem == username:
+           return users[0][i]
+       i+=1
+
+    i=0
+    for elem  in users[1]:
+        if elem == username:
+            return users[1][i]
+        i+=1 
+
+    i=0
+    for elem  in users[2]:
+        if elem == username:
+            return users[2][i]
+        i+=1  
+    return 0
 
 def in_system(username):
     print("Welcome in system {}".format(username))
-    print("Options: change password | logout.")
     while True:
+        print("Options: change password | logout.")
         if option= "change password":
-            bla bla bla 
+            temp=output_object_of_class()
+            if  not temp == 0:
+                user=input("Enter the username whose password you want to change :")
+                temp1=output_object_of_class()
+                if not temp1 == 0:
+                    if temp == temp1:
+                        temp.change_password()
+                        continue
+                    else:
+                        temp.change_password(temp1,temp1.get_role)
+                        continue
 
-
-            
         elif option == "logout":
               print(Logging out .) 
             answer= input("Do any of the users what to log in?(yes)") 
-            if answer == "yes":
-                return True
-            break    
+            if not answer == "yes":
+                return False
+            else: 
+                return True    
         else:
             print ("{} is not an option".format(option))
             continue        
-
-
-
-
 
 def main():
     count = 5
@@ -113,10 +137,10 @@ def main():
         register()
         count -= 1
 
-    #    while True 
-    #        print("Sign in system")
-    #      if login() == False
-    #            break
+    while True 
+        print("Sign in system")
+        if login() == False
+             break
 
 main()
 print(users)
