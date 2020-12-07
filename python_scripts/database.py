@@ -5,142 +5,123 @@ import role_class
 
 users=[[],[],[]]
 
-
 def register():
     regax = '^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$'
-    list=["admin","employee","guest"]
-    dict= {}
+    role_list = ["admin", "employee", "guest"]
     while True:
         username = input("New username: ")
-        if  len(username) == 0:  # if len(username) == 0:+
-            print("Username can't be blank")
-            continue
-        else:
+        if  len(username) != 0:
             break
+        else:
+            print("Username can't be blank.")
+            continue
     while True:
         password = input("New password: ")
-        if len(password) == 0:  # Same here.
-            print("Password can't be blank")
+        if len(password) != 0:
+            break
+        else:
+            print("Password can't be blank.")
             continue
-        else:
-            break
     while True:
-        email = input("Enter email: ") 
-        if not(re.search(regax,email)): #???
-            print("Invalid email")
-        else:
+        email = input("Enter email: ")
+        if re.search(regax, email):
             break
+        else:
+            print("Invalid email.")
     while True:
         role = input("Enter role: ")
-        if role not in list: # You can only use this as blank role is not in the list.+
+        if role in role_list:
+            break
+        else:
             print("There is no such role")
             continue
-        else:
-            break
     if role == "admin":
-        user = role_class.Admin(username, password, email,role)
+        user = role_class.Admin(username, password, email, role)
         users[0].append(user)
     elif role == "employee":
-        user = role_class.Employee(username, password, email,role)
+        user = role_class.Employee(username, password, email, role)
         users[1].append(user)
     else:
-        user = role_class.Guest(username, password, email, role) 
+        user = role_class.Guest(username, password, email, role)
         users[2].append(user)
+    print("Account has been created.\n")
 
-    print("Account has been created")
-
-def chenge_name_or_passwd(data_str, char):
-
+def change_name_or_passwd(data, flag):
     found = False
-    if char == 'name':
-        for user in users:
-            if user.get_name() == data_str:
+    for group in users:
+        for user in group:
+            if flag == 'name' and user.get_name() == data:
                 found = True
-                return False
-        if not found:
-            print("User with name {} not found".format(username))
-            print("Please,enter valid username ")
-            return True
-    else:
-        for user in users:
-            if user.get_password() == data_str:
-                found = True
-                return False
-        if not found:
-            print("Please,enter valid password ")
-            return True
+                return found
+            else:
+                if user.get_password() == data:
+                    found = True
+                    return found
+    if not found:
+        if flag == 'name':
+            print("User with name {} does not found.".format(username))
+            print("Please, re-enter valid username.")
+        else:
+            print("Wrong password.")
+            print("Please, re-enter.")
+    return found
+
 def login():
     while True:
         username = input("Username: ")
-        if not len(username) == 0:
-            if chenge_name_or_passwd(username,'name') == False:
-                break
+        if (not len(username) == 0) and change_name_or_passwd(username, 'name'):
+            break
     while True:
         password = input("Password: ")
-        if not len(password) ==  0:
-            if chenge_name_or_passwd(password,'psw') == False:
-                break
+        if (not len(password) == 0) and change_name_or_passwd(password, 'passwd'):
+            break
+    return username
 
-    return in_system(username) #this function has not been written yet
+def output_object_of_class(username):
+    for group in users:
+        for user in group:
+           if user.get_name() == username:
+               return user
+    return None
 
-def  output_object_class(username):
-    i=0
-    for elem in users[0]:
-       if elem == username:
-           return users[0][i]
-       i+=1
-
-    i=0
-    for elem  in users[1]:
-        if elem == username:
-            return users[1][i]
-        i+=1 
-
-    i=0
-    for elem  in users[2]:
-        if elem == username:
-            return users[2][i]
-        i+=1  
-    return 0
-
-def in_system(username):
-    print("Welcome in system {}".format(username))
+def in_system():
+    username = login()
+    print("Welcome to the system")
     while True:
         print("Options: change password | logout.")
-        if option= "change password":
-            temp=output_object_of_class()
-            if  not temp == 0:
-                user=input("Enter the username whose password you want to change :")
-                temp1=output_object_of_class()
-                if not temp1 == 0:
-                    if temp == temp1:
-                        temp.change_password()
-                        continue
-                    else:
-                        temp.change_password(temp1,temp1.get_role)
-                        continue
-
+        option = str(input("Enter option: "))
+        if option == "change password":
+            user = output_object_of_class(username)
+            if user != None:
+                slave = input("Enter the username of a user whose password you want to change: ")
+                slave = output_object_of_class(slave)
+                if slave != None:
+                    user.change_password(slave)
+                    continue
+                elif slave.get_name() == user.get_name():
+                    user.change_password()
+                else:
+                    print("User not found.\nTry again.\n")
+                    continue
         elif option == "logout":
-              print(Logging out .) 
-            answer= input("Do any of the users what to log in?(yes)") 
-            if not answer == "yes":
-                return False
-            else: 
-                return True    
+            print("Logging out.")
+            break
         else:
-            print ("{} is not an option".format(option))
-            continue        
+            print ("Invalid option.")
+            continue
 
 def main():
-    count = 5
+    count = 2
     while count != 0:
         register()
         count -= 1
-
-    while True 
-        print("Sign in system")
-        if login() == False
-             break
+    while True:
+        print("Sign in into system.")
+        in_system()
+        answer = input("Sign in into another user? (Yes/no):")
+        yes_answers = ["y", "Y", "yes", "Yes", ""]
+        if answer not in yes_answers:
+            break
 
 main()
 print(users)
