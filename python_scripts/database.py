@@ -87,14 +87,20 @@ def output_object_of_class(username):
 def in_system():
     username = login()
     print("Welcome to the system")
+    options = ["Change password", "logout"]
     while True:
-        print("Options: change password | logout.")
-        option = str(input("Enter option: "))
-        if option == "change password":
+        for option in options:
+            print("{}. {}".format(options.index(option), option))
+        try:
+            option = int(input("Enter option: "))
+        except:
+            print("Invalid index entered.\n")
+            continue
+        if option == 0:
             user = output_object_of_class(username)
             if user != None:
-                slave = input("Enter the username of a user whose password you want to change: ")
-                slave = output_object_of_class(slave)
+                slave_name = input("Enter the username of a user whose password you want to change: ")
+                slave = output_object_of_class(slave_name)
                 if slave != None:
                     if slave.get_name() == user.get_name():
                         user.change_password()
@@ -104,7 +110,10 @@ def in_system():
                 else:
                     print("User not found.\nTry again.\n")
                     continue
-        elif option == "logout":
+            else:
+                print("User not found.\nTry again.\n")
+                continue
+        elif option == 1:
             print("Logging out.")
             break
         else:
@@ -125,4 +134,3 @@ def main():
             break
 
 main()
-print(users)
