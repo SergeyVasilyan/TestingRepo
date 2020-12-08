@@ -39,57 +39,63 @@ class Admin(data_user):
     def change_password(self, user = None):
         if user == None:
             while True:
-                new_pass = input("Enter new password: ")
-                if len(new_pasis) >= 8:
-                    self.set_password(new_pass)
+                new_password = input("Enter new password: ")
+                if len(new_password) >= 8:
+                    self.set_password(new_password)
                     return
                 else:
                     print("Password must contain at least 8 characters,\nPlease try again.")
                     continue
-        role = user.get_role()
-        while role == "guest" or role == "employee" :
-            new_password = input("Enter new password: ")
-            if len(new_password) >= 8:
-                user.set_password(new_password)
-                return
-            else:
-                print("Password must contain at least 8 characters,\nPlease try again.")
-                continue
-        print("You can not change a password for a {} as it role is {}.".format(user.get_name(), user.get_role()))
+        elif user.get_role() == "guest" or user.get_role() == "employee":
+            while True:
+                new_password = input("Enter new password: ")
+                if len(new_password) >= 8:
+                    user.set_password(new_password)
+                    return
+                else:
+                    print("Password must contain at least 8 characters,\nPlease try again.")
+                    continue
+        else:
+            print("You can not change a password for a {} as it role is {}.".format(user.get_name(), user.get_role()))
+            return
 
 class Employee(data_user):
 
     def change_password(self, user = None):
         if user == None:
             while True:
-                new_pass = input("Enter new password: ")
-                if len(new_pasis) >= 8:
-                    self.set_password(new_pass)
+                new_password = input("Enter new password: ")
+                if len(new_password) >= 8:
+                    self.set_password(new_password)
                     return
                 else:
                     print("Password must contain at least 8 characters,\nPlease try again.")
                     continue
-        role = user.get_role()
-        while role == "guest":
-            new_password = input("Enter new password: ")
-            if len(new_password) >= 8:
-                user.set_password(new_password)
-                return
-            else:
-                print("Password must contain at least 8 characters,\nPlease try again.")
-                continue
-        print("You can not change a password for a {} as it role is {}.".format(user.get_name(), user.get_role()))
+        elif user.get_role() == "guest":
+            while True:
+                new_password = input("Enter new password: ")
+                if len(new_password) >= 8:
+                    user.set_password(new_password)
+                    return
+                else:
+                    print("Password must contain at least 8 characters,\nPlease try again.")
+                    continue
+        else:
+            print("You can not change a password for a {} as it role is {}.".format(user.get_name(), user.get_role()))
+            return
 
 class Guest(data_user):
     def change_password(self, user = None):
         if user == None:
             while True:
-                new_pass = input("Enter new password: ")
-                if len(new_pasis) >= 8:
-                    user.set_password(new_pass)
+                new_password = input("Enter new password: ")
+                if len(new_password) >= 8:
+                    self.set_password(new_password)
                     return
                 else:
                     print("Password must contain at least 8 characters,\nPlease try again.")
                     continue 
-        print("You can not change a password for a {} as it role is {}.".format(user.get_name(), user.get_role()))
+        else:
+            print("You can not change a password for a {} as it role is {}.".format(user.get_name(), user.get_role()))
+            return
 
