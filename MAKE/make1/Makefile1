@@ -1,0 +1,47 @@
+PROJECT := program.exe 
+
+SRCEXT := .cpp
+HEXT := .h
+IDIR := include
+SDIR := src
+ODIR := $(SDIR)/obj
+LDIR := lib
+BINDIR := bin
+CXX = g++
+LIBS= 
+# compiter flags
+CXXFLAGS = -Wall -Wextra -Werror -pedantic --std=c++11 -I$(IDIR)
+
+# linker flags
+LDFLAGS := $(LIBS)
+OBJECTS = $(patsubst $(SDIR)/%$(SRCEXT),$(ODIR)/%.o,$(wildcard $(SDIR)/*$(SRCEXT)))
+
+.PHONY: build
+build: directories executable
+
+.PHONY: debug
+debug: CXXFLAGS += -g -O0 -DDEBUG
+debug: LDFLAGS += -g
+debug: build
+
+.PHONY: release
+release: CXXFLAGS += -O2
+release: build
+
+.PHONY: all
+all: debug release
+
+$(ODIR)/%.o: $(SDIR)/%$(SRCEXT)
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+$(BINDIR)/$(PROJECT): $(OBJECTS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) $^ -o $@
+executable: $(BINDIR)/$(PROJECT)
+
+.PHONY: clean
+clean:
+	@rm -f $(OBJECTS)
+
+.PHONY: directories
+directories:
+	@mkdir -p $(ODIR)
+	@mkdir -p $(BINDIR)
