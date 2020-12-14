@@ -1,11 +1,20 @@
-SOURCES := main.cpp add.cpp
-OBJECTS := $(patsubst %.cpp,%.o,$(SOURCES))
+SDIR := ./src
+ODIR := $(SDIR)/obj
+BINDIR := ./bin
+SOURCES:= $(wildcard $(SDIR)/*.cpp)
+OBJECTS:= $(patsubst $(SDIR)/%.cpp, $(ODIR)/%.o, $(SOURCES))
+CXX = g++
 
-program : $(OBJECTS)
-    g++ $(OBJECTS) -o program
-main.o : 
-    g++ -c main.cpp -o main.o
-add.o : 
-    g++ -c add.cpp -o add.o
+$(BINDIR)/program: $(0DIR) $(OBJECTS)
+	${CXX} $(OBJECTS) -o $(BINDIR)/program
+
+$(ODIR)/%.o: $(SDIR)/%.cpp
+	${CXX} -c $< -o $@
 clean:
-    rm *.o program
+	rm $(OBJECTS) $(BINDIR)/program
+dir:
+	@mkdir -p $(ODIR)
+	@mkdir -p $(BINDIR)
+
+valgrind:
+	valgrind --leak-check=full -v ./program
