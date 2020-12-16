@@ -44,6 +44,8 @@ class User(Employ):
         pass
     def set_salary(self):
         pass
+    def get_type(self):
+        return "User"
     #This function is change user password after checking available password!
     #Function has 3 local variables(password,new_passw and rep_passw) for checking.
     def change_acsses_info(self):
@@ -80,21 +82,27 @@ class Admin(User):
         return self.password
     def __set_password(self,new_password):
         self.password=new_password
-
+    def get_type(self):
+        return "Admin"
     def add_user(self,list_of_users):
         name=input("Name: ")
         email=input("email")
         password=input("password")
         new_user=User(name,email,password)
         list_of_users[name]=email
+    def delete_user(self, user):
+        if User.__name__==user.get_type():
+            user.__delete__()
 #This is a main function which organize our program!
 def main():
-    luser=User("popk","pnduk@yahoo.kyanq","1010botas")
-    user=Admin("vazgen", "khkf@jam.com", "1234",45000)
+    luser=User("Grad","grad@iskander.smerch","1010botas")
+    user=Admin("vazgen", "vazgenchik@jam.com", "1234",45000)
     print(user.get_name())
-    user.change_acsses_info() 
+    #user.change_acsses_info() 
     users_list={}
-    user.add_user(users_list)
+    #user.add_user(users_list)
+    user.delete_user(luser)
     for i in users_list:
         print("User name: {} and email: {}" .format(i,users_list[i]))
+    print(luser.get_name())
 main()
