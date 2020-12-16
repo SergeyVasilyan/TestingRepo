@@ -1,30 +1,23 @@
 MAKE_DIR = $(PWD)
 
-SRC1_DIR := $(MAKE_DIR)/src1
-SRC2_DIR := $(MAKE_DIR)/src2
-SRC3_DIR := $(MAKE_DIR)/src3
-SRC4_DIR := $(MAKE_DIR)/src4
-SRC5_DIR := $(MAKE_DIR)/src5
+SRC_DIR := $(MAKE_DIR)/src
 
 INC_SRCH_PATH :=
-INC_SRCH_PATH += -I$(SRC1_DIR)
-INC_SRCH_PATH += -I$(SRC2_DIR)
-INC_SRCH_PATH += -I$(SRC3_DIR)
-INC_SRCH_PATH += -I$(SRC4_DIR)
-INC_SRCH_PATH += -I$(SRC5_DIR)
+INC_SRCH_PATH += -I$(MAKE_DIR)/mkfiles
+
 
 all:
-	@$(MAKE) -C src1 -f makefile
-	@$(MAKE) -C src2 -f makefile
-	@$(MAKE) -C src3 -f makefile
-	@$(MAKE) -C src4 -f makefile
-	@$(MAKE) -C src5 -f makefile
+	@$(MAKE) -C src -f makefile_scole
+	@$(MAKE) -C src -f makefile_sum
+	@$(MAKE) -C src -f makefile_sum_of_digits
+	@$(MAKE) -C src -f makefile_inverse
+	@$(MAKE) -C src -f makefile_draw_regtangle
 
 .PHONY: clean
 clean:
-	@$(MAKE) -C src1 -f makefile clean
-	@$(MAKE) -C src2 -f makefile clean
-	@$(MAKE) -C src3 -f makefile clean
-	@$(MAKE) -C src4 -f makefile clean
-	@$(MAKE) -C src5 -f makefile clean
+	@$(MAKE) -C src1 -f makefile_scole clean
+	@$(MAKE) -C src2 -f makefile_sum clean
+	@$(MAKE) -C src3 -f makefile_sum_of_digits clean
+	@$(MAKE) -C src4 -f makefile_inverse clean
+	@$(MAKE) -C src5 -f makefile_draw_regtangle clean
 

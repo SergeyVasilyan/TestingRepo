@@ -1,0 +1,22 @@
+SDIR := ../src
+ODIR := ../obj
+BINDIR := ../bin
+SOURCES:= main_score.cpp
+OBJECTS:= main_score.o
+CXX = g++
+TARGET := program_score
+
+
+$(BINDIR)/$(TARGET): dir $(OBJECTS)
+	${CXX} $(OBJECTS) -o $(BINDIR)/$(TARGET)
+
+$(OBJECTS): $(SOURCES)
+	${CXX} -c $< -o $@
+clean:
+	rm  $(OBJECTS) $(BINDIR)/$(TARGET)
+
+valgrind:
+	valgrind --leak-check=full -v $(BINDIR)/$(TARGET)
+
+
+
