@@ -1,22 +1,17 @@
-SDIR := ../src
-ODIR := ../obj
-BINDIR := ../bin
-SOURCES:= main_score.cpp
-OBJECTS:= main_score.o
+TOP := $(PWD)
+ODIR := $(TOP)/obj
+SDIR := $(TOP)/src
+BINDIR := $(TOP)/bin
+TARGET := score
+SOURCE_CPP = $(SDIR)/main_$(TARGET).cpp
+SOURCE_OBJ = $(ODIR)/main_$(TARGET).o
 CXX = g++
-TARGET := program_score
 
+$(BINDIR)/$(TARGET): $(0DIR) $(SOURCE_OBJ)
+	${CXX} $(SOURCE_OBJ) -o $(BINDIR)/$(TARGET)
 
-$(BINDIR)/$(TARGET): dir $(OBJECTS)
-	${CXX} $(OBJECTS) -o $(BINDIR)/$(TARGET)
-
-$(OBJECTS): $(SOURCES)
-	${CXX} -c $< -o $@
-clean:
-	rm  $(OBJECTS) $(BINDIR)/$(TARGET)
+$(SOURCE_OBJ):
+	${CXX} -c $(SOURCE_CPP) -o $(SOURCE_OBJ)
 
 valgrind:
 	valgrind --leak-check=full -v $(BINDIR)/$(TARGET)
-
-
-
