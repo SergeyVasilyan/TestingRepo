@@ -14,7 +14,7 @@ void dec_to_bin(int dec_number){
 	bin.push_front(dec_number%2);
 	dec_number /=2;
 	}
-	int add_0_count=bin.size()%4;
+	int add_0_count=4-bin.size()%4;
 	for(int i=0;i<add_0_count; i++){
 		bin.push_front(0);	
 	}
