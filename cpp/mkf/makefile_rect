@@ -1,0 +1,16 @@
+CXX:=g++
+CFLAG:=-std=c++11
+TARGET:=rect
+SRC_DIR:=../src
+OBJ_DIR:=../obj
+BIN_DIR:=../bin
+SRC:=$(SRC_DIR)/$(TARGET).cpp
+OBJ:=$(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC))
+$(TARGET):$(OBJ)
+	$(CXX) $(OBJ_DIR)/$(TARGET).o -o $(BIN_DIR)/$(TARGET)
+$(OBJ_DIR)/$(TARGET).o:$(SRC_DIR)/$(TARGET).cpp create_dir 
+	$(CXX) -c $(CFLAG) $< -o $@
+create_dir:
+	mkdir -p $(OBJ_DIR) $(BIN_DIR)
+clean:
+	rm -f $(BIN_DIR)/$(TARGET) $(OBJ_DIR)/$(TARGET).o
