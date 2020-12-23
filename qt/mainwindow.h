@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QAction>
 #include <QMenu>
-
+#include <QLabel>
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 
@@ -24,6 +24,7 @@ private:
 	QMenu* menu;
 	QPushButton* text_button;
 	QWidget* main_widget;
+    QLabel* label;
 
 };
 
