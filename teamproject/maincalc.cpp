@@ -1,0 +1,77 @@
+#include "maincalc.hpp"
+
+Calculator::Calculator()
+{
+	main_layout= new QGridLayout(this);
+	seconds_degree_button=new QPushButton(tr("2nd"),this);
+	pi_num_button=new QPushButton(tr("pi"),this);
+	e_num_button=new QPushButton(tr("e"),this);
+	clear_button=new QPushButton(tr("C"),this);
+	backspace_button=new QPushButton(tr("<-"),this);
+	second_power_button=new QPushButton(tr("x^2"),this);
+	one_divide_x_button=new QPushButton(tr("1/x"),this);
+	abs_button=new QPushButton(tr("|x|"),this);
+	exp_button=new QPushButton(tr("exp"),this);
+	mod_button=new QPushButton(tr("mod"),this);
+	sqrt_button=new QPushButton(tr("sqrt"),this);
+	left_scope_button=new QPushButton(tr("("),this);
+	right_scope_button=new QPushButton(tr(")"),this);
+	factorial_button=new QPushButton(tr("n!"),this);
+	divide_button=new QPushButton(tr("/"),this);
+	x_pow_y_button=new QPushButton(tr("x^y"),this);
+	num_9_button=new QPushButton(tr("9"),this);
+	num_8_button=new QPushButton(tr("8"),this);
+	num_7_button=new QPushButton(tr("7"),this);
+	num_6_button=new QPushButton(tr("6"),this);
+	num_5_button=new QPushButton(tr("5"),this);
+	num_4_button=new QPushButton(tr("4"),this);
+	num_3_button=new QPushButton(tr("3"),this);
+	num_2_button=new QPushButton(tr("2"),this);
+	num_1_button=new QPushButton(tr("1"),this);
+	num_0_button=new QPushButton(tr("0"),this);
+	multiply_button=new QPushButton(tr("*"),this);
+	substrackt_button=new QPushButton(tr("-"),this);
+	add_button=new QPushButton(tr("+"),this);
+	ten_pow_button=new QPushButton(tr("10^x"),this);
+	log_button=new QPushButton(tr("log"),this);
+	ln_button=new QPushButton(tr("ln"),this);
+	dot_button=new QPushButton(tr("."),this);
+	equal_button=new QPushButton(tr("="),this);
+	sign_button=new QPushButton(tr("+/-"),this);
+	main_layout->addWidget(seconds_degree_button,0,0);
+	main_layout->addWidget(pi_num_button,0,1);
+	main_layout->addWidget(e_num_button,0,2);
+	main_layout->addWidget(clear_button,0,3);
+	main_layout->addWidget(backspace_button,0,4);
+	main_layout->addWidget(second_power_button,1,0);
+	main_layout->addWidget(one_divide_x_button,1,1);
+	main_layout->addWidget(abs_button,1,2);
+	main_layout->addWidget(exp_button,1,3);
+	main_layout->addWidget(mod_button,1,4);
+	main_layout->addWidget(sqrt_button,2,0);
+	main_layout->addWidget(left_scope_button,2,1);
+	main_layout->addWidget(right_scope_button,2,2);
+	main_layout->addWidget(factorial_button,2,3);
+	main_layout->addWidget(divide_button,2,4);
+	main_layout->addWidget(x_pow_y_button,3,0);
+	main_layout->addWidget(num_7_button,3,1);
+	main_layout->addWidget(num_8_button,3,2);
+	main_layout->addWidget(num_9_button,3,3);
+	main_layout->addWidget(multiply_button,3,4);
+	main_layout->addWidget(ten_pow_button,4,0);
+	main_layout->addWidget(num_4_button,4,1);
+	main_layout->addWidget(num_5_button,4,2);
+	main_layout->addWidget(num_6_button,4,3);
+	main_layout->addWidget(substrackt_button,4,4);
+	main_layout->addWidget(log_button,5,0);
+	main_layout->addWidget(num_1_button,5,1);
+	main_layout->addWidget(num_2_button,5,2);
+	main_layout->addWidget(num_3_button,5,3);
+	main_layout->addWidget(add_button,5,4);
+	main_layout->addWidget(ln_button,6,0);
+	main_layout->addWidget(sign_button,6,1);
+	main_layout->addWidget(num_0_button,6,2);
+	main_layout->addWidget(dot_button,6,3);
+	main_layout->addWidget(equal_button,6,4);
+
+}
