@@ -3,28 +3,32 @@
 #include <QDialog>
 #include <QWidget>
 #include <QLayout>
+#include <QLineEdit>
+#include <QString>
+#include <cmath>
 class Calculator: public QDialog
 {
 	Q_OBJECT
 public:
 	explicit Calculator();
-/*public slots:
+	~Calculator();
+public slots:
+	void unary_operator();
+	void multiplicative_operator();
+	void additive_operator();
+	void change_sign();
+	void equal_clicked();
+	void dot_clicked();
 	void digit_clicked();
-	void multiply();
-	void add();
-	void divide();
-	void power();
-	void substract();
-	void mod();
-	void factorial();
-	void point_clicked();
+	void backspace_clicked();
 	void clear();
-	void logarithm();
-	void ln_log();
-	void pi_number();
-	void e_number();
-	void exponential();*/
 private:
+	double sum;
+	double mul;
+	bool waiting_for_operand;
+	QString pending_additive;
+	QString pending_multipl;
+	QLineEdit* display;
 	QGridLayout* main_layout;
 	QPushButton* seconds_degree_button;
 	QPushButton* pi_num_button;
@@ -61,5 +65,9 @@ private:
 	QPushButton* dot_button;
 	QPushButton* equal_button;
 	QPushButton* sign_button;
+	void abort_operation();
+	void clear_all();
+	int factorial(int);
+	bool calculate(double,const QString&);
 };
 
