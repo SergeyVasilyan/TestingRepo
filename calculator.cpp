@@ -62,7 +62,6 @@ Calculator::Calculator(QWidget *parent)
 
     Button *equalButton = createButton(tr("="), SLOT(equalClicked()));
 
-
     QGridLayout *mainLayout = new QGridLayout;
     mainLayout->setSizeConstraint(QLayout::SetFixedSize);
 
@@ -262,10 +261,49 @@ void Calculator::unaryOperatorClicked()
             return;
         }
         result = 1.0 / operand;
+
+    }else if(clickedOperator == tr("|x|")){
+		result=std::abs(operand);
+	}else if(clickedOperator == tr("2nd")){
+		result=std::pow(2.0,operand);
+	}else if(clickedOperator == tr("10^x")){
+		result=std::pow(10.0,operand);
+	}else if(clickedOperator == tr("ln")){
+		if(operand < 1){
+			abortOperation();
+			return;
+		}
+		result=std::log(operand);
+	}else if(clickedOperator == tr("log")){
+		if(operand < 1){
+			abortOperation();
+			return;
+		}
+		result=std::log10(operand);
+	}else if(clickedOperator == tr("exp")){
+		result=std::exp(operand);
+	}else if(clickedOperator == tr("pi")){
+		result=M_PI;
+	}else if(clickedOperator == tr("e")){
+		result=std::exp(1.0);
+	}else if(clickedOperator == tr("n!")){
+		if(operand<0 || int(operand)!=operand){
+			abortOperation();
+			return;
+		}
+		result=double(factorial(operand));
     }
     display->setText(QString::number(result));
     waitingForOperand = true;
 }
+
+int Calculator::factorial(int number){
+	if(number > 1)
+        return number * factorial(number - 1);
+    else
+        return 1;
+}
+
 void Calculator::additiveOperatorClicked()
 {
     Button *clickedButton = qobject_cast<Button *>(sender());
@@ -381,15 +419,6 @@ void Calculator::backspaceClicked()
     display->setText(text);
 }
 
-void Calculator::clear()
-{
-    if (waitingForOperand)
-        return;
-
-    display->setText("0");
-    waitingForOperand = true;
-}
-
 void Calculator::clearAll()
 {
     sumSoFar = 0.0;
@@ -398,29 +427,6 @@ void Calculator::clearAll()
     pendingMultiplicativeOperator.clear();
     display->setText("0");
     waitingForOperand = true;
-}
-
-void Calculator::clearMemory()
-{
-    sumInMemory = 0.0;
-}
-
-void Calculator::readMemory()
-{
-    display->setText(QString::number(sumInMemory));
-    waitingForOperand = true;
-}
-
-void Calculator::setMemory()
-{
-    equalClicked();
-    sumInMemory = display->text().toDouble();
-}
-
-void Calculator::addToMemory()
-{
-    equalClicked();
-    sumInMemory += display->text().toDouble();
 }
 
 Button *Calculator::createButton(const QString &text, const char *member)
@@ -447,7 +453,13 @@ bool Calculator::calculate(double rightOperand, const QString &pendingOperator)
         if (rightOperand == 0.0)
             return false;
         factorSoFar /= rightOperand;
-    }
+    } else if (pendingOperator == tr("mod")) {
+        if (rightOperand == 0.0)
+            return false;
+		factorSoFar = std::fmod(factorSoFar, rightOperand);
+	}else if (pendingOperator == tr("x^y")) {
+        factorSoFar = std::pow(factorSoFar, rightOperand);
+	}
     return true;
 }
 

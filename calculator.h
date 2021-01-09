@@ -25,12 +25,7 @@ private slots:
     void pointClicked();
     void changeSignClicked();
     void backspaceClicked();
-    void clear();
     void clearAll();
-    void clearMemory();
-    void readMemory();
-    void setMemory();
-    void addToMemory(); 
     void trigonometricFunc();
     void constVal();
 private:
@@ -40,6 +35,7 @@ private:
     Button *cotButton ;
     Button *createButton(const QString &text, const char *member);
     void abortOperation();
+    int factorial(int);
     bool calculate(double rightOperand, const QString &pendingOperator);
     double sumInMemory;
     double sumSoFar;
