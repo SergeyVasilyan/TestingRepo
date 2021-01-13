@@ -5,12 +5,10 @@
 
 class Thread {
   public:
-          Thread(void *(*)(void*), const pthread_attr_t* ,void*);
+          Thread(void *(*)(void*),void* );
 	      void my_pthread_join();
   private:
           pthread_t thrd;
-          void* (*func)(void*);
-          const pthread_attr_t* attr;
           void* arg;
 };
 #endif
