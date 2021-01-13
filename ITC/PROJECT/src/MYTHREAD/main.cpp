@@ -16,7 +16,7 @@ int main()
 	char* str2 = "World";
 
 	Thread thrd1(func,(void*)str1);
-    Thread thrd2(func,(void*)str2);
+        Thread thrd2(func,(void*)str2);
 	thrd1.my_pthread_join();
 	thrd2.my_pthread_join();
 	return 0;
