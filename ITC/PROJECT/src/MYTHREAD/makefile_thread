@@ -1,0 +1,24 @@
+TOP := $(PWD)
+ODIR := $(TOP)/obj
+SDIR := $(TOP)/src/MYTHREAD
+BINDIR := $(TOP)/bin
+LIB := $(TOP)/lib
+TARGET := thread
+SOURCE_CPP = $(SDIR)/$(TARGET).cpp
+SOURCE_OBJ = $(ODIR)/$(TARGET).o
+SOURCE_lib = $(ODIR)/$(TARGET).so
+FLAGS = -pthread
+CXX = g++
+
+$(BINDIR)/$(TARGET): $(0DIR) $(SOURCE_OBJ)
+	${CXX} ${FLAGS} $(SOURCE_OBJ) -o $(BINDIR)/$(TARGET)
+
+$(SOURCE_OBJ):
+	${CXX} -c $(SOURCE_CPP) -o $(SOURCE_OBJ)
+
+$(SOURCE_LIB):
+	${CXX} $(SOURCE_OBJ) -shared -o $(SOURCE_LIB)
+
+valgrind:
+	valgrind --leak-check=full -v $(BINDIR)/$(TARGET)
+
