@@ -8,14 +8,13 @@
 #define ERROR_JOIN_THREAD   -12
 #define SUCCESS        0
 
-Thread::Thread(pthread_t thrd1,void* (*f)(void*),const pthread_attr_t* attr1,void* arg1){
-	thrd = thrd1;
+Thread::Thread(void* (*f)(void*),const pthread_attr_t* attr1,void* arg1){
 	func = f;
 	attr = attr1;
 	arg = arg1;
 
 	int  status;
-        if(status = pthread_create(&thrd1, attr1, f, arg1)) {
+        if(status = pthread_create(&thrd, attr1, f, arg1)) {
          std::cerr << "Thread returns error" <<status<< std::endl;
          }
 	}

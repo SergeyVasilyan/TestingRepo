@@ -12,12 +12,11 @@ void* func(void* ptr)
 
 int main()
 {
-	pthread_t thrd1,thrd2;
 	char* str1 = "Hi";
 	char* str2 = "World";
 
-	Thread thrd1(thrd1,NULL,func,(void*)str1);
-    Thread thrd2(thrd2,NULL,func,(void*)str2);
+	Thread thrd1(NULL,func,(void*)str1);
+    Thread thrd2(NULL,func,(void*)str2);
 	thrd1.my_pthread_join();
 	thrd2.my_pthread_join();
 	return 0;

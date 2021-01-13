@@ -5,7 +5,7 @@
 
 class Thread {
   public:
-          Thread(pthread_t , void *(*)(void*), const pthread_attr_t* ,void*);
+          Thread(void *(*)(void*), const pthread_attr_t* ,void*);
 	      void my_pthread_join();
   private:
           pthread_t thrd;
