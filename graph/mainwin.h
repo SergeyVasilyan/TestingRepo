@@ -6,27 +6,34 @@
 #include <QPixmap>
 #include <QGraphicsScene>
 #include <QGraphicsView>
-
-
+#include <QWheelEvent>
+#include <QTableView>
+//#include <QStandardItemModel>
 class MainWin: public QMainWindow {
     Q_OBJECT
 
 public:
         MainWin();
-        int pic_height();
-        int pic_width();
 
 private slots:
         void import_image();
+	void customMenuRequested(QPoint pos);
+	void reset();
+	void zoom_in();
+	void zoom_out();
+protected:
+	virtual void wheelEvent(QWheelEvent* event);
 
 private:
-
+//	QStandardItemModel *model;
+	int p_width;
+	int p_height;
+        QTableView *table;
         QGraphicsScene *scene;
-        QGraphicsView *graphicsView;
-        int count ;
+        QGraphicsView *view;
         QPixmap pix;
         QWidget *wd;
-        QLabel *plabel;
+        //QLabel *plabel;
         QAction *importAction;
         QAction *exitAction;
         QMenu *fileMenu;

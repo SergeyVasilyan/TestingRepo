@@ -1,12 +1,18 @@
 #include "mainwin.h"
 #include "dialog.h"
 #include <QMenuBar>
+#include <QAbstractItemModel>
 #include <QDebug>
-
+#include <QModelIndex>
+#include <QVBoxLayout>
 MainWin::MainWin(){
+    p_width = 0;
+    p_height = 0;
     wd = new QWidget();
     setCentralWidget(wd);
-    plabel = new QLabel(wd);
+    view = new QGraphicsView (wd);
+    scene = new QGraphicsScene(wd);
+
     importAction = new QAction(tr("Import"), wd);
     importAction->setStatusTip(tr("Import "));
     connect(importAction, SIGNAL(triggered()), this, SLOT(import_image()));
@@ -21,61 +27,75 @@ MainWin::MainWin(){
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
+    QVBoxLayout *l=new QVBoxLayout(wd);
+    table=new QTableView();
+    table->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(table, SIGNAL(customContextMenuRequested(QPoint)),
+            SLOT(customMenuRequested(QPoint)));
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    l->addWidget(table);
+    l->addWidget(view);
+
 }
-/*
 void MainWin::import_image() {
     Dialog *dlg = new Dialog(this);
     if (dlg->exec() == QDialog::Accepted){
         QString path = dlg->getpath();
         if(pix.load(path)) {
-            plabel->clear();
-            plabel->setGeometry( 0, 0, pix.width(), pix.height());
-            plabel->setPixmap(pix);
-            qDebug() << pix.width();
-            qDebug() << pix.height();
-            resize(pix.width(), pix.height());
-        }
-    }
-}
-
-void MainWin::import_image() {
-
-    Dialog *dlg = new Dialog(this);
-    if (dlg->exec() == QDialog::Accepted){
-        QString path = dlg->getpath();
-        if(pix.load(path)) {
-
-            graphicsView = new  QGraphicsView(wd);
-            scene = new QGraphicsScene(wd);
-            scene->addPixmap(pix);
-            scene->setSceneRect(pix.rect());
-            graphicsView->setScene(scene);
-        }
-    }
-i}
-
-*/
-
-void MainWin::import_image() {
-    Dialog *dlg = new Dialog(this);
-    if (dlg->exec() == QDialog::Accepted){
-        QString path = dlg->getpath();
-        if(pix.load(path)) {
-            QGraphicsView * view = new QGraphicsView (wd);
-            QGraphicsScene *scene = new QGraphicsScene(wd);
-            scene->addPixmap(pix);
+	    p_height = pix.height();
+	    p_width = pix.width();
+        
+	    scene->addPixmap(pix);
+	    view->fitInView(0,0,view->width(),view->height());
             view->setScene(scene);
-            view->show();
             view->resize(this->width(),this ->height());
-
-            qDebug() << this->width();
-            qDebug() << this->height();
-
-            // coll from some slot to see the effect
-            view->scale(200,200);   //zoom in
-            view->scale(.5,.5); //zoom out
-
+	    view->show();
         }
     }
 }
+void MainWin::wheelEvent(QWheelEvent* event)
+{
+	static qreal factor = 1.0;
+	const qreal delta = event->delta() / 120.0;
+	if(delta < 0)
+		factor--;
+	else if(delta > 0)
+		factor++;
+	factor = qBound(1.0, factor, 100.0);
+	view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
+}
+void MainWin::customMenuRequested(QPoint pos){
+   // QModelIndex index= table->indexAt(pos);
 
+    QMenu *menu=new QMenu();
+    QAction *resetAction = new QAction(tr("Reset"));
+    QAction *inAction = new QAction(tr("Zoom in"));
+    QAction *outAction = new QAction(tr("Zoom out"));
+    inAction->setShortcut(tr("Ctrl++"));
+    outAction->setShortcut(tr("Ctrl+-"));
+
+    connect(resetAction, SIGNAL(triggered()), wd, SLOT(reset()));
+    connect(inAction, SIGNAL(triggered()), wd, SLOT(zoom_in()));
+    connect(outAction, SIGNAL(triggered()), wd, SLOT(zoom_out));
+
+    menu->addAction(resetAction);
+    menu->addAction(inAction);
+    menu->addAction(outAction);
+    menu->popup(table->viewport()->mapToGlobal(pos));
+}
+void MainWin::reset(){
+
+ pix.scaled(QSize(p_width,p_height), Qt::KeepAspectRatio);
+
+}
+void MainWin::zoom_out(){
+	static qreal factor = 0.0;
+        factor = qBound(1.0, factor, 100.0);
+        view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
+}
+void MainWin::zoom_in(){
+        static qreal factor = 2.0;
+        factor = qBound(1.0, factor, 100.0);
+        view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
+}
