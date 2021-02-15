@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QModelIndex>
 #include <QVBoxLayout>
+#include <QGraphicsItem>
 MainWin::MainWin(){
     p_width = 0;
     p_height = 0;
@@ -28,13 +29,13 @@ MainWin::MainWin(){
     fileMenu->addAction(exitAction);
 
     QVBoxLayout *l=new QVBoxLayout(wd);
-    table=new QTableView();
+    table=new QTableView(view);
     table->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(table, SIGNAL(customContextMenuRequested(QPoint)),
-            SLOT(customMenuRequested(QPoint)));
+           SLOT(customMenuRequested(QPoint)));
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    l->addWidget(table);
+    //l->addWidget(table);
     l->addWidget(view);
 
 }
@@ -43,13 +44,14 @@ void MainWin::import_image() {
     if (dlg->exec() == QDialog::Accepted){
         QString path = dlg->getpath();
         if(pix.load(path)) {
-	    p_height = pix.height();
+
+        p_height = pix.height();
 	    p_width = pix.width();
-        
+
 	    scene->addPixmap(pix);
 	    view->fitInView(0,0,view->width(),view->height());
-            view->setScene(scene);
-            view->resize(this->width(),this ->height());
+        view->setScene(scene);
+        //view->resize(this->width(),this ->height());
 	    view->show();
         }
     }
@@ -65,13 +67,13 @@ void MainWin::wheelEvent(QWheelEvent* event)
 	factor = qBound(1.0, factor, 100.0);
 	view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
 }
-void MainWin::customMenuRequested(QPoint pos){
-   // QModelIndex index= table->indexAt(pos);
 
-    QMenu *menu=new QMenu();
-    QAction *resetAction = new QAction(tr("Reset"));
-    QAction *inAction = new QAction(tr("Zoom in"));
-    QAction *outAction = new QAction(tr("Zoom out"));
+void MainWin::customMenuRequested(QPoint pos){
+
+    QMenu *menu=new QMenu(wd);
+    QAction *resetAction = new QAction(tr("Reset"),scene);
+    QAction *inAction = new QAction(tr("Zoom in"),  scene);
+    QAction *outAction = new QAction(tr("Zoom out"), scene);
     inAction->setShortcut(tr("Ctrl++"));
     outAction->setShortcut(tr("Ctrl+-"));
 
@@ -86,16 +88,41 @@ void MainWin::customMenuRequested(QPoint pos){
 }
 void MainWin::reset(){
 
- pix.scaled(QSize(p_width,p_height), Qt::KeepAspectRatio);
-
+    pix.scaled(QSize(p_width,p_height), Qt::KeepAspectRatio);
+    scene->addPixmap(pix);  
 }
 void MainWin::zoom_out(){
 	static qreal factor = 0.0;
-        factor = qBound(1.0, factor, 100.0);
-        view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
+    factor = qBound(1.0, factor, 100.0);
+    view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
 }
 void MainWin::zoom_in(){
-        static qreal factor = 2.0;
-        factor = qBound(1.0, factor, 100.0);
-        view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
+    static qreal factor = 2.0;
+    factor = qBound(1.0, factor, 100.0);
+    view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
 }
+/*
+void MainWin::contextMenuEvent(QContextMenuEvent *event)
+{
+    QPointF p=event->pos();
+
+    QGraphicsItem *item = itemAt(p.x(),p.y());
+    if (item != NULL) {
+
+            //QGraphicsView::contextMenuEvent(event);
+            contextMenuEvent(event);
+
+            return;
+        }
+
+   // QMenu menu();
+    //menu.addAction(tr("Action 1"));
+    //menu.addAction(tr("Action 2"));
+    //menu.exec(event->globalPos());
+    QMenu *menu=new QMenu();
+    menu->addAction(tr("Action 1"));
+    menu->addAction(tr("Action 2"));
+    menu->exec(event->globalPos());
+
+
+}*/
