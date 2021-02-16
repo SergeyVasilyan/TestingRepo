@@ -9,10 +9,11 @@
 MainWin::MainWin(){
     p_width = 0;
     p_height = 0;
+    this->resize(500,500);
     wd = new QWidget();
     setCentralWidget(wd);
-    view = new QGraphicsView (wd);
     scene = new QGraphicsScene(wd);
+    view = new QGraphicsView (wd);
 
     importAction = new QAction(tr("Import"), wd);
     importAction->setStatusTip(tr("Import "));
@@ -28,17 +29,14 @@ MainWin::MainWin(){
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
-    QVBoxLayout *l=new QVBoxLayout(wd);
-    table=new QTableView(view);
-    table->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(table, SIGNAL(customContextMenuRequested(QPoint)),
-           SLOT(customMenuRequested(QPoint)));
     view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    //l->addWidget(table);
-    l->addWidget(view);
-
+    view->resize(this->width(),this ->height());
+    view->fitInView(0,0,view->width(),view->height());
+    view->setScene(scene);
+    view->show();
 }
+
 void MainWin::import_image() {
     Dialog *dlg = new Dialog(this);
     if (dlg->exec() == QDialog::Accepted){
@@ -47,12 +45,9 @@ void MainWin::import_image() {
 
         p_height = pix.height();
 	    p_width = pix.width();
-
 	    scene->addPixmap(pix);
-	    view->fitInView(0,0,view->width(),view->height());
-        view->setScene(scene);
-        //view->resize(this->width(),this ->height());
-	    view->show();
+        view->fitInView(0,0,view->width(),view->height());
+
         }
     }
 }
@@ -68,30 +63,17 @@ void MainWin::wheelEvent(QWheelEvent* event)
 	view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
 }
 
-void MainWin::customMenuRequested(QPoint pos){
+void MainWin::zoom_out(){
 
-    QMenu *menu=new QMenu(wd);
-    QAction *resetAction = new QAction(tr("Reset"),scene);
-    QAction *inAction = new QAction(tr("Zoom in"),  scene);
-    QAction *outAction = new QAction(tr("Zoom out"), scene);
-    inAction->setShortcut(tr("Ctrl++"));
-    outAction->setShortcut(tr("Ctrl+-"));
+    static qreal factor = 1.0;
+    const qreal delta = -1;
+    if(delta < 0)
+        factor--;
+    factor = qBound(1.0, factor, 100.0);
+    view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
 
-    connect(resetAction, SIGNAL(triggered()), wd, SLOT(reset()));
-    connect(inAction, SIGNAL(triggered()), wd, SLOT(zoom_in()));
-    connect(outAction, SIGNAL(triggered()), wd, SLOT(zoom_out));
-
-    menu->addAction(resetAction);
-    menu->addAction(inAction);
-    menu->addAction(outAction);
-    menu->popup(table->viewport()->mapToGlobal(pos));
 }
 void MainWin::reset(){
-
-    pix.scaled(QSize(p_width,p_height), Qt::KeepAspectRatio);
-    scene->addPixmap(pix);  
-}
-void MainWin::zoom_out(){
 	static qreal factor = 0.0;
     factor = qBound(1.0, factor, 100.0);
     view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
@@ -101,28 +83,22 @@ void MainWin::zoom_in(){
     factor = qBound(1.0, factor, 100.0);
     view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
 }
-/*
+
 void MainWin::contextMenuEvent(QContextMenuEvent *event)
 {
-    QPointF p=event->pos();
+    QMenu *menu = new QMenu(view);
+    resetAction = new QAction(tr("Reset"), wd);
+    connect(resetAction, SIGNAL(triggered()), this, SLOT(reset()));
 
-    QGraphicsItem *item = itemAt(p.x(),p.y());
-    if (item != NULL) {
+    z_inAction = new QAction(tr("Zoom-in"), wd);
+    z_inAction->setShortcut(tr("Ctrl++"));
+    connect(z_inAction, SIGNAL(triggered()), this, SLOT(zoom_in()));
+    z_outAction = new QAction(tr("Zoom-out"), wd);
+    z_outAction->setShortcut(tr("Ctrl+-"));
+    connect(z_outAction, SIGNAL(triggered()), this, SLOT(zoom_out()));
 
-            //QGraphicsView::contextMenuEvent(event);
-            contextMenuEvent(event);
-
-            return;
-        }
-
-   // QMenu menu();
-    //menu.addAction(tr("Action 1"));
-    //menu.addAction(tr("Action 2"));
-    //menu.exec(event->globalPos());
-    QMenu *menu=new QMenu();
-    menu->addAction(tr("Action 1"));
-    menu->addAction(tr("Action 2"));
+    menu->addAction(resetAction);
+    menu->addAction(z_inAction);
+    menu->addAction(z_outAction);
     menu->exec(event->globalPos());
-
-
-}*/
+}
