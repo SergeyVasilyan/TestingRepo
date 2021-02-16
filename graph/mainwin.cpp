@@ -4,16 +4,20 @@
 #include <QAbstractItemModel>
 #include <QDebug>
 #include <QModelIndex>
-#include <QVBoxLayout>
-#include <QGraphicsItem>
 MainWin::MainWin(){
-    p_width = 0;
-    p_height = 0;
+
     this->resize(500,500);
     wd = new QWidget();
     setCentralWidget(wd);
+
     scene = new QGraphicsScene(wd);
     view = new QGraphicsView (wd);
+    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    view->resize(this->width(),this ->height());
+    view->fitInView(0,0,view->width(),view->height());
+    view->setScene(scene);
+    view->show();
 
     importAction = new QAction(tr("Import"), wd);
     importAction->setStatusTip(tr("Import "));
@@ -29,12 +33,6 @@ MainWin::MainWin(){
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
-    view->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    view->resize(this->width(),this ->height());
-    view->fitInView(0,0,view->width(),view->height());
-    view->setScene(scene);
-    view->show();
 }
 
 void MainWin::import_image() {
@@ -42,11 +40,11 @@ void MainWin::import_image() {
     if (dlg->exec() == QDialog::Accepted){
         QString path = dlg->getpath();
         if(pix.load(path)) {
+           scene->clear();
+	   scene->addPixmap(pix);
+	   QPointF sceneCenter = view->mapToScene( view->viewport()->rect().center() );
 
-        p_height = pix.height();
-	    p_width = pix.width();
-	    scene->addPixmap(pix);
-        view->fitInView(0,0,view->width(),view->height());
+//           view->fitInView(0,0,view->width(),view->height());
 
         }
     }
@@ -65,13 +63,10 @@ void MainWin::wheelEvent(QWheelEvent* event)
 
 void MainWin::zoom_out(){
 
-    static qreal factor = 1.0;
-    const qreal delta = -1;
-    if(delta < 0)
-        factor--;
-    factor = qBound(1.0, factor, 100.0);
-    view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
 
+    scene->addPixmap(pix); //p is QGraphicsPixmapItem, pix is an original pixmap
+    scene->setStyle(0.5); //how can I scale the pixmap together with figures?? How to calculate the required scale?
+    view->scaple(scaleFactor_,scaleFactor_);
 }
 void MainWin::reset(){
 	static qreal factor = 0.0;
@@ -91,10 +86,10 @@ void MainWin::contextMenuEvent(QContextMenuEvent *event)
     connect(resetAction, SIGNAL(triggered()), this, SLOT(reset()));
 
     z_inAction = new QAction(tr("Zoom-in"), wd);
-    z_inAction->setShortcut(tr("Ctrl++"));
+    z_inAction->setShortcut(tr("Ctrl+I"));
     connect(z_inAction, SIGNAL(triggered()), this, SLOT(zoom_in()));
     z_outAction = new QAction(tr("Zoom-out"), wd);
-    z_outAction->setShortcut(tr("Ctrl+-"));
+    z_outAction->setShortcut(tr("Ctrl+O"));
     connect(z_outAction, SIGNAL(triggered()), this, SLOT(zoom_out()));
 
     menu->addAction(resetAction);
