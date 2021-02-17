@@ -6,10 +6,10 @@ OBJECTS:= $(patsubst $(SDIR)/%.cpp, $(ODIR)/%.o, $(SOURCES))
 CXX = g++
 TARGET := program
 
-#$(BINDIR)/program: $(0DIR) $(OBJECTS)
-#	${CXX} $(OBJECTS) -o $(BINDIR)/$(TARGET)
+$(BINDIR)/$(TARGET): $(0DIR) $(OBJECTS)
+	${CXX} $(OBJECTS) -o $(BINDIR)/$(TARGET)
 
-$(ODIR)/%.o: $(SDIR)/%.cpp
+$(OBJECTS): $(SOURCES)
 	${CXX} -c $< -o $@
 clean:
 	rm $(OBJECTS) $(BINDIR)/$(TARGET)
