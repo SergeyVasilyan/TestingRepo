@@ -4,6 +4,8 @@
 #include <QAbstractItemModel>
 #include <QDebug>
 #include <QModelIndex>
+
+static qreal factor1=1.0;
 MainWin::MainWin(){
 
     this->resize(500,500);
@@ -40,43 +42,44 @@ void MainWin::import_image() {
     if (dlg->exec() == QDialog::Accepted){
         QString path = dlg->getpath();
         if(pix.load(path)) {
-           scene->clear();
-	   scene->addPixmap(pix);
-	   QPointF sceneCenter = view->mapToScene( view->viewport()->rect().center() );
-
-//           view->fitInView(0,0,view->width(),view->height());
+            scene->clear();
+            scene->addPixmap(pix);
+            view->fitInView(0,0,view->width(),view->height());
 
         }
     }
 }
 void MainWin::wheelEvent(QWheelEvent* event)
 {
-	static qreal factor = 1.0;
-	const qreal delta = event->delta() / 120.0;
-	if(delta < 0)
-		factor--;
-	else if(delta > 0)
-		factor++;
-	factor = qBound(1.0, factor, 100.0);
-	view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
+    const qreal delta = event->delta() / 120.0;
+    if(delta < 0)
+        factor1--;
+    else if(delta > 0)
+        factor1++;
+    factor1 = qBound(1.0, factor1, 100.0);
+    view->setTransform(QTransform(factor1, 0, 0, factor1, 0, 0));
 }
 
-void MainWin::zoom_out(){
+void MainWin::zoom_out()
+{
+
+    factor1--;
+    factor1 = qBound(1.0, factor1, 100.0);
+    view->setTransform(QTransform(factor1, 0, 0, factor1, 0, 0));
 
 
-    scene->addPixmap(pix); //p is QGraphicsPixmapItem, pix is an original pixmap
-    scene->setStyle(0.5); //how can I scale the pixmap together with figures?? How to calculate the required scale?
-    view->scaple(scaleFactor_,scaleFactor_);
 }
 void MainWin::reset(){
-	static qreal factor = 0.0;
+    static qreal factor = 0.0;
     factor = qBound(1.0, factor, 100.0);
     view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
 }
 void MainWin::zoom_in(){
-    static qreal factor = 2.0;
-    factor = qBound(1.0, factor, 100.0);
-    view->setTransform(QTransform(factor, 0, 0, factor, 0, 0));
+
+    factor1++;
+    factor1 = qBound(1.0, factor1, 100.0);
+    view->setTransform(QTransform(factor1, 0, 0, factor1, 0, 0));
+
 }
 
 void MainWin::contextMenuEvent(QContextMenuEvent *event)
@@ -86,10 +89,10 @@ void MainWin::contextMenuEvent(QContextMenuEvent *event)
     connect(resetAction, SIGNAL(triggered()), this, SLOT(reset()));
 
     z_inAction = new QAction(tr("Zoom-in"), wd);
-    z_inAction->setShortcut(tr("Ctrl+I"));
+    z_inAction->setShortcut(QKeySequence("CTRL+I"));
     connect(z_inAction, SIGNAL(triggered()), this, SLOT(zoom_in()));
     z_outAction = new QAction(tr("Zoom-out"), wd);
-    z_outAction->setShortcut(tr("Ctrl+O"));
+    z_outAction->setShortcut(tr("CTRL+O"));
     connect(z_outAction, SIGNAL(triggered()), this, SLOT(zoom_out()));
 
     menu->addAction(resetAction);
