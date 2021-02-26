@@ -13,3 +13,6 @@ $(BINDIR)/$(TARGET): $(0DIR) $(SOURCE_OBJ)
 $(SOURCE_OBJ):
 	${CXX} -c $(SOURCE_CPP) -o $(SOURCE_OBJ)
 
+.PHONY: clean
+clean:
+	rm $(SOURCE_OBJ) $(BINDIR)/$(TARGET)
