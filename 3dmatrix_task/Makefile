@@ -1,14 +1,14 @@
-TARGET := inputfile
-SOURCE_CPP = $(SDIR)/main.cpp
-SOURCE_OBJ = $(ODIR)/main.o
-CXX = g++
+DIR = $(PWD)
+MAKE_DIR = $(DIR)/mkfiles
 
-$(TARGET): $(SOURCE_OBJ)
-	${CXX} $(SOURCE_OBJ) -o $(TARGET)
 
-$(SOURCE_OBJ):
-	${CXX} -c $(SOURCE_CPP) -o $(SOURCE_OBJ)
+all: scalar
 
-clean:
-	rm $(SOURCE_OBJ) $(TARGET) 
+.PHONY: scalar
+scalar:
+	@$(MAKE) -C $(MAKE_DIR) -f makefile_scalar
+
+.PHONY:scalar_clean
+scalar_clean:
+	@$(MAKE) -C $(MAKE_DIR) -f makefile_scalar clean
 

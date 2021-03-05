@@ -1,0 +1,20 @@
+TOP := $(PWD)
+ODIR := $(TOP)/obj
+SDIR := $(TOP)/src
+BINDIR := $(TOP)/bin
+TARGET := matrix_scalar
+SOURCE_CPP = $(SDIR)/$(TARGET).cpp
+SOURCE_OBJ = $(ODIR)/$(TARGET).o
+FLAG = -std=c++11
+CXX = g++
+
+$(BINDIR)/$(TARGET): $(0DIR) $(SOURCE_OBJ)
+	${CXX} $(FLAG) $(SOURCE_OBJ) -o $(BINDIR)/$(TARGET)
+
+$(SOURCE_OBJ):
+	${CXX} -c $(FLAG) $(SOURCE_CPP) -o $(SOURCE_OBJ)
+
+.PHONY: clean
+clean:
+	rm $(SOURCE_OBJ) $(BINDIR)/$(TARGET)
+
