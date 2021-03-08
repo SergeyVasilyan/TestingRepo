@@ -2,13 +2,13 @@ DIR = $(PWD)
 MAKE_DIR = $(DIR)/mkfiles
 
 
-all: scalar
+all: project
 
-.PHONY: scalar
-scalar:
-	@$(MAKE) -C $(MAKE_DIR) -f makefile_scalar
+.PHONY: project
+project:
+	@$(MAKE) -C $(MAKE_DIR) -f makefile_project
 
-.PHONY:scalar_clean
-scalar_clean:
-	@$(MAKE) -C $(MAKE_DIR) -f makefile_scalar clean
+.PHONY:project_clean
+project_clean:
+	@$(MAKE) -C $(MAKE_DIR) -f makefile_project clean
 

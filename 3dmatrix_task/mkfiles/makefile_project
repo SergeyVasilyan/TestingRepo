@@ -1,0 +1,22 @@
+TOP := $(PWD)
+ODIR := $(TOP)/obj
+SDIR := $(TOP)/src
+BINDIR := $(TOP)/bin
+TARGET := main
+SOURCE_CPP = $(SDIR)/$(TARGET).cpp $(SDIR)/image_matrix.cpp $(SDIR)/filtr_matrix.cpp
+SOURCE_OBJ = $(ODIR)/$(TARGET).o $(ODIR)/image_matrix.o $(ODIR)/filtr_matrix.o
+FLAG = -std=c++11
+CXX = g++
+
+$(BINDIR)/$(TARGET): $(0DIR) $(SOURCE_OBJ)
+	${CXX} $(FLAG) $(SOURCE_OBJ) -o $(BINDIR)/$(TARGET)
+
+$(SOURCE_OBJ):
+	 ${CXX} -c $(FLAG) $(SDIR)/image_matrix.cpp -o $(ODIR)/image_matrix.o
+	 ${CXX} -c $(FLAG) $(SDIR)/filtr_matrix.cpp -o $(ODIR)/filtr_matrix.o
+	 ${CXX} -c $(FLAG) $(SDIR)/$(TARGET).cpp -o $(ODIR)/$(TARGET).o
+
+.PHONY: clean
+clean:
+	rm $(SOURCE_OBJ) $(BINDIR)/$(TARGET)
+
