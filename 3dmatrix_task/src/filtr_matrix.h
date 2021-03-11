@@ -1,18 +1,16 @@
 #ifndef FILTR_MATRIX_H
 #define FILTR_MATRIX_H
-#include <stdio.h>
 #include <iostream>
-int rows=5;
-int cols=5;
-int layer=1;
+#include <stdio.h>
+
 class FMatrix
 {
 public:
-    FMatrix(std::string path);
-    bool read_file(int ***array, std::string path);
-    void change();
-    int ***data;
+	FMatrix(std::string);
+	bool read_file(std::string);
+	void change();
+	int ***data;
 private:
-    std::string filename;
+	std::string filename;
 };
 #endif
