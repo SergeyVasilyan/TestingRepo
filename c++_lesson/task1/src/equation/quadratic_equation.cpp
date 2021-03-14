@@ -28,6 +28,7 @@ int main(){
 				std::cout<<"Enter the free coefficient(c): ";
 				std::cin>>temp;
 				if(check_double(temp,c) == true){
+					if(a !=  0){
 					D = pow(b,2) - 4*a*c;
 					if(D > 0){
 						x1 = ((-b) - sqrt(D)) / (2*a);
@@ -41,6 +42,11 @@ int main(){
 					}
 					else{
 						std::cout<<"Don't root."<<std::endl;
+					}
+				}
+					else{					
+					x1 = (-c)/b;
+                                        std::cout<<"x1 =  "<<x1<<std::endl;
 					}
 				}
 			}

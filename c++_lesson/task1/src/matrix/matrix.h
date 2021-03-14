@@ -5,7 +5,7 @@
 class Matrix
 {
 public:
-	Matrix(int= 5 ,int= 5);
+	Matrix(int = 5 ,int = 5);
 	~Matrix();
 	friend std::istream& operator>>(std::istream&, Matrix&);
 	friend std::ostream& operator<<(std::ostream&, Matrix&);

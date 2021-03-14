@@ -1,0 +1,19 @@
+TOP := $(PWD)
+ODIR := $(TOP)/obj
+SDIR := $(TOP)/src/equation
+BINDIR := $(TOP)/bin
+TARGET := equation
+SOURCE_CPP = $(SDIR)/quadratic_equation.cpp
+SOURCE_OBJ = $(ODIR)/quadratic_equation.o
+FLAG = -std=c++11
+CXX = g++
+
+$(BINDIR)/$(TARGET): $(0DIR) $(SOURCE_OBJ)
+	${CXX} $(FLAG) $(SOURCE_OBJ) -o $(BINDIR)/$(TARGET)
+
+$(SOURCE_OBJ):
+	 ${CXX} -c $(FLAG) $(SDIR)/quadratic_equation.cpp -o $(ODIR)/quadratic_equation.o
+
+.PHONY: clean
+clean:
+	rm $(SOURCE_OBJ) $(BINDIR)/$(TARGET)
