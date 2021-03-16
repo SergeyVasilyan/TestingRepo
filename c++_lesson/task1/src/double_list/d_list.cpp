@@ -2,10 +2,13 @@
 #include"d_list.h"
 
 template <class T>
-DList<T>::List():first(NULL), size(0){ }
+List<T>::List()
+	:first(NULL),
+       	size(0)
+   {}
 
 template <class T>
-DList<T>::~List()
+List<T>::~List()
 {
         while(this->isEmpty()){
                 this->remove(0);
@@ -13,54 +16,60 @@ DList<T>::~List()
 }
 
 template <class T>
-bool DList<T>::isEmpty(){
+bool List<T>::isEmpty(){
 return this->size == 0;
 }
 
 template <class T>
-int DList<T>::Size(){
-return this->size;
+int List<T>::Size(){
+	return this->size;
 }
 
-template <typename T>
-void DList<T>::insert(T value, int pos)
+template <class T>
+void List<T>::insert(T value, int pos)
 {
-        if(pos < 0 || pos > size()){
-                throw("Underflow/Overflow");
-        }
-        if(first == NULL)
-        {
-		node<T>* p = new node<T>(value);
-                this->first = p;
-		this->size++;
-               // return;
-        }
-
-	node<T>* q = new node<T>;
-        node* p = this->first;
-        for(int i=0; i<pos-1; i++){
-		p= p->r_link;
+	if(pos < 0 || pos > size()){
+		throw("Underflow/Overflow");
 	}
-	q->info=value;
-	q->l_link = p->l_link;
-	q->r_link = p->r_link;
-	(p->l_link)->r_link = q;
-	if(p->r_link == NULL){
-        (p->r_link)->l_link =` q;
+	if(isEmpty())
+	{
+		node<T>* p = new node<T>(value);
+		this->first = p;
+		this->size++;
+	}
+
+	node<T>* q = new node<T>(value);
+	if(pos == 0){
+		q->l_link = this->first->l_link;
+		q->r_link = this->first;
+		this->first->l_link = q;
+		this->first = q;
+	}
+	else{
+		node<T>* p = this->first;
+		for(int i=0; i<pos-1; i++){
+			p= p->r_link;
+		}
+		q->r_link = p-> r_link;
+		q->l_link = p;
+		p->r_link = q;
+		if(p->r_link != NULL){
+			p->r_link->l_link = q;
+		}
 	}
 	this->size++;
 }
 
-template <typename T>
-void DList<T>::remove(int pos)
+template <class T>
+void List<T>::remove(int pos)
 {
-	if(isEmpty() == NULL){
+	if(isEmpty()){
 		throw("List is empty");
 	}
 	if(pos < 0 || pos >=size()){
                 throw("out of range");
         }
-	node* p = this->first;
+	node<T>* p = this->first;
         for(int i=0; i<pos-1; i++){
                 p= p->r_link;
         }
@@ -70,5 +79,6 @@ void DList<T>::remove(int pos)
 	if(p->r_link != NULL){
 		 (p->r_link)->l_link = p->l_link;
 	}
+	delete p;
         this->size--;
 }

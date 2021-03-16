@@ -9,14 +9,19 @@ struct node
 	node<T>* l_link;
 	node<T>* r_link;
 
-	node(T item, node<T>* lptr = NULL, node<T>* rptr = NULL): info(item), l_link(lptr), r_link(rptr) { }
+	node(T item, node<T>* lptr = NULL, node<T>* rptr = NULL)
+	    :info(item),
+	     l_link(lptr),
+	     r_link(rptr)
+       	{}
 };
 
 template <class T>
-class DList
+class List
 {
 public:
-	DList();
+	List();
+	~List();
 	bool isEmpty();
 	int Size();
 	void insert(T, int);
@@ -25,4 +30,5 @@ private:
 	node<T>* first;
 	int size;
 };
+
 #endif

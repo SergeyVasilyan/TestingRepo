@@ -2,11 +2,10 @@
 #include "d_list.h"
 
 int main() {
-        DList<int> fl;
+        List<int> l;
         for(int i = 0; i < 5; i++) {
-                fl.insert(2 * i, i);
+                l.insert(2 * i, i);
         }
-	std::cout << fl.Size() <<std::endl;
+	std::cout << l.Size() <<std::endl;
         return 0;
 }
-
