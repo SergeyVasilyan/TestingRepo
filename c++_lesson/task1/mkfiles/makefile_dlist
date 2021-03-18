@@ -3,15 +3,15 @@ ODIR := $(TOP)/obj
 SDIR := $(TOP)/src/double_list
 BINDIR := $(TOP)/bin
 TARGET := dlist
-SOURCE_CPP = $(SDIR)/main.cpp $(SDIR)/d_list.cpp 
+SOURCE_CPP = $(SDIR)/main.cpp $(SDIR)/d_list.cpp  $(SDIR)/d_list.h
 SOURCE_OBJ = $(ODIR)/main.o $(ODIR)/d_list.o
 FLAG = -std=c++11
 CXX = g++
 
-$(BINDIR)/$(TARGET): $(0DIR) $(SOURCE_OBJ)
+$(BINDIR)/$(TARGET): $(SOURCE_OBJ)
 	${CXX} $(FLAG) $(ODIR)/d_list.o $(ODIR)/main.o -o $(BINDIR)/$(TARGET)
 
-$(SOURCE_OBJ):
+$(SOURCE_OBJ):  $(SOURCE_CPP)
 	 ${CXX} -c $(FLAG) $(SDIR)/d_list.cpp -o $(ODIR)/d_list.o
 	 ${CXX} -c $(FLAG) $(SDIR)/main.cpp -o $(ODIR)/main.o
 

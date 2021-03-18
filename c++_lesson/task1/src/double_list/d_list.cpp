@@ -10,7 +10,7 @@ List<T>::List()
 template <class T>
 List<T>::~List()
 {
-        while(this->isEmpty()){
+        while(!this->isEmpty()){
                 this->remove(0);
         }
 }
@@ -28,7 +28,7 @@ int List<T>::Size(){
 template <class T>
 void List<T>::insert(T value, int pos)
 {
-	if(pos < 0 || pos > size()){
+	if( pos < 0 || pos > Size() ){
 		throw("Underflow/Overflow");
 	}
 	if(isEmpty())
@@ -66,7 +66,7 @@ void List<T>::remove(int pos)
 	if(isEmpty()){
 		throw("List is empty");
 	}
-	if(pos < 0 || pos >=size()){
+	if(pos < 0 || pos > Size()){
                 throw("out of range");
         }
 	node<T>* p = this->first;
