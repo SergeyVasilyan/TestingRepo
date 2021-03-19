@@ -3,7 +3,6 @@
 #include <fstream>
 #include <ctime>
 enum data_index {Times, Base_line, Odor, Temp, Date, Time};
-data_index data_count;
 
 struct data
 {
@@ -15,41 +14,42 @@ struct data
 	std::string time;
 };
 
-bool check_double(std::string& str, double& result)
+data_index data_count;
+
+bool check_double(const std::string& str, double& result)
 {
 	try {
 		result = std::stod(str);
 		return true;
-	} catch(std::exception& invalid_argument) {
-		std::cout << "Could not convert string to double." << std::endl;
+	} catch (std::exception& i) {
+		std::cout << "Error: " << i.what() << std::endl;
 		return false;
 	}
 }
 
-bool check_date(std::string& date)
+bool check_date(const std::string& date)
 {
 	struct tm tm;
-	if (strptime(date.c_str(), "%Y/%m/%d", &tm)) {
+	if (0 != strptime(date.c_str(), "%Y/%m/%d", &tm)) {
 		return true;
-        } else {
-		std::cout << "Date is invalid." << std::endl;
-		return false;
-	}
+        }
+        std::cout << "Date is invalid." << std::endl;
+        return false;
 }
 
-bool check_time(std::string& time)
+bool check_time(const std::string& time)
 {
 	struct tm tm;
-	if (strptime(time.c_str(), "%H:%M:%S", &tm)) {
+	if (0 != strptime(time.c_str(), "%H:%M:%S", &tm)) {
 		return true;
-        } else {
-		std::cout << "Time is invalid." << std::endl;
-		return false;
-	}
+        }
+        std::cout << "Time is invalid." << std::endl;
+        return false;
 }
-void print(std::vector<data>& log) 
+
+void print(const std::vector<data>& log)
 {
-	for (int i = 0; i< 30; i++) {
+	for (auto i = 0; i < log.size(); i++) {
 		std::cout << "Times - " << log[i].times
 			<< " Base line - " << log[i].base_line
 			<< " Odor - " << log[i].odor
@@ -58,8 +58,9 @@ void print(std::vector<data>& log)
 			<< " Time - " << log[i].time << std::endl;
 	}
 }
+
 void set_data(data& item, std::string& dt)
-{	
+{
 	double result = 0;
 	if (dt != "") {
 	switch (data_count) {
@@ -104,12 +105,12 @@ void set_data(data& item, std::string& dt)
 }
 int main()
 {
-	std::vector<data> log;
-	std::string str = "";
-    std::string data1 = "";
-	data item;
-    std::string path = "data.txt";
-	std::ifstream file_input(path);
+        std::vector<data> log;
+        std::string str = "";
+        std::string data1 = "";
+        data item;
+        std::string path = "data.txt";
+        std::ifstream file_input(path);
 	if (! file_input.is_open()) {
 		std::cout << "File isn't open" << std::endl;
 		return -1;
@@ -119,7 +120,7 @@ int main()
 			if (! isspace(str[i])) {
 				data1 += str[i];
 			} else {
-					set_data(item, data1);
+				set_data(item, data1);
 			}
 		}
 		set_data(item, data1);
