@@ -11,7 +11,7 @@ CXX = g++
 $(BINDIR)/$(TARGET): $(0DIR) $(SOURCE_OBJ)
 	${CXX} $(FLAG) $(SOURCE_OBJ) -o $(BINDIR)/$(TARGET)
 
-$(SOURCE_OBJ):
+$(SOURCE_OBJ): $(SOURCE_CPP)
 	 ${CXX} -c $(FLAG) $(SDIR)/quadratic_equation.cpp -o $(ODIR)/quadratic_equation.o
 
 .PHONY: clean

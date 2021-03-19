@@ -15,7 +15,6 @@ struct node
 	     r_link(rptr)
        	{}
 };
-
 template <class T>
 class List
 {
@@ -30,5 +29,4 @@ private:
 	node<T>* first;
 	int size;
 };
-
 #endif

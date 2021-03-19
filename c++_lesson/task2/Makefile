@@ -6,8 +6,7 @@ CXX = g++
 
 $(TARGET): $(SOURCE_OBJ)
 	${CXX} $(FLAG) $(SOURCE_OBJ) -o $(TARGET)
-
-$(SOURCE_OBJ):
+$(SOURCE_OBJ): $(SOURCE_CPP)
 	 ${CXX} -c $(FLAG) log_parser.cpp -o log_parser.o
 
 .PHONY: clean
