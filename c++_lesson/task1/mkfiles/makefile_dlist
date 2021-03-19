@@ -3,17 +3,18 @@ ODIR := $(TOP)/obj
 SDIR := $(TOP)/src/double_list
 BINDIR := $(TOP)/bin
 TARGET := dlist
-SOURCE_CPP = $(SDIR)/main.cpp $(SDIR)/d_list.cpp  $(SDIR)/d_list.h
-SOURCE_OBJ = $(ODIR)/main.o $(ODIR)/d_list.o
+SOURCE_CPP = $(SDIR)/main.cpp
+SOURCE_OBJ = $(patsubst %.cpp, $(ODIR)/%.o, $(notdir $(SOURCE_CPP)))
 FLAG = -std=c++11
 CXX = g++
 
-$(BINDIR)/$(TARGET): $(SOURCE_OBJ)
-	${CXX} $(FLAG) $(ODIR)/d_list.o $(ODIR)/main.o -o $(BINDIR)/$(TARGET)
+#$(error hello $(SOURCE_OBJ))
 
-$(SOURCE_OBJ):  $(SOURCE_CPP)
-	 ${CXX} -c $(FLAG) $(SDIR)/d_list.cpp -o $(ODIR)/d_list.o
-	 ${CXX} -c $(FLAG) $(SDIR)/main.cpp -o $(ODIR)/main.o
+$(BINDIR)/$(TARGET): $(SOURCE_OBJ)
+	${CXX} $^ -o $@
+
+$(ODIR)/%.o: $(SDIR)/%.cpp
+	 ${CXX} -c $(FLAG) $< -o $@
 
 .PHONY: clean
 clean:
