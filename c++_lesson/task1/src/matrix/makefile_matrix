@@ -1,5 +1,5 @@
 TOP := $(PWD)
-ODIR := $(TOP)/obj
+ODIR := $(TOP)/obj/matrix
 SDIR := $(TOP)/src/matrix
 BINDIR := $(TOP)/bin
 TARGET := matrix

@@ -1,5 +1,5 @@
 TOP := $(PWD)
-ODIR := $(TOP)/obj
+ODIR := $(TOP)/obj/list
 SDIR := $(TOP)/src/double_list
 BINDIR := $(TOP)/bin
 TARGET := dlist

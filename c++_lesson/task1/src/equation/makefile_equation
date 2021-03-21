@@ -1,5 +1,5 @@
 TOP := $(PWD)
-ODIR := $(TOP)/obj
+ODIR := $(TOP)/obj/equat
 SDIR := $(TOP)/src/equation
 BINDIR := $(TOP)/bin
 TARGET := equation

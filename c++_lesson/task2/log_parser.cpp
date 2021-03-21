@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <ctime>
+
 enum data_index {Times, Base_line, Odor, Temp, Date, Time};
 
 struct data
@@ -13,8 +14,6 @@ struct data
 	std::string date;
 	std::string time;
 };
-
-data_index data_count;
 
 bool check_double(const std::string& str, double& result)
 {
@@ -32,9 +31,9 @@ bool check_date(const std::string& date)
 	struct tm tm;
 	if (0 != strptime(date.c_str(), "%Y/%m/%d", &tm)) {
 		return true;
-        }
-        std::cout << "Date is invalid." << std::endl;
-        return false;
+	}
+	std::cout << "Date is invalid." << std::endl;
+	return false;
 }
 
 bool check_time(const std::string& time)
@@ -42,9 +41,9 @@ bool check_time(const std::string& time)
 	struct tm tm;
 	if (0 != strptime(time.c_str(), "%H:%M:%S", &tm)) {
 		return true;
-        }
-        std::cout << "Time is invalid." << std::endl;
-        return false;
+	}
+	std::cout << "Time is invalid." << std::endl;
+	return false;
 }
 
 void print(const std::vector<data>& log)
@@ -59,58 +58,57 @@ void print(const std::vector<data>& log)
 	}
 }
 
-void set_data(data& item, std::string& dt)
+void set_data(data& item, std::string& dt, data_index& data_count)
 {
 	double result = 0;
-	if (dt != "") {
 	switch (data_count) {
 	case Times:
 		if (check_double(dt, result) == true)
 			item.times = result;
-			data_count = Base_line;
-			dt = "";
-			break;
+		data_count = Base_line;
+		dt = "";
+		break;
 	case Base_line:
 		if (check_double(dt, result) == true)
 			item.base_line = result;
-   		    data_count = Odor;
-			dt = "";
-			break;
+		data_count = Odor;
+		dt = "";
+		break;
 	case Odor:
 		if (check_double(dt, result) == true)
 			item.odor = result;
-	    	data_count = Temp;
-			dt = "";
-			break;
+		data_count = Temp;
+		dt = "";
+		break;
 	case Temp:
 		if (check_double(dt, result) == true)
 			item.temp = result;
-			data_count = Date;
-			dt = "";
-			break;
+		data_count = Date;
+		dt = "";
+		break;
 	case Date:
 		if (check_date(dt) == true)
 			item.date = dt;
-			data_count = Time;
-			dt = "";
-			break;
+		data_count = Time;
+		dt = "";
+		break;
 	case Time:
 		if (check_time(dt) == true)
 			item.time = dt;
-			data_count = Times;
-			dt = "";
-			break;
-	}
+		data_count = Times;
+		dt = "";
+		break;
 	}
 }
 int main()
 {
-        std::vector<data> log;
-        std::string str = "";
-        std::string data1 = "";
-        data item;
-        std::string path = "data.txt";
-        std::ifstream file_input(path);
+	data_index data_count;
+	std::vector<data> log;
+	std::string str = "";
+	std::string data1 = "";
+	data item;
+	std::string path = "data.txt";
+	std::ifstream file_input(path);
 	if (! file_input.is_open()) {
 		std::cout << "File isn't open" << std::endl;
 		return -1;
@@ -120,12 +118,16 @@ int main()
 			if (! isspace(str[i])) {
 				data1 += str[i];
 			} else {
-				set_data(item, data1);
+				if (data1 != "") {
+					set_data(item, data1, data_count);
+				}
 			}
 		}
-		set_data(item, data1);
+		if (data1 != "") {
+			set_data(item, data1, data_count);
+		}
 		log.push_back(item);
 	}
-    	print(log);
-        return 0;
+	print(log);
+	return 0;
 }
