@@ -48,7 +48,7 @@ bool check_time(const std::string& time)
 
 void print(const std::vector<data>& log)
 {
-	for (auto i = 0; i < log.size(); i++) {
+	for (auto i = 0; i < log.size(); i++) { 
 		std::cout << "Times - " << log[i].times
 			<< " Base line - " << log[i].base_line
 			<< " Odor - " << log[i].odor
@@ -58,51 +58,56 @@ void print(const std::vector<data>& log)
 	}
 }
 
-void set_data(data& item, std::string& dt, data_index& data_count)
-{
+void set_data(data& item, std::string& dt, data_index& data_count) {
 	double result = 0;
 	switch (data_count) {
 	case Times:
-		if (check_double(dt, result) == true)
+		if (check_double(dt, result) == true) {
 			item.times = result;
-		data_count = Base_line;
-		dt = "";
+			data_count = Base_line;
+			dt = "";
+		}
 		break;
 	case Base_line:
-		if (check_double(dt, result) == true)
+		if (check_double(dt, result) == true) {
 			item.base_line = result;
-		data_count = Odor;
-		dt = "";
+			data_count = Odor;
+			dt = "";
+		}
 		break;
 	case Odor:
-		if (check_double(dt, result) == true)
+		if (check_double(dt, result) == true) {
 			item.odor = result;
-		data_count = Temp;
-		dt = "";
+			data_count = Temp;
+			dt = "";
+		}
 		break;
 	case Temp:
-		if (check_double(dt, result) == true)
+		if (check_double(dt, result) == true) {
 			item.temp = result;
-		data_count = Date;
-		dt = "";
+			data_count = Date;
+			dt = "";
+		}
 		break;
 	case Date:
-		if (check_date(dt) == true)
+		if (check_date(dt) == true) {
 			item.date = dt;
-		data_count = Time;
-		dt = "";
+			data_count = Time;
+			dt = "";
+		}
 		break;
 	case Time:
-		if (check_time(dt) == true)
+		if (check_time(dt) == true) {
 			item.time = dt;
-		data_count = Times;
-		dt = "";
+			data_count = Times;
+			dt = "";
+		}
 		break;
 	}
 }
 int main()
 {
-	data_index data_count;
+	data_index data_count = Times;
 	std::vector<data> log;
 	std::string str = "";
 	std::string data1 = "";

@@ -2,6 +2,7 @@
 #define D_LIST_H
 
 #include <iostream>
+#include <casserti>
 
 template<class T>
 struct node
@@ -29,26 +30,31 @@ public:
 	void insert(const T&, unsigned int);
 	void remove(unsigned int);
 	T& operator[](unsigned int);
+	bool operator==(List&);
 private:
 	node<T>* first;
-	int msize;
+	int m_size;
 };
 
 template <class T>
 List<T>::List()
 	: first(NULL),
-	  msize(0)
+	  m_size(0)
 {}
 
 template<class T>
 List<T>::List(List& cpylist) {
+	if (this != cpylist) {
 	int i=0;
 	node<T>* temp = cpylist.first;
+	//this petqa jnjem,bayc enenc ,vor gone mi hat element pahpanvi,vor lriv chkori this-y
 	while (temp->r_link) {
 		this->insert(temp->info, i);
 		temp = temp->r_link;
 		i++;
 	}
+	}
+	return this;
 }
 
 template <class T>
@@ -62,13 +68,13 @@ List<T>::~List()
 template <class T>
 bool List<T>::isEmpty()
 {
-	return msize == 0;
+	return m_size == 0;
 }
 
 template <class T>
 int List<T>::size()
 {
-	return msize;
+	return m_size;
 }
 
 template <class T>
@@ -98,7 +104,7 @@ void List<T>::insert(const T& value, unsigned int pos) {
 			}
 		}
 	}
-	msize++;
+	m_size++;
 }
 
 template <class T>
@@ -123,7 +129,7 @@ void List<T>::remove(unsigned int pos) {
 		}
 	}
 	delete p;
-	this->msize--;
+	this->m_size--;
 }
 template<class T>
 T& List<T>::operator[](unsigned int index) {
@@ -137,5 +143,15 @@ T& List<T>::operator[](unsigned int index) {
 	else {
 		std::cout<<" Invalid argument type.\n ";
 	}
+}
+template<class T>
+bool List<T>::operator==(List& other_list) {
+	assert (this->size() == other_list.size());
+	for (int i = 0; i < this->size(); i++) {
+		if (this[i] != other_list[i]) {
+			return false;
+	   	}
+	}
+	return true;
 }
 #endif
