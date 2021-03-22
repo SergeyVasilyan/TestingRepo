@@ -1,0 +1,17 @@
+1. Directories:
+	-src
+	-bin
+	-outputs
+	-test
+		-matrix
+		-filter
+In /src directory are .cpp and object files.
+In /bin directory are executable of project which will create after writing "make" in command line.
+In /outputs directory are all feature maps of convolution that came from the last work of the program.
+In /test/matrix directory are templates of matrices. "matrix", "matrix1" are valid for convolution and another matrices are non valid.
+In /test/filter directory are templates of filters.
+
+2. How work program.
+After creating executable move to /bin directory, then execute ./convolution.
+First you will write names of matrices. If you don't write or write name which doesn't exist in /test/matrix directory then program show error message and will be closed.If you write names of matrices you will enter "0" for next step. After that you will write names of filters as in previous step and after entering of all filters write "0".
+If everything is good then before convolution of matrices by filters program asks "Do you want change filter " if yes press "y" in another case "n". After successful convolution you will see message "Convolution is done!". 
