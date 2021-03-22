@@ -23,12 +23,14 @@ class List
 {
 public:
 	List();
-	List(List&);
+	List(const List&);
 	~List();
 	bool isEmpty();
 	int size();
+	void clear();
 	void insert(const T&, unsigned int);
 	void remove(unsigned int);
+	List& operator=(const List&)
 	T& operator[](unsigned int);
 	bool operator==(List&);
 private:
@@ -43,16 +45,13 @@ List<T>::List()
 {}
 
 template<class T>
-List<T>::List(List& cpylist) {
-	if (this != cpylist) {
+List<T>::List(const List& cpylist) {
 	int i=0;
 	node<T>* temp = cpylist.first;
-	//this petqa jnjem,bayc enenc ,vor gone mi hat element pahpanvi,vor lriv chkori this-y
 	while (temp->r_link) {
 		this->insert(temp->info, i);
 		temp = temp->r_link;
 		i++;
-	}
 	}
 	return this;
 }
@@ -131,6 +130,20 @@ void List<T>::remove(unsigned int pos) {
 	delete p;
 	this->m_size--;
 }
+
+void List<T>::clear(unsigned int pos) {
+	
+
+}
+
+template<class T>
+List& List::operator=(const List& )
+{
+
+
+
+}
+
 template<class T>
 T& List<T>::operator[](unsigned int index) {
 	if (index >= 0 && index < this->size()) {
