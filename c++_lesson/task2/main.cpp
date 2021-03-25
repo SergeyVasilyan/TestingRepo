@@ -20,8 +20,7 @@ void check_double(const std::string& str, double& result)
 	try {
 		result = std::stod(str);
 	} catch (std::exception& i) {
-		//throw(i.what());
-		throw("Error");
+		throw ;
 	}
 }
 
@@ -29,7 +28,7 @@ void check_date(const std::string& date)
 {
 	struct tm tm;
 	if (0 == strptime(date.c_str(), "%Y/%m/%d", &tm)) {
-	throw(" Date is invalid. ");
+		throw(" Date is invalid. ");
 	}
 }
 
@@ -37,14 +36,14 @@ void check_time(const std::string& time)
 {
 	struct tm tm;
 	if (0 == strptime(time.c_str(), "%H:%M:%S", &tm)) {
-	throw(" Time is invalid." );
+		throw(" Time is invalid." );
 	}
 }
 
 void print(const std::vector<data>& log)
 {
 	for (auto i = 0; i < log.size(); i++) { 
-		std::cout << "Times - " << log[i].times
+	      std::cout << "Times - " << log[i].times
 			<< " Base line - " << log[i].base_line
 			<< " Odor - " << log[i].odor
 			<< " Temp - " << log[i].temp

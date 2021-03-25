@@ -2,7 +2,7 @@
 #define D_LIST_H
 
 #include <iostream>
-#include <casserti>
+#include <cassert>
 
 template<class T>
 struct node
@@ -25,14 +25,14 @@ public:
 	List();
 	List(const List&);
 	~List();
-	bool isEmpty();
-	int size();
+	bool isEmpty() const;
+	int size() const;
 	void clear();
 	void insert(const T&, unsigned int);
 	void remove(unsigned int);
-	List& operator=(const List&)
-	T& operator[](unsigned int);
-	bool operator==(List&);
+	List<T>& operator=(const List&);
+	T& operator[](unsigned int) const;
+	bool operator==(const List&) const;
 private:
 	node<T>* first;
 	int m_size;
@@ -53,7 +53,6 @@ List<T>::List(const List& cpylist) {
 		temp = temp->r_link;
 		i++;
 	}
-	return this;
 }
 
 template <class T>
@@ -65,13 +64,13 @@ List<T>::~List()
 }
 
 template <class T>
-bool List<T>::isEmpty()
+bool List<T>::isEmpty() const
 {
 	return m_size == 0;
 }
 
 template <class T>
-int List<T>::size()
+int List<T>::size() const
 {
 	return m_size;
 }
@@ -130,22 +129,33 @@ void List<T>::remove(unsigned int pos) {
 	delete p;
 	this->m_size--;
 }
-
-void List<T>::clear(unsigned int pos) {
-	
-
-}
-
-template<class T>
-List& List::operator=(const List& )
+template <class T>
+void List<T>::clear()
 {
-
-
-
+        while (! isEmpty()) {
+                remove(0);
+        }
 }
 
 template<class T>
-T& List<T>::operator[](unsigned int index) {
+List<T>& List<T>::operator=(const List<T>& dlist )
+{
+	if(this != &dlist){
+		 this->clear();
+	  	 int i=0;
+       		 node<T>* temp = dlist.first;
+  		 while (temp->r_link) {
+               		 this->insert(temp->info, i);
+               		 temp = temp->r_link;
+              		 i++;
+        }
+	}
+	return *this;
+}
+
+template<class T>
+T& List<T>::operator[](unsigned int index) const
+{
 	if (index >= 0 && index < this->size()) {
 		node<T>* temp = this->first;
 			for (unsigned int i = 0; i < index; i++) {
@@ -158,7 +168,8 @@ T& List<T>::operator[](unsigned int index) {
 	}
 }
 template<class T>
-bool List<T>::operator==(List& other_list) {
+bool List<T>::operator==(const List& other_list) const
+{
 	assert (this->size() == other_list.size());
 	for (int i = 0; i < this->size(); i++) {
 		if (this[i] != other_list[i]) {

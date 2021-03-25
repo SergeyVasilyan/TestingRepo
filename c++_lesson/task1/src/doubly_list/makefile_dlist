@@ -1,6 +1,6 @@
 TOP := $(PWD)
 ODIR := $(TOP)/obj/list
-SDIR := $(TOP)/src/double_list
+SDIR := $(TOP)/src/doubly_list
 BINDIR := $(TOP)/bin
 TARGET := dlist
 SOURCE_CPP = $(SDIR)/main.cpp

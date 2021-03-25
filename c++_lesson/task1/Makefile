@@ -10,7 +10,7 @@ matrix:
 
 .PHONY: dlist
 dlist:
-	@$(MAKE) -C $(MAKE_DIR)/double_list -f makefile_dlist
+	@$(MAKE) -C $(MAKE_DIR)/doubly_list -f makefile_dlist
 
 .PHONY: equation
 equation:
@@ -25,7 +25,7 @@ matrix_clean:
 
 .PHONY: dlist_clean
 dlist_clean:
-	@$(MAKE) -C $(MAKE_DIR)/double_list -f makefile_dlist clean
+	@$(MAKE) -C $(MAKE_DIR)/doubly_list -f makefile_dlist clean
 
 .PHONY: equation_clean
 equation_clean:
