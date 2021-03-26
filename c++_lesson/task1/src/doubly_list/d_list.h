@@ -40,25 +40,43 @@ private:
 
 template <class T>
 List<T>::List()
-	: first(NULL),
-	  m_size(0)
+	: first(NULL)
+	, m_size(0)
 {}
 
 template<class T>
-List<T>::List(const List& cpylist) {
-	int i=0;
+List<T>::List(const List& cpylist)
+	: first(NULL)
+	, m_size(0)
+{
+	if (cpylist.isEmpty()) {
+		return;
+	}
+	int i = 0;
 	node<T>* temp = cpylist.first;
+	assert(NULL != temp);
 	while (temp->r_link) {
-		this->insert(temp->info, i);
+		insert(temp->info, i);
 		temp = temp->r_link;
 		i++;
 	}
+	insert(temp->info, i);
 }
 
 template <class T>
 List<T>::~List()
 {
-	this->clear();
+	clear();
+}
+
+template <class T>
+void List<T>::clear()
+{
+        while (! isEmpty()) {
+                remove(0);
+        }
+		assert(NULL == first);
+		assert(0 == size());
 }
 
 template <class T>
@@ -77,25 +95,27 @@ template <class T>
 void List<T>::insert(const T& value, unsigned int pos) {
 	if (pos < 0 || pos > size()) {
 		std::cout<<("Underflow/Overflow")<<std::endl;
+		return;
 	}
 	if (isEmpty()) {
-		node<T>* temp = new node<T>(value);
-		this->first = temp;
+		first = new node<T>(value);
+		assert(NULL == first->r_link);
+		assert(NULL == first->l_link);
 	} else {
 		node<T>* q = new node<T>(value);
 		if (pos == 0) {
-			q->r_link = this->first;
-			this->first->l_link = q;
-			this->first = q;
+			q->r_link = first;
+			first->l_link = q;
+			first = q;
 		} else {
-			node<T>* p = this->first;
-			for(int i = 0; i < pos-1; i++){
+			node<T>* p = first;
+			for(int i = 0; i < pos - 1; i++){
 				p = p->r_link;
 			}
-			q->r_link = p-> r_link;
+			q->r_link = p->r_link;
 			q->l_link = p;
 			p->r_link = q;
-			if(p->r_link != NULL){
+			if (p->r_link != NULL) {
 				p->r_link->l_link = q;
 			}
 		}
@@ -107,38 +127,34 @@ template <class T>
 void List<T>::remove(unsigned int pos) {
 	if (isEmpty()) {
 		std::cout<<"List is empty"<<std::endl;
+		return;
 	}
 	if (pos < 0 || pos >= size()) {
 		std::cout<<" Out of range. "<<std::endl;
+		return;
 	}
-	node<T>* p = this->first;
+	node<T>* p = first;
 	for (int i = 0; i < pos; i++) {
 		p = p->r_link;
 	}
 	if (p->l_link != NULL) {
-		(p->l_link)->r_link = p->r_link;
+		p->l_link->r_link = p->r_link;
+	} else {
+		assert(0 == pos);
+		first = p->r_link;
 	}
 	if (p->r_link != NULL) {
 		p->r_link->l_link = p->l_link;
-		if (pos == 0) {
-		this->first = p->r_link;
-		}
 	}
 	delete p;
-	this->m_size--;
-}
-template <class T>
-void List<T>::clear()
-{
-        while (! isEmpty()) {
-                remove(0);
-        }
+	m_size--;
+	assert(m_size >= 0);
 }
 
 template<class T>
-List<T>& List<T>::operator=(const List<T>& dlist )
+List<T>& List<T>::operator= (const List<T>& dlist)
 {
-	if(this != &dlist){
+	if (this != &dlist) {
 		 this->clear();
 	  	 int i=0;
        	 node<T>* temp = dlist.first;
@@ -155,24 +171,23 @@ List<T>& List<T>::operator=(const List<T>& dlist )
 template<class T>
 T& List<T>::operator[](unsigned int index) const
 {
-	if (index >= 0 && index < this->size()) {
-		node<T>* temp = this->first;
-			for (unsigned int i = 0; i < index; i++) {
-				temp = temp->r_link;
-			}
-		return temp->info;
+	assert(index >= 0);
+	assert(index < size());
+	node<T>* temp = this->first;
+	for (unsigned int i = 0; i < index; i++) {
+		temp = temp->r_link;
 	}
-	else {
-		std::cout<<" Invalid argument type.\n ";
-	}
+	return temp->info;
 }
 
 template<class T>
-bool List<T>::operator == (const List& other_list) const
+bool List<T>::operator==(const List& other_list) const
 {
-	assert (this->size() == other_list.size());
-	for (int i = 0; i < this->size(); i++) {
-		if (this[i] != other_list[i]) {
+	if (size() != other_list.size()) {
+		return false;
+	}
+	for (int i = 0; i < size(); i++) {
+		if (this->operator[](i) != other_list[i]) {
 			return false;
 	   	}
 	}

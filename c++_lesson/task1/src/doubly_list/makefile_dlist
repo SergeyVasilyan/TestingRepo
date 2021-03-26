@@ -5,7 +5,7 @@ BINDIR := $(TOP)/bin
 TARGET := dlist
 SOURCE_CPP = $(SDIR)/main.cpp
 SOURCE_OBJ = $(patsubst %.cpp, $(ODIR)/%.o, $(notdir $(SOURCE_CPP)))
-FLAG = -std=c++11
+FLAG = -std=c++11 -g -ggdb
 CXX = g++
 
 #$(error hello $(SOURCE_OBJ))
