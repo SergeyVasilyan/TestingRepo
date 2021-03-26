@@ -58,9 +58,7 @@ List<T>::List(const List& cpylist) {
 template <class T>
 List<T>::~List()
 {
-	while (! isEmpty()) {
-		remove(0);
-	}
+	this->clear();
 }
 
 template <class T>
@@ -143,12 +141,13 @@ List<T>& List<T>::operator=(const List<T>& dlist )
 	if(this != &dlist){
 		 this->clear();
 	  	 int i=0;
-       		 node<T>* temp = dlist.first;
+       	 node<T>* temp = dlist.first;
   		 while (temp->r_link) {
                		 this->insert(temp->info, i);
                		 temp = temp->r_link;
               		 i++;
         }
+		 this->insert(temp->info, i);
 	}
 	return *this;
 }
@@ -167,8 +166,9 @@ T& List<T>::operator[](unsigned int index) const
 		std::cout<<" Invalid argument type.\n ";
 	}
 }
+
 template<class T>
-bool List<T>::operator==(const List& other_list) const
+bool List<T>::operator == (const List& other_list) const
 {
 	assert (this->size() == other_list.size());
 	for (int i = 0; i < this->size(); i++) {

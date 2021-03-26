@@ -15,41 +15,35 @@ struct data
 	std::string time;
 };
 
-bool check_double(const std::string& str, double& result)
+void check_double(const std::string& str, double& result)
 {
 	try {
 		result = std::stod(str);
-		return true;
 	} catch (std::exception& i) {
-		std::cout << "Error: " << i.what() << std::endl;
-		return false;
+		throw ("Error.") ;
 	}
 }
 
-bool check_date(const std::string& date)
+void check_date(const std::string& date)
 {
 	struct tm tm;
-	if (0 != strptime(date.c_str(), "%Y/%m/%d", &tm)) {
-		return true;
+	if (0 == strptime(date.c_str(), "%Y/%m/%d", &tm)) {
+		throw(" Date is invalid. ");
 	}
-	std::cout << "Date is invalid." << std::endl;
-	return false;
 }
 
-bool check_time(const std::string& time)
+void check_time(const std::string& time)
 {
 	struct tm tm;
-	if (0 != strptime(time.c_str(), "%H:%M:%S", &tm)) {
-		return true;
+	if (0 == strptime(time.c_str(), "%H:%M:%S", &tm)) {
+		throw(" Time is invalid." );
 	}
-	std::cout << "Time is invalid." << std::endl;
-	return false;
 }
 
 void print(const std::vector<data>& log)
 {
 	for (auto i = 0; i < log.size(); i++) { 
-		std::cout << "Times - " << log[i].times
+	      std::cout << "Times - " << log[i].times
 			<< " Base line - " << log[i].base_line
 			<< " Odor - " << log[i].odor
 			<< " Temp - " << log[i].temp
@@ -62,47 +56,41 @@ void set_data(data& item, std::string& dt, data_index& data_count) {
 	double result = 0;
 	switch (data_count) {
 	case Times:
-		if (check_double(dt, result) == true) {
+			check_double(dt, result);
 			item.times = result;
 			data_count = Base_line;
 			dt = "";
-		}
-		break;
+			break;
 	case Base_line:
-		if (check_double(dt, result) == true) {
+			check_double(dt, result);
 			item.base_line = result;
 			data_count = Odor;
 			dt = "";
-		}
-		break;
+			break;
 	case Odor:
-		if (check_double(dt, result) == true) {
+			check_double(dt, result);
 			item.odor = result;
 			data_count = Temp;
 			dt = "";
-		}
-		break;
+			break;
 	case Temp:
-		if (check_double(dt, result) == true) {
+			check_double(dt, result);
 			item.temp = result;
 			data_count = Date;
 			dt = "";
-		}
-		break;
+			break;
 	case Date:
-		if (check_date(dt) == true) {
+			check_date(dt);
 			item.date = dt;
 			data_count = Time;
 			dt = "";
-		}
-		break;
+			break;
 	case Time:
-		if (check_time(dt) == true) {
+			check_time(dt);
 			item.time = dt;
 			data_count = Times;
 			dt = "";
-		}
-		break;
+			break;
 	}
 }
 int main()
