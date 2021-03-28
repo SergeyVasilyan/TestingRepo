@@ -28,6 +28,7 @@ public:
 	bool isEmpty() const;
 	int size() const;
 	void clear();
+	node<T>* get_node(int) const;
 	void insert(const T&, unsigned int);
 	void remove(unsigned int);
 	List<T>& operator=(const List&);
@@ -92,6 +93,18 @@ int List<T>::size() const
 }
 
 template <class T>
+node<T>* List<T>::get_node(int index) const
+{
+	assert(index >= 0);
+        assert(index < size());
+	node<T>* temp = first;
+        for (unsigned int i = 0; i < index; i++) {
+                temp = temp->r_link;
+        }
+	return  temp;
+}
+
+template <class T>
 void List<T>::insert(const T& value, unsigned int pos) {
 	if (pos < 0 || pos > size()) {
 		std::cout<<("Underflow/Overflow")<<std::endl;
@@ -109,9 +122,7 @@ void List<T>::insert(const T& value, unsigned int pos) {
 			first = q;
 		} else {
 			node<T>* p = first;
-			for(int i = 0; i < pos - 1; i++){
-				p = p->r_link;
-			}
+			p = get_node(pos-1);//avelocvoxi naxord dirqy
 			q->r_link = p->r_link;
 			q->l_link = p;
 			p->r_link = q;
@@ -134,9 +145,7 @@ void List<T>::remove(unsigned int pos) {
 		return;
 	}
 	node<T>* p = first;
-	for (int i = 0; i < pos; i++) {
-		p = p->r_link;
-	}
+	p = get_node(pos);//heracvox node  
 	if (p->l_link != NULL) {
 		p->l_link->r_link = p->r_link;
 	} else {
@@ -152,36 +161,28 @@ void List<T>::remove(unsigned int pos) {
 }
 
 template<class T>
-List<T>& List<T>::operator= (const List<T>& dlist)
+List<T>& List<T>::operator = (const List<T>& dlist)
 {
 	if (this != &dlist) {
-		 this->clear();
-	  	 int i=0;
-       	 node<T>* temp = dlist.first;
-  		 while (temp->r_link) {
-               		 this->insert(temp->info, i);
-               		 temp = temp->r_link;
-              		 i++;
-        }
-		 this->insert(temp->info, i);
+		this->clear();
+		node<T>* temp = dlist.first;
+		for (int i = 0; i < dlist.size(); i++) {
+			this->insert(temp->info, i);
+			temp = temp->r_link;
+		}
+		return *this;
 	}
-	return *this;
 }
 
 template<class T>
 T& List<T>::operator[](unsigned int index) const
 {
-	assert(index >= 0);
-	assert(index < size());
-	node<T>* temp = this->first;
-	for (unsigned int i = 0; i < index; i++) {
-		temp = temp->r_link;
-	}
+        node<T>* temp = get_node(index);
 	return temp->info;
 }
 
 template<class T>
-bool List<T>::operator==(const List& other_list) const
+bool List<T>::operator == (const List& other_list) const
 {
 	if (size() != other_list.size()) {
 		return false;

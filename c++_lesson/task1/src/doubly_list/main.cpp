@@ -9,6 +9,7 @@ int main() {
 		l.insert(2 * i, i);
 	}
 
+	l.insert(5,5);
 	for (int i = 0; i < l.size(); i++) {
 		std::cout<<l[i]<<"    ";
 	}
@@ -25,13 +26,12 @@ int main() {
     }
 */
 
-	List<int> l2(l);
+	List<int> l2(l1);
   	std::cout << std::endl;
 	std::cout << "L2 "<< std::endl ;
 	for (int i = 0; i < l2.size(); i++) {
 			std::cout<<l2[i]<<"    ";
 	}
 	std::cout<<std::endl;
-	assert(l2 == l);
 	return 0;
 }
