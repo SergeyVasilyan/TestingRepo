@@ -96,19 +96,19 @@ template <class T>
 node<T>* List<T>::get_node(int index) const
 {
 	assert(index >= 0);
-        assert(index < size());
+    assert(index < size());
 	node<T>* temp = first;
-        for (unsigned int i = 0; i < index; i++) {
-                temp = temp->r_link;
-        }
+    for (unsigned int i = 0; i < index; i++) {
+            temp = temp->r_link;
+    }
 	return  temp;
 }
 
 template <class T>
-void List<T>::insert(const T& value, unsigned int pos) {
+void List<T>::insert(const T& value, unsigned int pos) noexcept {
+
 	if (pos < 0 || pos > size()) {
-		std::cout<<("Underflow/Overflow")<<std::endl;
-		return;
+		throw std::out_of_range {"List out of range."};
 	}
 	if (isEmpty()) {
 		first = new node<T>(value);
@@ -122,7 +122,7 @@ void List<T>::insert(const T& value, unsigned int pos) {
 			first = q;
 		} else {
 			node<T>* p = first;
-			p = get_node(pos-1);//avelocvoxi naxord dirqy
+			p = get_node(pos-1);   //avelocvoxi naxord dirqy
 			q->r_link = p->r_link;
 			q->l_link = p;
 			p->r_link = q;
@@ -137,15 +137,13 @@ void List<T>::insert(const T& value, unsigned int pos) {
 template <class T>
 void List<T>::remove(unsigned int pos) {
 	if (isEmpty()) {
-		std::cout<<"List is empty"<<std::endl;
-		return;
+		throw std::underflow_error {"List is empty"};
 	}
 	if (pos < 0 || pos >= size()) {
-		std::cout<<" Out of range. "<<std::endl;
-		return;
-	}
+        throw std::out_of_range {"List out of range."};
+    }
 	node<T>* p = first;
-	p = get_node(pos);//heracvox node  
+	p = get_node(pos);   //heracvox node
 	if (p->l_link != NULL) {
 		p->l_link->r_link = p->r_link;
 	} else {
@@ -170,14 +168,16 @@ List<T>& List<T>::operator = (const List<T>& dlist)
 			this->insert(temp->info, i);
 			temp = temp->r_link;
 		}
-		return *this;
 	}
+		return *this;
 }
-
 template<class T>
 T& List<T>::operator[](unsigned int index) const
 {
-        node<T>* temp = get_node(index);
+	if (index < 0 || index > size()) {
+        throw std::out_of_range {"List out range."};
+	}
+    node<T>* temp = get_node(index);
 	return temp->info;
 }
 
