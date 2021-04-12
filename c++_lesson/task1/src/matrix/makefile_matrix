@@ -1,0 +1,21 @@
+TOP := $(PWD)
+ODIR := $(TOP)/obj/matrix
+SDIR := $(TOP)/src/matrix
+BINDIR := $(TOP)/bin
+TARGET := matrix
+SOURCE_CPP = $(SDIR)/main.cpp $(SDIR)/matrix.cpp 
+SOURCE_OBJ = $(patsubst %.cpp, $(ODIR)/%.o, $(notdir $(SOURCE_CPP)))
+FLAG = -std=c++11 -g -ggdb
+CXX = g++
+
+#$(error hello $(SOURCE_OBJ))
+
+$(BINDIR)/$(TARGET): $(SOURCE_OBJ)
+	${CXX} $^ -o $@
+
+$(ODIR)/%.o: $(SDIR)/%.cpp
+	 ${CXX} -c $(FLAG) $< -o $@
+
+.PHONY: clean
+clean:
+	rm $(SOURCE_OBJ) $(BINDIR)/$(TARGET)
