@@ -14,7 +14,7 @@ $(BINDIR)/$(TARGET): $(SOURCE_OBJ)
 	${CXX} $^ -o $@
 
 $(ODIR)/%.o: $(SDIR)/%.cpp
-	 ${CXX} -c $(FLAG) $< -o $@
+	 ${CXX} -c -g -ggdb -$(FLAG) $< -o $@
 
 .PHONY: clean
 clean:
