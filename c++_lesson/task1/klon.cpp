@@ -15,6 +15,7 @@ void check_double(const std::string& str, double& result)
 		std::cerr << "Invalid argument: " << ia.what() << '\n';
 	}
 }
+/*
 std::string rand_filename() {
 	const int CHARS_PER_ABC = 26;
 	std::string file_name  = "";
@@ -26,62 +27,82 @@ std::string rand_filename() {
 	file_name = file_name + "_matrix.txt";
 	return file_name;
 }
-Matrix::Matrix(int x,int y): rows(x),cols(y) {
+*/
+
+Matrix::Matrix(int x, int y)
+	: data(0)
+	, rows(x)
+	, cols(y)
+{
+	assert(rows > 0);
+	assert(cols > 0);
 	data = new double* [rows];
-	for (int i = 0; i < rows; ++i){
+	for (int i = 0; i < rows; ++i) {
 		data[i] = new double [cols];
 	}
-	for (int i = 0; i < rows; i++){
-		for (int j = 0; j < cols; j++){
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
 			data[i][j] = 0;
 		}
 	}
 }
-Matrix::Matrix(const Matrix& copy_matrix):rows(copy_matrix.rows),cols(copy_matrix.cols) {
+
+Matrix::Matrix(const Matrix& copy_matrix)
+	: rows(copy_matrix.rows)
+	, cols(copy_matrix.cols)
+{
+	assert(rows > 0);
+   	assert(cols > 0);
 	data = new double* [rows];
-	for (int i=0; i<rows; i++) {
+	for (int i = 0; i < rows; i++) {
 		data[i] = new double [cols];
 	}
-	for (int i=0; i<rows; i++) {
-		for (int j=0; j<cols; j++) {
+	for (int i = 0; i < rows; i++) {
+		for (int j = 0; j < cols; j++) {
 			data[i][j] = copy_matrix.data[i][j];
 		}
 	}
 }
+
 Matrix& Matrix::operator = (const Matrix& mat) {
 	if (this != &mat) {
 		if (rows != mat.rows || cols != mat.cols) {
 			delete data;
+			assert(data == 0);
 			rows = mat.rows;
 			cols = mat.cols;
 			data = new double*[rows];
 			for (int i = 0; i < rows; ++i)
 				data[i] = new double[cols];
 		}
-		for (int i=0; i<rows; i++) {
-			for (int j = 0; j<cols; j++) {
+		for (int i = 0; i < rows; i++) {
+			for (int j = 0; j < cols; j++) {
 				data[i][j] = mat.data[i][j];
 			}
 		}
 	}
 	return *this;
 }
-
+/*
 const double* Matrix::operator[](const int& index) {
 		assert (index >= 0);
 		if (data[rows * cols * sizeof(double)] > data[index]) {
 			return data[index];
 		}
 		throw std::out_of_range {"Matrix out of range."};
-}
-double* Matrix::operator[](const int index) {
+}*/
+
+double* Matrix::operator[](const int index)
+{
 		assert (index >= 0);
-		if (data[rows * cols * sizeof(double)] > data[index]) {
-			return data[index];
-		}
-		throw std::out_of_range {"Matrix out of range."};
+	std::cout<<"&-  "<<data[index]<<std::endl; 
+		std::cout<<"&-  "<<data[rows*cols*sizeof(double)]<<std::endl;
+		return data[index];
+		std::cout<<"&-  "<<data[index];
 }
-bool Matrix::operator == (const Matrix& mat) const {
+
+bool Matrix::operator == (const Matrix& mat) const
+{
 	if (rows != mat.rows || cols != mat.cols) {
 		return false;
 	}
@@ -94,32 +115,29 @@ bool Matrix::operator == (const Matrix& mat) const {
 	}
 	return true ;
 }
-Matrix Matrix::operator + (const Matrix& other) {
+
+Matrix Matrix::operator + (const Matrix& other)
+{
 	if (rows == other.rows && cols == other.cols) {
 		Matrix temp(rows,cols);
 		for (int i = 0; i < rows; i++) {
 			for (int j = 0; j < cols; j++) {
-				temp.data[i][j] = data[i][j] + other.data[i][j];
+				temp .data[i][j] = data[i][j] + other.data[i][j];
 			}
 		}
 		return temp;
 	}
-	std::cout << "The dimensions of the matrix do not match." << std::endl;
-	exit(1);
+	throw std::logic_error {"The dimensions of the matrix do not match."};
 }
-Matrix& Matrix::operator += (const Matrix& other) {
-	if (rows == other.rows && cols == other.cols) {
-		for (int i = 0; i < rows; i++) {
-			for(int j = 0; j < cols; j++) {
-				data[i][j] += other.data[i][j];
-			}
-		}
-		return *this;
-	}
-	std::cout << "The dimensions of the matrix do not match." << std::endl;
-        exit(1);  //no eto netochno
+
+Matrix& Matrix::operator += (const Matrix& other)
+{
+	*this = *this + other;
+	return *this;
 }
-Matrix  Matrix::operator - (const Matrix& other) {
+ 
+Matrix  Matrix::operator - (const Matrix& other)
+{
 	if (rows == other.rows && cols == other.cols) {
 		Matrix temp(rows,cols);
 		for(int i = 0; i < rows; i++) {
@@ -129,22 +147,17 @@ Matrix  Matrix::operator - (const Matrix& other) {
 		}
 	return temp;
 	}
-	std::cout << "The dimensions of the matrix do not match." << std::endl;
-    exit(1);
+	throw std::logic_error {"The dimensions of the matrix do not match."};
 }
-Matrix& Matrix::operator -= (const Matrix& other) {
-	if (rows == other.rows && cols == other.cols) {
-		for(int i = 0; i < rows; i++) {
-			for(int j = 0; j < cols; j++) {
-				data[i][j] -= other.data[i][j];
-			}
-		}
-		return *this;
-	}
-	std::cout << "The dimensions of the matrix do not match." << std::endl;
-        exit(1);
+
+Matrix& Matrix::operator -= (const Matrix& other)
+{
+	 *this = *this - other;
+	 return *this;
 }
-Matrix Matrix::operator * (const Matrix& mat) {
+
+Matrix Matrix::operator * (const Matrix& mat)
+{
     if (cols == mat.rows) {
         Matrix temp(rows,mat.cols);
         for (int i = 0; i < rows; i++) {
@@ -156,26 +169,20 @@ Matrix Matrix::operator * (const Matrix& mat) {
         }
         return temp;
     }
-    std::cout << "The dimensions of the matrix are incorrect." << std::endl;
-    exit(1);
+	throw std::logic_error {"The dimensions of the matrix are incorrect."};
 }
-Matrix& Matrix::operator *= (const Matrix& mat) {
-	if (rows == cols && mat.rows == mat.cols && rows == mat.rows) { //ete nuyn chapi qarakusayin matrixner en nor tuyl enq talis
-		Matrix temp(rows,cols);
-		temp = *this;//no eto netochno
-		for (int i = 0; i < rows; i++) {
-			for(int j = 0; j < cols; j++) {
-				for(int k = 0; k < cols; k++) {
-					data[i][j] += temp.data[i][k] * mat.data[k][j];
-				}
-			}
-		}
+
+Matrix& Matrix::operator *= (const Matrix& mat)
+{
+	if (rows == cols && mat.rows == mat.cols && rows == mat.rows) { //ete qarakusayin matrixner en nor tuyl enq talis
+		*this = *this * mat;
 		return *this;
 	}
-	std::cout << "The dimensions of the matrix are incorrect." << std::endl;
-	exit(1);
+	throw std::logic_error {"The dimensions of the matrix are incorrect."};
 }
-Matrix& Matrix::operator * (const double& number) {
+
+Matrix& Matrix::operator * (const double& number)
+{
 	for (int i = 0; i < rows; i++) {
 		for (int j = 0; j < cols; j++) {
 			data[i][j] = data[i][j] * number;
@@ -183,7 +190,8 @@ Matrix& Matrix::operator * (const double& number) {
 	}
 	return *this;
 }
-Matrix operator * (const double& number, const Matrix& mat) {
+Matrix operator * (const double& number, const Matrix& mat)
+{
     Matrix temp(mat.rows, mat.cols);
     for (int i = 0; i < mat.rows; i++) {
         for (int j = 0; j < mat.cols; j++) {
@@ -192,13 +200,19 @@ Matrix operator * (const double& number, const Matrix& mat) {
     }
     return temp;
 }
-Matrix::~Matrix() {std::cout << "55" << std::endl;
+
+Matrix::~Matrix()
+{
 	for (int i = 0; i < rows; i++) {
-		delete [] data[i];std::cout << "33" << std::endl;
-	}std::cout << "44" << std::endl;
+		delete [] data[i];
+	}
 	delete [] data;
+	data = 0;
+	cols = 0;
+	rows = 0;
 }
-bool check_dimensions_of_matrix(std::string path, const int row, const int col) {
+
+bool check_dimensions_of_matrix(const std::string& path, const int row, const int col) {
 	std::string str1_row;
 	int row_count = 0, column_count = 0, i = 0;
 	std::ifstream file_input(path);
@@ -235,13 +249,16 @@ bool check_dimensions_of_matrix(std::string path, const int row, const int col) 
 	file_input.close();
 	return true ;
 }
+
 std::istream& operator >> (std::istream& in, Matrix& matrix) {
 	std::string file_path;
-	double result;
-	int i = 0, j = 0;
-	std::cout<<"Enter file name: ";
+	double result = 0;
+	int i = 0;
+	int j = 0;
+	std::cout << "Enter file name: ";
 	in >> file_path;
 	if (check_dimensions_of_matrix(file_path, matrix.rows, matrix.cols) == false) {
+		
 		exit(1);
 	} else {
 		std::string str = "";
@@ -276,8 +293,11 @@ std::istream& operator >> (std::istream& in, Matrix& matrix) {
 		assert(i == matrix.rows);
 		file_input.close();
 	}
+	return in;
 }
+
 std::ostream& operator << (std::ostream& out, Matrix& matrix) {
+	/*
 	std::string file_name_s = "";
 	while (true) {
 		file_name_s = rand_filename();
@@ -295,11 +315,12 @@ std::ostream& operator << (std::ostream& out, Matrix& matrix) {
 			myfile.close();
 			break;
 		}
-	}
+	}*/
 	for (int i = 0; i < matrix.rows; ++i) {
-                for (int j = 0; j < matrix.cols; ++j) {
-                        out << matrix.data[i][j] << " ";
-                }
-		out<<std::endl;
-        }
+		for (int j = 0; j < matrix.cols; ++j) {
+			out << matrix.data[i][j] << " ";
+		}
+		out << std::endl;
+	}
+	return out;
 }
