@@ -36,7 +36,7 @@ Matrix::Matrix(int x, int y)
 
 Matrix::Matrix(const Matrix& copy_matrix)
 	: rows(copy_matrix.rows)
-	  , cols(copy_matrix.cols)
+	, cols(copy_matrix.cols)
 {
 	assert(rows > 0);
 	assert(cols > 0);
@@ -70,27 +70,11 @@ Matrix& Matrix::operator = (const Matrix& mat) {
 	}
 	return *this;
 }
- /*
 double* Matrix::operator[](const int index)
 {
 	assert (index >= 0);
-	try
-	{
-		return data[index];
-	}
-	catch (...)
-	{
-		std::cout << "Out-of-bounds exception captured!\n";
-	}
-}
-*/
-double* Matrix::operator[](const int index)
-{
-	std::cout<<data[rows *cols*sizeof(double)];
-	std::cout<<data[index];
-        assert (index >= 0);
-        assert (data[index] <= data[rows *cols*sizeof(double)] && data[index] >= data[0]);
-        return data[index];
+	assert (index < rows);
+	return data[index];
 }
 
 bool Matrix::operator == (const Matrix& mat) const
@@ -183,25 +167,24 @@ Matrix& Matrix::operator * (const double& number)
 	return *this;
 }
 /*
-Matrix& operator * (const double& number, Matrix& mat)
-{
-        Matrix temp(mat.rows, mat.cols);
-	temp = mat * number;
-	return temp;
-}
-*/
-/*
-Matrix operator * (const double& number, const Matrix& mat)
-{
-	Matrix temp(mat.rows, mat.cols);
-	for (int i = 0; i < mat.rows; i++) {
-		for (int j = 0; j < mat.cols; j++) {
-			temp.data[i][j] = number * mat.data[i][j];
-		}
-	}
-	return temp;
-}
-*/
+   Matrix operator * (const double& number, Matrix& mat)
+   {
+   Matrix temp(mat.rows, mat.cols);
+   temp = mat * number;
+   return temp;
+   }
+
+   Matrix operator * (const double& number, const Matrix& mat)
+   {
+   Matrix temp(mat.rows, mat.cols);
+   for (int i = 0; i < mat.rows; i++) {
+   for (int j = 0; j < mat.cols; j++) {
+   temp.data[i][j] = number * mat.data[i][j];
+   }
+   }
+   return temp;
+   }
+ */
 Matrix::~Matrix()
 {
 	for (int i = 0; i < rows; i++) {
@@ -213,14 +196,20 @@ Matrix::~Matrix()
 	rows = 0;
 }
 
-bool Matrix::check_dimensions_of_matrix(const std::string& path)
+void check_dimensions(int dim_count, int dim)
+{
+	if ((dim_count) % dim != 0 || dim_count / dim != 1) {
+		throw std::logic_error {"The dimensions of the matrix and matrix int the file do not math."};
+	}
+}
+
+void Matrix::check_dimensions_of_matrix(std::string& path)
 {
 	std::string str1_row;
 	int row_count = 0, column_count = 0, i = 0;
 	std::ifstream file_input(path);
 	if ( ! file_input.is_open()) {
-		std::cout << " File isn't open." << std::endl;
-		return false;
+		throw std::ifstream::failure {"File isn't open."};
 	}
 	while (getline(file_input, str1_row)) {
 		if (str1_row[0] != '\0') {
@@ -238,20 +227,23 @@ bool Matrix::check_dimensions_of_matrix(const std::string& path)
 					column_count++;
 				}
 			}
-			if ((column_count) % cols != 0 || column_count / cols != 1) {
-				std::cout << "The number of columns is incorrect." << std::endl;
-				return false;
-			}
+			check_dimensions(column_count, cols);
 		}
 	}
-	if (row_count % rows != 0 || row_count / rows != 1) {
-		std::cout << "The number of rows is incorrect." << std::endl;
-		return false;
-	}
+	check_dimensions(row_count, rows);
 	file_input.close();
-	return true ;
 }
 
+void Matrix::change_element(std::string& data1, double& result, int i, int j)
+{
+	assert(i >= 0);
+	assert(j >= 0);	
+	if (data1 != "") {
+		convert_to_double(data1, result);
+		data[i][j] = result;
+		data1 = "";
+	}
+}
 std::istream& operator >> (std::istream& in, Matrix& matrix)
 {
 	std::string file_path;
@@ -259,41 +251,29 @@ std::istream& operator >> (std::istream& in, Matrix& matrix)
 	int i = 0;
 	int j = 0;
 	std::cout << "Enter file name: ";
-	in >> file_path;
-	if (matrix.check_dimensions_of_matrix(file_path) == false) {
-		throw std::logic_error {"The dimensions of the matrix and matrix int the file do not math."};
-	} else {
-		std::string str = "";
-		std::string data1 = "";
-		std::ifstream file_input(file_path);
-		if ( ! file_input.is_open()) {
-			throw std::ifstream::failure {"File isn't open."};
-		}
-		while (getline(file_input, str)) {
-			assert(j == 0);
-			for (int k = 0; str[k] != '\0'; k++) {
-				if (! isspace(str[k])) {
-					data1 += str[k];
-				} else {
-					if (data1 != "") {
-						convert_to_double(data1, result);
-						matrix.data[i][j] = result;
-						data1 = "";
-						j++;
-					}
-				}
-			}
-			if (data1 != "") {
-				convert_to_double(data1, result);
-				matrix.data[i][j] = result;
-				data1 = "";
-			}
-			i++;
-			j = 0;
-		}
-		assert(i == matrix.rows);
-		file_input.close();
+	matrix.check_dimensions_of_matrix(file_path);
+	std::string str = "";
+	std::string data1 = "";
+	std::ifstream file_input(file_path);
+	if ( ! file_input.is_open()) {
+		throw std::ifstream::failure {"File isn't open."};
 	}
+	while (getline(file_input, str)) {
+		assert(j == 0);
+		for (int k = 0; str[k] != '\0'; k++) {
+			if (! isspace(str[k])) {
+				data1 += str[k];
+			} else {
+				matrix.change_element(data1, result, i, j);
+				j++;
+			}
+		}
+		matrix.change_element(data1, result, i, j);
+		i++;
+		j = 0;
+	}
+	assert(i == matrix.rows);
+	file_input.close();
 	return in;
 }
 
