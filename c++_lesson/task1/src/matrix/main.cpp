@@ -47,16 +47,17 @@ void check_scalar_with_assignment_operator()
 void check_cin_operator()
 {
     Matrix mat1(3,3); // stugel chaperi anpatasxanutyuny ev convert chlinely 
-	std::cin >> mat1;
+    std::cout << "object created." << std::endl;
+    std::cin >> mat1;
 }
 int main()
 {
-//	check_constructor();
+//  check_constructor();
 //  check_assignment_operator();
 //  check_subscript_operator();
 //  check_equality_operator();
 //  check_sum_operator();
 //  check_scalar_with_assignment_operator();
-//	check_cin_operator();
+//  check_cin_operator();
 	return 0;
 }

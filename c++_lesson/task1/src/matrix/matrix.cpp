@@ -7,7 +7,8 @@
 #include<time.h>
 #include<cstring>
 
-void convert_to_double(const std::string& str, double& result)
+// returns converted double type value if possible.
+void Matrix::convert_to_double(const std::string& str, double& result)
 {
 	try {
 		result = std::stod(str);
@@ -16,6 +17,7 @@ void convert_to_double(const std::string& str, double& result)
 	}
 }
 
+// overloaded constructor that creates a matrix with  ROWxCOL dimensions.
 Matrix::Matrix(int x, int y)
 	: data(0)
 	, rows(x)
@@ -27,13 +29,14 @@ Matrix::Matrix(int x, int y)
 	for (int i = 0; i < rows; ++i) {
 		data[i] = new double [cols];
 	}
-	for (int i = 0; i < rows; i++) {
+	for (int i = 0; i < rows; i++) { // fills the matrix with zero.
 		for (int j = 0; j < cols; j++) {
 			data[i][j] = 0;
 		}
 	}
 }
 
+// overloaded copy constructor.
 Matrix::Matrix(const Matrix& copy_matrix)
 	: rows(copy_matrix.rows)
 	, cols(copy_matrix.cols)
@@ -51,8 +54,9 @@ Matrix::Matrix(const Matrix& copy_matrix)
 	}
 }
 
+// overloaded assignment operator.
 Matrix& Matrix::operator = (const Matrix& mat) {
-	if (this != &mat) {
+	if (this != &mat) { // checks if the same matrix weren't assigned, if not and if they don't match in size then deletes *this of matrix
 		if (rows != mat.rows || cols != mat.cols) {
 			delete data;
 			assert(data == 0);
@@ -70,6 +74,7 @@ Matrix& Matrix::operator = (const Matrix& mat) {
 	}
 	return *this;
 }
+// changes and return the value of a specified element.
 double* Matrix::operator[](const int index)
 {
 	assert (index >= 0);
@@ -77,9 +82,10 @@ double* Matrix::operator[](const int index)
 	return data[index];
 }
 
+// overloaded equality check operator.
 bool Matrix::operator == (const Matrix& mat) const
 {
-	if (rows != mat.rows || cols != mat.cols) {
+	if (rows != mat.rows || cols != mat.cols) { // if the dimensions don't match or at least one element doesn't match then false
 		return false;
 	}
 	for (int i = 0; i < rows; i++) {
@@ -92,6 +98,7 @@ bool Matrix::operator == (const Matrix& mat) const
 	return true ;
 }
 
+// overloaded addiction operator.
 Matrix Matrix::operator + (const Matrix& other)
 {
 	if (rows == other.rows && cols == other.cols) {
@@ -106,12 +113,14 @@ Matrix Matrix::operator + (const Matrix& other)
 	throw std::logic_error {"The dimensions of the matrix do not match."};
 }
 
+// overloaded addiction with assignment operator.
 Matrix& Matrix::operator += (const Matrix& other)
 {
 	*this = *this + other;
 	return *this;
 }
 
+// overloaded substation operator.
 Matrix  Matrix::operator - (const Matrix& other)
 {
 	if (rows == other.rows && cols == other.cols) {
@@ -126,12 +135,14 @@ Matrix  Matrix::operator - (const Matrix& other)
 	throw std::logic_error {"The dimensions of the matrix do not match."};
 }
 
+// overloaded substation with assignment operator.
 Matrix& Matrix::operator -= (const Matrix& other)
 {
 	*this = *this - other;
 	return *this;
 }
 
+// scalar product of two matrices.
 Matrix Matrix::operator * (const Matrix& mat)
 {
 	if (cols == mat.rows) {
@@ -148,15 +159,17 @@ Matrix Matrix::operator * (const Matrix& mat)
 	throw std::logic_error {"The dimensions of the matrix are incorrect."};
 }
 
+// scalar product of two matrices via assignment to the first matrix.
 Matrix& Matrix::operator *= (const Matrix& mat)
 {
-	if (rows == cols && mat.rows == mat.cols && rows == mat.rows) { //ete qarakusayin matrixner en nor tuyl enq talis
+	if (rows == cols && mat.rows == mat.cols && rows == mat.rows) { // if it is a square matrix, then calculate the dot product.
 		*this = *this * mat;
 		return *this;
 	}
 	throw std::logic_error {"The dimensions of the matrix are incorrect."};
 }
 
+// performs multiplication of the matrix with given number on the right.
 Matrix& Matrix::operator * (const double& number)
 {
 	for (int i = 0; i < rows; i++) {
@@ -166,47 +179,33 @@ Matrix& Matrix::operator * (const double& number)
 	}
 	return *this;
 }
-/*
-   Matrix operator * (const double& number, Matrix& mat)
-   {
-   Matrix temp(mat.rows, mat.cols);
-   temp = mat * number;
-   return temp;
-   }
 
-   Matrix operator * (const double& number, const Matrix& mat)
-   {
-   Matrix temp(mat.rows, mat.cols);
-   for (int i = 0; i < mat.rows; i++) {
-   for (int j = 0; j < mat.cols; j++) {
-   temp.data[i][j] = number * mat.data[i][j];
-   }
-   }
-   return temp;
-   }
- */
-Matrix::~Matrix()
+// performs multiplication of the matrix with given number on the right.
+Matrix operator * (const double& number, const Matrix& mat)
 {
-	for (int i = 0; i < rows; i++) {
-		delete [] data[i];
+	Matrix temp(mat.rows, mat.cols);
+	for (int i = 0; i < mat.rows; i++) {
+		for (int j = 0; j < mat.cols; j++) {
+			temp.data[i][j] = number * mat.data[i][j];
+		}
 	}
-	delete [] data;
-	data = 0;
-	cols = 0;
-	rows = 0;
+	return temp;
 }
 
-void check_dimensions(int dim_count, int dim)
+void Matrix::check_dimension(int dim_count, int dim)
 {
 	if ((dim_count) % dim != 0 || dim_count / dim != 1) {
-		throw std::logic_error {"The dimensions of the matrix and matrix int the file do not math."};
+		throw std::logic_error {"The dimensions of the matrix and matrix in the file do not match."};
 	}
 }
 
+// check dimensions of matrix and matrix in file.
 void Matrix::check_dimensions_of_matrix(std::string& path)
 {
-	std::string str1_row;
-	int row_count = 0, column_count = 0, i = 0;
+	std::string str1_row; // the next line of the file is hold.
+	int row_count = 0; // counts the number of rows in a file.
+        int column_count = 0; // counts the number of columns in a file.
+        int i = 0;
 	std::ifstream file_input(path);
 	if ( ! file_input.is_open()) {
 		throw std::ifstream::failure {"File isn't open."};
@@ -214,26 +213,28 @@ void Matrix::check_dimensions_of_matrix(std::string& path)
 	while (getline(file_input, str1_row)) {
 		if (str1_row[0] != '\0') {
 			row_count++;
-			column_count = 0;
+			assert(column_count = 0);
 			for ( i = 0; str1_row[i] != '\0'; i++) {
 				if (str1_row[i] == ' ') {
 					if (i != 0 && str1_row[i-1] != ' ') {
-						column_count++;
+						column_count++; // each time encounter a space , adds the value of the counter if there was no space before.
 					}
 				}
 			}
-			if (str1_row[i] == '\0') {
+			if (str1_row[i] == '\0') { // checks if last data was viewed, as there might not have been a space after the last data.
 				if (i != 0 && str1_row[i-1] != ' ') {
 					column_count++;
 				}
 			}
-			check_dimensions(column_count, cols);
+			check_dimension(column_count, cols); // Checks the number of columns in the file corresponds to the number of columns in the matrix.
+			column_count = 0; // zero the counter by going to the next line of the file.
 		}
 	}
-	check_dimensions(row_count, rows);
+	check_dimension(row_count, rows); // Checks the number of rows in the file corresponds to the number of rows in the matrix.
 	file_input.close();
 }
 
+// converts data and assigns to the corresponding element of the matrix.
 void Matrix::change_element(std::string& data1, double& result, int i, int j)
 {
 	assert(i >= 0);
@@ -244,6 +245,8 @@ void Matrix::change_element(std::string& data1, double& result, int i, int j)
 		data1 = "";
 	}
 }
+
+// reads the data from the file, performs validations and fills the matrix in case of correctness.
 std::istream& operator >> (std::istream& in, Matrix& matrix)
 {
 	std::string file_path;
@@ -251,6 +254,7 @@ std::istream& operator >> (std::istream& in, Matrix& matrix)
 	int i = 0;
 	int j = 0;
 	std::cout << "Enter file name: ";
+	in >> file_path;
 	matrix.check_dimensions_of_matrix(file_path);
 	std::string str = "";
 	std::string data1 = "";
@@ -277,6 +281,7 @@ std::istream& operator >> (std::istream& in, Matrix& matrix)
 	return in;
 }
 
+// prints the content of the matrix.
 std::ostream& operator << (std::ostream& out, Matrix& matrix)
 {
 	for (int i = 0; i < matrix.rows; ++i) {
@@ -286,4 +291,16 @@ std::ostream& operator << (std::ostream& out, Matrix& matrix)
 		out << std::endl;
 	}
 	return out;
+}
+
+// overloaded matrix destructor.
+Matrix::~Matrix()
+{
+	for (int i = 0; i < rows; i++) {
+		delete [] data[i];
+	}
+	delete [] data;
+	data = 0;
+	cols = 0;
+	rows = 0;
 }

@@ -1,5 +1,6 @@
 #ifndef MATRIX_H
 #define MATRIX_H
+#include<iostream>
 /**************
    A class that creates an matrix object,
    which dimensions can not be changed during the object lifetime.
@@ -14,7 +15,6 @@ public:
 	void check_dimensions_of_matrix(std::string&); // check dimensions of matrix and matrix in file.
    	Matrix& operator = (const Matrix&); // overloaded assignment operator.
    	bool operator == (const Matrix&) const; // overloaded equality check operator.
-	Matrix& operator - (); // converts the elements of the matrix to the opposite sign.
 	Matrix operator * (const Matrix&); // scalar product of two matrices.
 	Matrix& operator *= (Matrix const&); // scalar product of two matrices via assignment to the first matrix.
 	Matrix operator + (const Matrix&); // overloaded addiction operator.
@@ -28,7 +28,7 @@ public:
     ~Matrix(); // overloaded matrix destructor.
 private:
 	static void convert_to_double(const std::string&, double&); // returns converted double type value if possible.
-	static void check_dimensions(int, int);
+	static void check_dimension(int, int);
 private:
 	double** data;
 	int rows;
