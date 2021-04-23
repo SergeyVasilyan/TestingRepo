@@ -8,7 +8,7 @@
 class Matrix
 {
 public:
-	Matrix(const int, const int); // overloaded constructor that creates a matrix with  ROWxCOL dimensions and fills the matrix with zero.
+	Matrix(const int, const int); // overloaded constructor that creates a matrix with  ROW x COL dimensions and fills the matrix with zero.
 	Matrix(const Matrix&); // overloaded copy constructor.
 	double* operator[](const int); // changes and return the value of a specified element.
 	void change_element(std::string&, double&, int, int); // converts data and assigns to the corresponding element of the matrix.

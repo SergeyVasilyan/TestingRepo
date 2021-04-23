@@ -1,9 +1,9 @@
-#include"matrix.h" 
+#include"matrix.h"
 #include<iostream>
 #include<cassert>
 #include<fstream>
 #include<unistd.h>
-#include<stdlib.h> 
+#include<stdlib.h>
 #include<time.h>
 #include<cstring>
 
@@ -17,7 +17,7 @@ void Matrix::convert_to_double(const std::string& str, double& result)
 	}
 }
 
-// overloaded constructor that creates a matrix with  ROWxCOL dimensions.
+// overloaded constructor that creates a matrix with  ROW x COL dimensions.
 Matrix::Matrix(int x, int y)
 	: data(0)
 	, rows(x)
@@ -74,6 +74,7 @@ Matrix& Matrix::operator = (const Matrix& mat) {
 	}
 	return *this;
 }
+
 // changes and return the value of a specified element.
 double* Matrix::operator[](const int index)
 {
@@ -213,9 +214,9 @@ void Matrix::check_dimensions_of_matrix(std::string& path)
 	while (getline(file_input, str1_row)) {
 		if (str1_row[0] != '\0') {
 			row_count++;
-			assert(column_count = 0);
+			assert(column_count == 0);
 			for ( i = 0; str1_row[i] != '\0'; i++) {
-				if (str1_row[i] == ' ') {
+				if (isspace(str1_row[i])) {
 					if (i != 0 && str1_row[i-1] != ' ') {
 						column_count++; // each time encounter a space , adds the value of the counter if there was no space before.
 					}

@@ -32,7 +32,7 @@ void check_sub_operator()
 {
     Matrix mat1(3,2);
     std::cin >> mat1;
-    Matrix mat2(3,2);
+    Matrix mat2(3,9);
 	mat2[0][0] = 3;
 	mat2[2][1] = 5.222;
     Matrix mat3 = mat1 - mat2;
@@ -59,7 +59,6 @@ void check_scalar_with_assignment_operator()
 }
 void check_multiplication_number()
 {
-/*	
 	Matrix mat1(2,2);
     mat1[0][0] = 1;
     mat1[0][1] = 1;
@@ -69,16 +68,18 @@ void check_multiplication_number()
     mat1 = mat1 * 6;
     std::cout << mat1 << std::endl;
 	/*
-	*/
 	Matrix mat1(2,2);
-    mat1[0][0] = 1;
-    mat1[0][1] = 1;
-    mat1[1][0] = 1;
-    mat1[1][1] = 1;
+    mat2[0][0] = 1;
+    mat2[0][1] = 1;
+    mat2[1][0] = 1;
+    mat2[1][1] = 1;
 	double a;
 	std::cin >> a;
     mat1 = a * mat1;
     std::cout << mat1 << std::endl;
+
+
+	 */
 
 }
 void check_cin_operator()
@@ -89,13 +90,13 @@ void check_cin_operator()
 }
 int main()
 {
-//  check_assignment_operator();
+  	check_assignment_operator();
 //  check_equality_operator();
 //  bad_check_sum_operator();
 //	check_sub_operator();
 //  bad_check_scalar_with_assignment_operator();
 //	check_scalar_with_assignment_operator();
 //	check_multiplication_number();
-    check_cin_operator();
+//  check_cin_operator();
 	return 0;
 }
