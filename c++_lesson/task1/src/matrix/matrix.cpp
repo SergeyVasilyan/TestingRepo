@@ -99,6 +99,11 @@ bool Matrix::operator == (const Matrix& mat) const
 	return true ;
 }
 
+bool Matrix::square_matrix()
+{
+	return rows == cols;
+}
+
 // overloaded addiction operator.
 Matrix Matrix::operator + (const Matrix& other)
 {

@@ -15,6 +15,7 @@ public:
 	void check_dimensions_of_matrix(std::string&); // check dimensions of matrix and matrix in file.
    	Matrix& operator = (const Matrix&); // overloaded assignment operator.
    	bool operator == (const Matrix&) const; // overloaded equality check operator.
+	bool square_matrix();
 	Matrix operator * (const Matrix&); // scalar product of two matrices.
 	Matrix& operator *= (Matrix const&); // scalar product of two matrices via assignment to the first matrix.
 	Matrix operator + (const Matrix&); // overloaded addiction operator.
@@ -25,7 +26,7 @@ public:
 	friend Matrix operator * (const double&, const Matrix&); // performs multiplication of the matrix with given number on the left.
 	friend std::istream& operator>>(std::istream&, Matrix&); // reads the data from the file, performs validations and fills the matrix in case of correctness.
 	friend std::ostream& operator<<(std::ostream&, Matrix&); // prints the content of the matrix.
-    ~Matrix(); // overloaded matrix destructor.
+        ~Matrix(); // overloaded matrix destructor.
 private:
 	static void convert_to_double(const std::string&, double&); // returns converted double type value if possible.
 	static void check_dimension(int, int);
