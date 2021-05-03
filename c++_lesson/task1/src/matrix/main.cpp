@@ -1,12 +1,17 @@
 #include"matrix.h"
 #include<iostream>
 #include<csignal>
+#include <pthread.h>
+#define ERROR_CREATE_THREAD -11
+#define ERROR_JOIN_THREAD -12
+#define SUCCESS 0
 
-void signal_handel(int signum) 
+void signal_handel(int signum)
 {
 	std::cout << "Interrupt signal (" << signum <<") received." << std::endl;
 	exit(signum);
 }
+
 void check_assignment_operator()
 {
 	Matrix mat1(3,2);
@@ -93,16 +98,33 @@ void check_cin_operator()
 	std::cout << "object created." << std::endl;
 	std::cin >> mat1;
 }
+void* server(void *args)
+{
+    return SUCCESS;
+}
 int main()
 {
 	signal(SIGABRT, signal_handel);
+	pthread_t thread;
+    int status;
+    int status_addr;
+    status = pthread_create(&thread, NULL, server, NULL);
+    if (status != 0) {
+        printf("main error: can't create thread, status = %d\n", status);
+        exit(ERROR_CREATE_THREAD);
+    }
+    status = pthread_join(thread, (void**)&status_addr);
+    if (status != SUCCESS) {
+        printf("main error: can't join thread, status = %d\n", status);
+        exit(ERROR_JOIN_THREAD);
+    }
 	//  check_assignment_operator();
 	//  check_equality_operator();
 	//  bad_check_sum_operator();
-	//  check_sub_operator();
+	    check_sub_operator();
 	//  bad_check_scalar_with_assignment_operator();
 	//  check_scalar_with_assignment_operator();
 	//  check_multiplication_number();
-	check_cin_operator();
+	//  check_cin_operator();
 	return 0;
 }
