@@ -35,7 +35,6 @@ Matrix::Matrix(int x, int y)
 		}
 	}
 }
-
 // overloaded copy constructor.
 Matrix::Matrix(const Matrix& copy_matrix)
 	: rows(copy_matrix.rows)
