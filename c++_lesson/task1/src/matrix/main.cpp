@@ -7,7 +7,7 @@
 #include<netinet/in.h>
 #include<unistd.h>
 #include<fstream>
-#include<cstring> 
+#include<cstring>
 #define ERROR_CREATE_THREAD -11
 #define ERROR_JOIN_THREAD -12
 #define SUCCESS 0
@@ -106,12 +106,12 @@ void check_cin_operator()
 }
 bool check_double(const std::string& str)
 {
-        try {
-                double result = std::stod(str);
+	try {
+		double result = std::stod(str);
 		return true;
-        } catch (const std::invalid_argument& ia) {
-                return false;
-        }
+	} catch (const std::invalid_argument& ia) {
+		return false;
+	}
 }
 bool check_data(std::string str, bool flag)
 {
@@ -141,6 +141,7 @@ bool check_data(std::string str, bool flag)
 	if (flag == true) {
 		return row == word;
 	}
+	return true;
 }
 void* server(void *args)
 {
@@ -153,7 +154,7 @@ void* server(void *args)
 		exit(EXIT_FAILURE);
 	}
 	address.sin_family = AF_UNIX;
-	address.sin_addr.s_addr = INADDR_ANY; //INADDE_ANY соответствует адресу локального компьютера.
+	address.sin_addr.s_addr = INADDR_ANY;
 	address.sin_port = htons(PORT);
 
 	if (bind (server_fd, (struct sockaddr *)&address, sizeof(address)) < 0) {
@@ -165,35 +166,31 @@ void* server(void *args)
 		exit(EXIT_FAILURE);
 	}
 	if ((new_socket = accept (server_fd, (struct sockaddr *)&address,
-				  (socklen_t*)&addrlen)) < 0) {
+							  (socklen_t*)&addrlen)) < 0) {
 		perror("Accept failed.");
 		exit(EXIT_FAILURE);
 	}
-	if (recv (new_socket, buffer, strlen(buffer) > 0) {///sxal mxal banner kaa
+	if (recv (new_socket, buffer, strlen(buffer), 0) > 0) {
 		if (check_data(buffer, true)) {
-			if (recv (new_socket, buffer, strlen(buffer) > 0) {
+			if (recv (new_socket, buffer, strlen(buffer), 0) > 0) {
 				if (check_data(buffer, false)) {
-					buffer = 'True';
+					strcpy(buffer, "Correct." );
 					send(new_socket, buffer, strlen(buffer), 0);
-					return SUCCESS;
 				} else {
-					buffer = 'True';
-                                	send(new_socket, buffer, strlen(buffer), 0);
-                                	return SUCCESS;
+					strcpy(buffer, "Incorrect." );
+					send(new_socket, buffer, strlen(buffer), 0);
 				}
 			} else {
 				printf("\nServer don't work.\n");
-				return;
 			}
 		} else {
-			buffer = 'True';
-                        send(new_socket, buffer, strlen(buffer), 0);
-                        return SUCCESS;
+			strcpy(buffer, "Incorrect" );
+			send(new_socket, buffer, strlen(buffer), 0);
 		}
 	} else {
 		printf("\nServer don't work.\n");
-		return -1;
 	}
+	return SUCCESS;
 }
 int main()
 {
