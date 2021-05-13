@@ -6,55 +6,55 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <string>
-#define PORT 6996
+#include<fstream>
+#define PORT 3113
 
-std::string file_path(std::string str)
+bool check_exist_file(std::string str)
 {
-	struct data {
-		std::string cl_filepath;
-		std::string sr_username;
-		std::string sr_filepath;
+	std::ifstream test(str);
+	if( ! test) {
+		return false;
 	}
-	data aa;//heto kpoxem anuny
+	std::cout << "1" << std::endl;
+	return true;
+}
+
+std::string create_file_path(std::string str)
+{
+	std::string cl_filepath = "";
+	std::string sr_filepath = "";
 	std::string word = "";
 	int count = 1;
+	std::cout << "2" << std::endl;
 	for (int k = 0; str[k] != '\0'; k++) { //sa arandzin funkcia kara lini 
-            if (! isspace(str[k])) {
-                word += str[k];
-            } else {
-				switch (count) {
-				case 1:
-					aa.cl_filepath = word;
-					count++;
-					break;
-				case 2:
-					aa.sr_username = word;
-					count++;
-					break;
-				case 3:
-					aa.sr_filepath = word;
-					count++;
-					break;
-			}
-				word = "";
-           }
-    }
-	for (int k = str.lenght; str[k] != '/'; k--) {
-            word += str[k];
+		if (! isspace(str[k])) {
+			word += str[k];
+		} else {
+			std::cout << word << std::endl;
+			cl_filepath = word;
+			word = "";
+			std::cout << "4" << std::endl;
+		}
 	}
-	aa.sr_username += "/";
-	aa.sr_username += aa.sr_filepath;
-	aa.sr_username += "/";
-	aa.sr_username += word;
-	return aa.sr_username;
-
+	sr_filepath = word;
+	if (check_exist_file(sr_filepath)) {
+		sr_filepath += "/";
+		sr_filepath += cl_filepath;
+		return sr_filepath;
+	} else {
+		// tralala
+		return "";
+	}
 }
-int main() {
+
+int main()
+{
 	int sock = socket (AF_INET, SOCK_STREAM, 0);
 	if (sock < 0) {
 		printf ("ERROR: Failed to obtain Socket Descriptor.\n");
 		return (0);
 	}
+	std::cout << "5" << std::endl;
 	struct sockaddr_in addr_local;
 	struct sockaddr_in addr_remote;
 	addr_local.sin_family = AF_INET;
@@ -65,36 +65,69 @@ int main() {
 		printf ("ERROR: Failed to bind Port %d.\n",PORT);
 		return (0);
 	}
+	std::cout << "6" << std::endl;
 	if (listen (sock, SOMAXCONN) < 0) {
 		printf ("ERROR: Failed to listen Port %d.\n", PORT);
 		return (0);
 	}
+	std::cout << "7" << std::endl;
 	int success = 0;
 	while (success == 0) {
-		if ((int new_sock = accept(sockfd, (struct sockaddr *)&addr_remote, sizeof(struct sockaddr_in))) == -1) {
+		int addrlen = sizeof(addr_remote);
+		int new_sock = accept(sock, (struct sockaddr *)&addr_remote, (socklen_t*)&addrlen);
+		if (new_sock == -1) {
 			printf ("ERROR: Obtain new socket descriptor error.\n");
 		} else {
-			if (!fork()) {
-				char buffer[4096] = {0};
-				if (recv(new_sock, buffer, strlen(buffer), 0) < 0) {
-					perror("Error sending.");
+			std::cout << "8" << std::endl;
+			if ( ! fork()) {
+				char buffer[1024] = {0};
+				if (recv(new_sock, buffer, 1024, 0) < 0) {
+					perror("Error reading.");
 				} else {
-					std::string s_data(buffer);
-					std::string file_path = file_path(s_data);
-					//file open .....
-					// file-i parunakutyunnenq stanum 
-					//bufferi pahy....
-					if (recv (new_sock, buffer, strlen(buffer), 0) < 0) {
-						perror("Error sending.");
-					} else {
-						//stananq parunakutyuny ev save anenq
-						//ev patasxany uxarkenq , vor ameninch ok a
+					char answer[1024] = "OK";
+					if (send(new_sock, answer, strlen(answer), 0) < 0) {
+						printf("\nError sending.\n");
 					}
-					success = 1;
-					close(new_sock);
+					std::cout << "9" << std::endl;
+					std::string s_data(buffer);
+					std::string file_path = create_file_path(s_data);
+					buffer[1024] = {0};
+					if (recv(new_sock, buffer, 1024, 0) < 0) {//buffer fili chapy
+						perror("Error reading.");
+					} else {
+						if (send(new_sock, answer, strlen(answer), 0) < 0) {
+							printf("\nError sending.\n");
+						}
+						std::cout << "10" << std::endl;
+						int lenght = atoi(buffer);
+						char buffer_data[lenght] = {0};
+						if (recv (new_sock, buffer_data, lenght, 0) < 0) {
+							perror("Error reading.");
+						} else {//buffer_data-n berel stringi
+							if (send(new_sock, answer, strlen(answer), 0) < 0) {
+								printf("\nError sending.\n");
+							}
+							std::cout << "11" << std::endl;
+							std::ofstream outfile (file_path);
+							for (int k = 0; buffer_data[k] != '\0'; k++) {
+								outfile << buffer_data[k];//lav sxala es masy
+							}
+							std::cout << "12" << std::endl;
+							outfile.close();
+							//ev patasxany uxarkenq , vor ameninch ok a
+							std::string messenge = "OK";
+							if (send(new_sock, messenge.c_str(), messenge.length(), 0) < 0) {
+								printf("\nError sending.\n");
+							}
+							std::cout << "13" << std::endl;
+						}
+						success = 1;
+						close(new_sock);
+						std::cout << "14" << std::endl;
+					}
 				}
-			}
 
+			}
 		}
 	}
 	close(sock);
