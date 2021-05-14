@@ -33,9 +33,12 @@ std::string create_file_path(std::string str)
 	}
 	sr_filepath = word;
 	if (check_exist_file(sr_filepath)) {
-		sr_filepath += "/";
-		sr_filepath += cl_filepath;
-		return sr_filepath;
+		std::string str = "";
+		str += "~/"
+		str += sr_filepath;
+		str += "/";
+		str += cl_filepath;
+		return str;
 	} else {
 		return "";
 	}

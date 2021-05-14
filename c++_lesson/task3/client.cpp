@@ -70,13 +70,13 @@ int main(int argc,char** argv) {
 		std::string cl_filepath = argv[1];
 		std::string s_ipaddress = argv[2];
 		std::string s_save_filepath = argv[3];
-		int chrlen = 101;
-		char answer[chrlen] = {0};
+		std::cout << s_save_filepath << std::endl;
 		int sock = socket(AF_INET, SOCK_STREAM, 0);
 		if (sock < 0) {
 			perror("Error opening socket.");
 			return 1;
 		}
+		// fill_value(hint);
 		struct sockaddr_in hint;
 		hint.sin_family = AF_INET;
 		hint.sin_port = htons(PORT);
@@ -102,14 +102,6 @@ int main(int argc,char** argv) {
 				}
 				messenge(sock);
 				messenge(sock);
-				/*answer[chrlen] = {0};
-				if (recv(sock, answer, chrlen, 0) > 0) {
-					printf("%s\n", answer);
-				} else {
-					perror("Error reading.");
-					return 1;
-				}
-				*/
 			} else {
 				perror("Error sending.");
 				return 1;
