@@ -7,8 +7,9 @@
 #include <arpa/inet.h>
 #include <string>
 #include<fstream>
-#define PORT 4113
+#define PORT 6113
 
+// Check path validity.
 bool check_path_validity(std::string str)
 {
 	std::ifstream test(str);
@@ -33,17 +34,17 @@ std::string create_file_path(std::string str)
 	}
 	sr_filepath = word;
 	if (check_path_validity(sr_filepath)) {
-		std::string str = "";
-		//str += "~/";
-		str += sr_filepath;
-		str += "/";
-		str += cl_filepath;
-		return str;
+		if (sr_filepath[sr_filepath.length() - 1] != '/') {
+			sr_filepath += '/';
+		}
+		sr_filepath += cl_filepath;
+		return sr_filepath;
 	} else {
 		return "";
 	}
 }
 
+// Struct sockaddr_in object fills value.???( localiny )
 void configure_comunication(struct sockaddr_in& addr_local )
 {
 	addr_local.sin_family = AF_INET;
@@ -52,6 +53,7 @@ void configure_comunication(struct sockaddr_in& addr_local )
 	bzero(&(addr_local.sin_zero), 8);
 }
 
+// Sends a message to the client.
 void send_response(int new_sock, char* answer, int chrlen)
 {
 	if (send(new_sock, answer, chrlen, 0) < 0) {
@@ -60,6 +62,7 @@ void send_response(int new_sock, char* answer, int chrlen)
 	}
 }
 
+// Saves data in file.
 void save_file(std::string file_path, char* buffer_data)
 {
 	std::ofstream outfile (file_path);
@@ -79,11 +82,12 @@ void receive_file_path(int new_sock,std::string& file_path)
 		int chrlen = 101;
 		char answer[chrlen] = "Server got path file.)";
 		send_response(new_sock, answer, chrlen);
+		std::cout << "Got file info." << std::endl;
 		std::string s_data(buffer);
 		file_path = create_file_path(s_data);
 		if (file_path == "") {
 			perror("Path incorrect.");
-			exit(1); //kpoxes heto
+			exit(1);
 		}
 	}
 }
@@ -98,6 +102,7 @@ void receive_file_data(int new_sock, std::string file_path)
 		int chrlen = 101;
 		char answer[chrlen] = "Server got file size.)";
 		send_response(new_sock, answer, chrlen);
+		std::cout << "Got file size." << std::endl;
 		int lenght = atoi(buffer) + 1;
 		char buffer_data[lenght] = {0};
 		if (recv (new_sock, buffer_data, lenght, 0) < 0) {
@@ -105,6 +110,7 @@ void receive_file_data(int new_sock, std::string file_path)
 			exit(1);
 		} else {
 			strcpy(answer, "Server got file data.)");
+			std::cout << "Got file data." << std::endl;
 			send_response(new_sock, answer, chrlen);
 			save_file(file_path, buffer_data);
 		}
@@ -119,9 +125,11 @@ void communicate_with_client(int new_sock, int& success)
 	receive_file_data(new_sock, file_path);
 	char messenge[chrlen] = "Everything is done well:)";
 	send_response(new_sock, messenge, chrlen);
+	std::cout << "Client connection ended." << std::endl;
 	success = 1;
 }
 
+// ???
 int main()
 {
 	int sock = socket (AF_INET, SOCK_STREAM, 0);

@@ -6,8 +6,9 @@
 #include<unistd.h>
 #include<string.h>
 #include<fstream>
-#define PORT 4113
+#define PORT 6113
 
+// Fills the contents of the file in the "data" string.
 void get_file_data(std::string file_path, std::string& data)
 {
 	std::string str = "";
@@ -25,6 +26,7 @@ void get_file_data(std::string file_path, std::string& data)
 	file_input.close();
 }
 
+// Gets file name from file path.
 std::string get_filename(const std::string& str)
 {
 	if (str.length() == 0) {
@@ -43,27 +45,34 @@ std::string get_filename(const std::string& str)
 	return last_word;
 }
 
-std::string create_file_information_string(std::string str1, std::string str2)
+// create file information string("filename server_absolute_file_path").
+std::string create_file_information_string(std::string username, std::string sr_filepath, std::string cl_filepath)
 {
-	std::string cl_filename = get_filename(str1);
-	std::string buffer = "";
-	buffer += cl_filename;
-	buffer += " ";
-	buffer += str2;
-	return buffer;
+	std::string absolute_filepath = "";
+	std::string cl_filename = get_filename(cl_filepath);
+	absolute_filepath += cl_filename;
+	absolute_filepath += " ";
+	if (sr_filepath[0] == '~' && sr_filepath[1] == '/') {
+		absolute_filepath += "/home/";
+		absolute_filepath += username;
+		sr_filepath.erase(0, 1);
+	}
+	absolute_filepath += sr_filepath;
+	return absolute_filepath;
 }
-
+// Receives the message sent by the server.
 void get_response(int socket)
 {
 	int chrlen = 101;
 	char answer[chrlen] = {0};
 	if (recv(socket, answer, chrlen, 0) < 0) {
 		perror("Error reading.");
-		exit(1);//heto poxell;
+		exit(1);
 	}
 	printf("%s\n", answer);
 }
 
+// Struct sockaddr_in object fills value. ???
 void configure_comunication(struct sockaddr_in& hint, std::string s_ipaddress)
 {
 	hint.sin_family = AF_INET;
@@ -71,9 +80,13 @@ void configure_comunication(struct sockaddr_in& hint, std::string s_ipaddress)
 	inet_pton(AF_INET, s_ipaddress.c_str(), &hint.sin_addr);
 }
 
-bool send_data(int sock, std::string cl_filepath, std::string s_save_filepath)
+// Sends data to server.
+// Data: 1. filename, server absolute file path.
+//       2. file size.
+//       3. file data.
+bool send_data(int sock, std::string cl_filepath, std::string s_username, std::string s_save_filepath)
 {
-	std::string buffer = create_file_information_string(cl_filepath, s_save_filepath);
+	std::string buffer = create_file_information_string(s_username, s_save_filepath, cl_filepath);
 	if (send (sock, buffer.c_str(), buffer.length(), 0) < 0) {
 		perror("Error sending.");
 		return false;
@@ -98,14 +111,16 @@ bool send_data(int sock, std::string cl_filepath, std::string s_save_filepath)
 	return true;
 }
 
+// ???
 int main(int argc,char** argv)
 {
-	if (argc != 4) { // file path, IP, server file path
+	if (argc != 5) { // file path, IP, server file path
 		std::cout<<"Incorrect arguments count."<<std::endl;
 	} else {
 		std::string cl_filepath = argv[1];
 		std::string s_ipaddress = argv[2];
-		std::string s_save_filepath = argv[3];
+		std::string s_username = argv[3];
+		std::string s_save_filepath = argv[4];
 		int sock = socket(AF_INET, SOCK_STREAM, 0);
 		if (sock < 0) {
 			perror("Error opening socket.");
@@ -117,7 +132,7 @@ int main(int argc,char** argv)
 			perror("Error connecting.");
 			return 1;
 		}
-		if (send_data(sock, cl_filepath, s_save_filepath) == false) {
+		if (send_data(sock, cl_filepath, s_username, s_save_filepath) == false) {
 			return 1;
 		}
 		close(sock);
