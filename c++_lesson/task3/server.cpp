@@ -117,8 +117,9 @@ void receive_file_data(int new_sock, std::string file_path)
 	}
 }
 
-void communicate_with_client(int new_sock, int& success)
+void communicate_with_client(int new_sock, struct sockaddr_in addr_remote, int& success)
 {
+	std::cout << "Client IP- " << addr_remote.sin_addr.s_addr << std::endl; //inch-vor convert petqa arvi 
 	int chrlen = 101;
 	std::string file_path = "";
 	receive_file_path(new_sock,file_path);
@@ -157,7 +158,7 @@ int main()
 			return 1;
 		} else {
 			if ( ! fork()) {
-				communicate_with_client(new_sock, success);
+				communicate_with_client(new_sock, addr_remote, success);
 				close(new_sock);
 
 			}
