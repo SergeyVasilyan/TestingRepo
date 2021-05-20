@@ -7,9 +7,13 @@
 #include <arpa/inet.h>
 #include <string>
 #include<fstream>
+#include<csignal>
 #define PORT 6113
 
-// Check path validity.
+/*
+   Checks path validity.
+   First argument - file path.
+*/
 bool check_path_validity(std::string str)
 {
 	std::ifstream test(str);
@@ -19,16 +23,20 @@ bool check_path_validity(std::string str)
 	return true;
 }
 
+/*
+  Creates file path.
+  First argument - file information string.
+*/
 std::string create_file_path(std::string str)
 {
-	std::string cl_filepath = "";
+	std::string cl_filename = "";
 	std::string sr_filepath = "";
 	std::string word = "";
 	for (int k = 0; str[k] != '\0'; k++) {
 		if (! isspace(str[k])) {
 			word += str[k];
 		} else {
-			cl_filepath = word;
+			cl_filename = word;
 			word = "";
 		}
 	}
@@ -37,14 +45,17 @@ std::string create_file_path(std::string str)
 		if (sr_filepath[sr_filepath.length() - 1] != '/') {
 			sr_filepath += '/';
 		}
-		sr_filepath += cl_filepath;
+		sr_filepath += cl_filename;
 		return sr_filepath;
 	} else {
 		return "";
 	}
 }
 
-// Struct sockaddr_in object fills value.???( localiny )
+/*
+    Attaches socket to the port 6113.
+    First argument - connection structure.
+*/
 void configure_comunication(struct sockaddr_in& addr_local )
 {
 	addr_local.sin_family = AF_INET;
@@ -53,7 +64,12 @@ void configure_comunication(struct sockaddr_in& addr_local )
 	bzero(&(addr_local.sin_zero), 8);
 }
 
-// Sends a message to the client.
+/*
+   Sends response to the client.
+   First argument - socket descriptor.
+   Second argument - message.
+   Third argument - message length.
+*/
 void send_response(int new_sock, char* answer, int chrlen)
 {
 	if (send(new_sock, answer, chrlen, 0) < 0) {
@@ -62,7 +78,11 @@ void send_response(int new_sock, char* answer, int chrlen)
 	}
 }
 
-// Saves data in file.
+/*
+   Saves file.
+   First argument - file path.
+   Second argument - file content.
+*/
 void save_file(std::string file_path, char* buffer_data)
 {
 	std::ofstream outfile (file_path);
@@ -72,6 +92,11 @@ void save_file(std::string file_path, char* buffer_data)
 	outfile.close();
 }
 
+/*
+   Receives file information from the client.
+   First argument - socket descriptor.
+   Second argument - file path container.
+*/
 void receive_file_path(int new_sock,std::string& file_path)
 {
 	char buffer[1024] = {0};
@@ -92,13 +117,19 @@ void receive_file_path(int new_sock,std::string& file_path)
 	}
 }
 
+/*
+   Receives file data from the client.
+   First argument - socket descriptor.
+   Second argument - file path.
+*/
 void receive_file_data(int new_sock, std::string file_path)
 {
 	char buffer[1024] = {0};
-	if (recv(new_sock, buffer, 1024, 0) < 0) {//buffer- file-i data-i chapy
+	if (recv(new_sock, buffer, 1024, 0) < 0) {
 		perror("Error reading.");
 		exit(1);
 	} else {
+		sleep(10);
 		int chrlen = 101;
 		char answer[chrlen] = "Server got file size.)";
 		send_response(new_sock, answer, chrlen);
@@ -117,9 +148,16 @@ void receive_file_data(int new_sock, std::string file_path)
 	}
 }
 
-void communicate_with_client(int new_sock, struct sockaddr_in addr_remote, int& success)
+/*
+  Configures communication between server and client.
+  First argument - socket descriptor.
+  Second argument - connection structure.
+*/
+void communicate_with_client(int new_sock, struct sockaddr_in addr_remote)
 {
-	std::cout << "Client IP- " << addr_remote.sin_addr.s_addr << std::endl; //inch-vor convert petqa arvi 
+	char cl_ip[INET_ADDRSTRLEN + 1];
+	inet_ntop(AF_INET, &(addr_remote.sin_addr.s_addr), cl_ip, sizeof(cl_ip));
+	std::cout << "Client IP- " << cl_ip << std::endl;
 	int chrlen = 101;
 	std::string file_path = "";
 	receive_file_path(new_sock,file_path);
@@ -127,12 +165,18 @@ void communicate_with_client(int new_sock, struct sockaddr_in addr_remote, int& 
 	char messenge[chrlen] = "Everything is done well:)";
 	send_response(new_sock, messenge, chrlen);
 	std::cout << "Client connection ended." << std::endl;
-	success = 1;
 }
 
-// ???
+void signal_handle(int signum)
+{
+        std::cout << "Aborting application." << std::endl;
+        exit(signum);
+}
+// Programs execution start point.
 int main()
 {
+	signal(SIGABRT, signal_handle);
+	signal(SIGINT, signal_handle);
 	int sock = socket (AF_INET, SOCK_STREAM, 0);
 	if (sock < 0) {
 		perror ("ERROR: Failed to obtain Socket Descriptor.\n");
@@ -149,6 +193,7 @@ int main()
 		perror ("ERROR: Failed to listen Port");
 		return 1;
 	}
+	std::cout << "Server is ready." << std::endl;
 	int success = 0;
 	while (success == 0) {
 		int addrlen = sizeof(addr_remote);
@@ -158,7 +203,7 @@ int main()
 			return 1;
 		} else {
 			if ( ! fork()) {
-				communicate_with_client(new_sock, addr_remote, success);
+				communicate_with_client(new_sock, addr_remote);
 				close(new_sock);
 
 			}

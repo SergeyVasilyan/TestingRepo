@@ -6,9 +6,14 @@
 #include<unistd.h>
 #include<string.h>
 #include<fstream>
+#include<csignal>
 #define PORT 6113
 
-// Fills the contents of the file in the "data" string.
+/*
+   Reads the content of the file and stores it into variable.
+   First argument - file path.
+   Second argument - content variable.
+ */
 void get_file_data(std::string file_path, std::string& data)
 {
 	std::string str = "";
@@ -26,7 +31,10 @@ void get_file_data(std::string file_path, std::string& data)
 	file_input.close();
 }
 
-// Gets file name from file path.
+/*
+   Gets file name from file path.
+   First argument - file path.
+*/
 std::string get_filename(const std::string& str)
 {
 	if (str.length() == 0) {
@@ -45,7 +53,12 @@ std::string get_filename(const std::string& str)
 	return last_word;
 }
 
-// create file information string("filename server_absolute_file_path").
+/*
+   Creates corresponding string data containing file name and save location absolute path.
+   First argument - server side username.
+   Second argument - server side file path.
+   Third argument -client side file path.
+*/
 std::string create_file_information_string(std::string username, std::string sr_filepath, std::string cl_filepath)
 {
 	std::string absolute_filepath = "";
@@ -60,7 +73,10 @@ std::string create_file_information_string(std::string username, std::string sr_
 	absolute_filepath += sr_filepath;
 	return absolute_filepath;
 }
-// Receives the message sent by the server.
+/*
+   Receives response from the server.
+   First argument - socket descriptor.
+*/
 void get_response(int socket)
 {
 	int chrlen = 101;
@@ -72,7 +88,11 @@ void get_response(int socket)
 	printf("%s\n", answer);
 }
 
-// Struct sockaddr_in object fills value. ???
+/*
+  Configures communication between client and server.//???
+  First argument - connection structure.
+  Second argument - server IP address.
+*/
 void configure_comunication(struct sockaddr_in& hint, std::string s_ipaddress)
 {
 	hint.sin_family = AF_INET;
@@ -80,10 +100,13 @@ void configure_comunication(struct sockaddr_in& hint, std::string s_ipaddress)
 	inet_pton(AF_INET, s_ipaddress.c_str(), &hint.sin_addr);
 }
 
-// Sends data to server.
-// Data: 1. filename, server absolute file path.
-//       2. file size.
-//       3. file data.
+/*
+   Sends data to server.
+   First argument - socket descriptor.
+   Second argument - client side file path.
+   Third argument - server side username.
+   Forth argument - server side file path.
+*/
 bool send_data(int sock, std::string cl_filepath, std::string s_username, std::string s_save_filepath)
 {
 	std::string buffer = create_file_information_string(s_username, s_save_filepath, cl_filepath);
@@ -111,10 +134,18 @@ bool send_data(int sock, std::string cl_filepath, std::string s_username, std::s
 	return true;
 }
 
-// ???
+void signal_handle(int signum)
+{
+        std::cout << "Aborting application." << std::endl;
+        exit(signum);
+}
+
+// Programs execution start point.
 int main(int argc,char** argv)
 {
-	if (argc != 5) { // file path, IP, server file path
+	signal(SIGABRT, signal_handle);
+	signal(SIGINT, signal_handle);
+	if (argc != 5) { // file path, server IP, server side username, server side file path.
 		std::cout<<"Incorrect arguments count."<<std::endl;
 	} else {
 		std::string cl_filepath = argv[1];
