@@ -76,16 +76,19 @@ std::string create_file_information_string(std::string username, std::string sr_
 /*
    Receives response from the server.
    First argument - socket descriptor.
-*/
+ */
 void get_response(int socket)
 {
 	int chrlen = 101;
-	char answer[chrlen] = {0};
-	if (recv(socket, answer, chrlen, 0) < 0) {
+	char status[chrlen] = {0};
+	if (recv(socket, status, chrlen, 0) < 0) {
 		perror("Error reading.");
 		exit(1);
 	}
-	printf("%s\n", answer);
+	if (strcmp(status, "Error") == 0) {
+		std::cout << "Error in server." << std::endl;
+		exit(1);
+	}
 }
 
 /*
@@ -124,7 +127,6 @@ bool send_data(int sock, std::string cl_filepath, std::string s_username, std::s
 				perror("Error sending.");
 				return false;
 			}
-		get_response(sock);
 		get_response(sock);
 		} else {
 			perror("Error sending.");

@@ -70,9 +70,9 @@ void configure_comunication(struct sockaddr_in& addr_local )
    Second argument - message.
    Third argument - message length.
 */
-void send_response(int new_sock, char* answer, int chrlen)
+void send_response(int new_sock, std::string status)
 {
-	if (send(new_sock, answer, chrlen, 0) < 0) {
+	if (send(new_sock, status.c_str(), status.length(), 0) < 0) {
 		perror("Error sending.");
 		exit(1);
 	}
@@ -100,20 +100,22 @@ void save_file(std::string file_path, char* buffer_data)
 void receive_file_path(int new_sock,std::string& file_path)
 {
 	char buffer[1024] = {0};
+	std::string status = "Error";
 	if (recv(new_sock, buffer, 1024, 0) < 0) {
+		send_response(new_sock, status);
 		perror("Error reading.");
 		exit(1);
 	} else {
-		int chrlen = 101;
-		char answer[chrlen] = "Server got path file.)";
-		send_response(new_sock, answer, chrlen);
 		std::cout << "Got file info." << std::endl;
 		std::string s_data(buffer);
 		file_path = create_file_path(s_data);
 		if (file_path == "") {
+			send_response(new_sock, status);
 			perror("Path incorrect.");
 			exit(1);
 		}
+		status = "Luck";
+		send_response(new_sock, status);
 	}
 }
 
@@ -125,25 +127,27 @@ void receive_file_path(int new_sock,std::string& file_path)
 void receive_file_data(int new_sock, std::string file_path)
 {
 	char buffer[1024] = {0};
+	std::string status = "Error";
 	if (recv(new_sock, buffer, 1024, 0) < 0) {
+		send_response(new_sock, status);
 		perror("Error reading.");
 		exit(1);
 	} else {
-		sleep(10);
-		int chrlen = 101;
-		char answer[chrlen] = "Server got file size.)";
-		send_response(new_sock, answer, chrlen);
+		status = "Luck";
+                send_response(new_sock, status);
 		std::cout << "Got file size." << std::endl;
 		int lenght = atoi(buffer) + 1;
 		char buffer_data[lenght] = {0};
 		if (recv (new_sock, buffer_data, lenght, 0) < 0) {
+			status = "Exit";
+			send_response(new_sock, status);
 			perror("Error reading.");
 			exit(1);
 		} else {
-			strcpy(answer, "Server got file data.)");
 			std::cout << "Got file data." << std::endl;
-			send_response(new_sock, answer, chrlen);
 			save_file(file_path, buffer_data);
+			status = "Luck";
+			send_response(new_sock, status);
 		}
 	}
 }
@@ -158,12 +162,9 @@ void communicate_with_client(int new_sock, struct sockaddr_in addr_remote)
 	char cl_ip[INET_ADDRSTRLEN + 1];
 	inet_ntop(AF_INET, &(addr_remote.sin_addr.s_addr), cl_ip, sizeof(cl_ip));
 	std::cout << "Client IP- " << cl_ip << std::endl;
-	int chrlen = 101;
 	std::string file_path = "";
 	receive_file_path(new_sock,file_path);
 	receive_file_data(new_sock, file_path);
-	char messenge[chrlen] = "Everything is done well:)";
-	send_response(new_sock, messenge, chrlen);
 	std::cout << "Client connection ended." << std::endl;
 }
 
