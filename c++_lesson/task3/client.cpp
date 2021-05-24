@@ -155,16 +155,20 @@ int main(int argc,char** argv)
 		std::string s_username = argv[3];
 		std::string s_save_filepath = argv[4];
 		int sock = socket(AF_INET, SOCK_STREAM, 0);
+		std::cout << "1" << std::endl;
 		if (sock < 0) {
 			perror("Error opening socket.");
 			return 1;
 		}
 		struct sockaddr_in hint;
 		configure_comunication(hint, s_ipaddress);
-		if (connect (sock,(sockaddr *)&hint,sizeof(hint)) < 0) {
+		std::cout << "2" << std::endl;
+		if (connect (sock, (sockaddr *)&hint, sizeof(hint)) < 0) {
+			std::cout << "3" << std::endl;
 			perror("Error connecting.");
 			return 1;
 		}
+		std::cout << "4" << std::endl;
 		if (send_data(sock, cl_filepath, s_username, s_save_filepath) == false) {
 			return 1;
 		}

@@ -134,7 +134,7 @@ void receive_file_data(int new_sock, std::string file_path)
 		exit(1);
 	} else {
 		status = "Luck";
-                send_response(new_sock, status);
+        send_response(new_sock, status);
 		std::cout << "Got file size." << std::endl;
 		int lenght = atoi(buffer) + 1;
 		char buffer_data[lenght] = {0};
@@ -195,8 +195,7 @@ int main()
 		return 1;
 	}
 	std::cout << "Server is ready." << std::endl;
-	int success = 0;
-	while (success == 0) {
+	while (true) {
 		int addrlen = sizeof(addr_remote);
 		int new_sock = accept(sock, (struct sockaddr *)&addr_remote, (socklen_t*)&addrlen);
 		if (new_sock == -1) {
