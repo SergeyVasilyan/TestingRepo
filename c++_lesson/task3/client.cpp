@@ -7,6 +7,7 @@
 #include<string.h>
 #include<fstream>
 #include<csignal>
+#include <cstdlib>
 #define PORT 6113
 
 /*
@@ -151,26 +152,22 @@ int main(int argc,char** argv)
 		std::cout<<"Incorrect arguments count."<<std::endl;
 	} else {
 		std::string cl_filepath = argv[1];
-		std::string s_ipaddress = argv[2];
-		std::string s_username = argv[3];
+		std::string s_username = argv[2];
+		std::string s_ipaddress = argv[3];
 		std::string s_save_filepath = argv[4];
 		int sock = socket(AF_INET, SOCK_STREAM, 0);
-		std::cout << "1" << std::endl;
 		if (sock < 0) {
 			perror("Error opening socket.");
-			return 1;
+			return EXIT_FAILURE;
 		}
 		struct sockaddr_in hint;
 		configure_comunication(hint, s_ipaddress);
-		std::cout << "2" << std::endl;
 		if (connect (sock, (sockaddr *)&hint, sizeof(hint)) < 0) {
-			std::cout << "3" << std::endl;
 			perror("Error connecting.");
-			return 1;
+			return EXIT_FAILURE;
 		}
-		std::cout << "4" << std::endl;
 		if (send_data(sock, cl_filepath, s_username, s_save_filepath) == false) {
-			return 1;
+			return EXIT_FAILURE;
 		}
 		close(sock);
 	}

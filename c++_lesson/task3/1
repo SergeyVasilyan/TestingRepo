@@ -186,6 +186,7 @@ int main()
 	struct sockaddr_in addr_local;
 	struct sockaddr_in addr_remote;
 	configure_comunication(addr_local);
+	static int PROCESS_PID=0;
 	if (bind (sock, (struct sockaddr*)&addr_local, sizeof(struct sockaddr)) == -1 ) {
 		perror ("ERROR: Failed to bind Port");
 		return EXIT_FAILURE;
@@ -195,19 +196,29 @@ int main()
 		return EXIT_FAILURE;
 	}
 	std::cout << "Server is ready." << std::endl;
+	PROCESS_PID = getpid();
+	std::cout << "P process -" << PROCESS_PID << std::endl;
 	while (true) {
+		PROCESS_PID = getpid();
+                std::cout << "process 1 -" << PROCESS_PID << std::endl;
 		int addrlen = sizeof(addr_remote);
+		std::cout << "Child process " << std::endl;
 		int new_sock = accept(sock, (struct sockaddr *)&addr_remote, (socklen_t*)&addrlen);
 		if (new_sock == -1) {
 			perror ("ERROR: Obtain new socket descriptor error.");
 			return EXIT_FAILURE;
 		} else {
 			if ( ! fork()) {
+				 PROCESS_PID = getpid();
+                                std::cout << "process 2 -" << PROCESS_PID << std::endl;
 				communicate_with_client(new_sock, addr_remote);
 				close(new_sock);
 				return 0;
 			}
 		}
+		 PROCESS_PID = getpid();
+                std::cout << "process 3 -" << PROCESS_PID << std::endl;
+
 	}
 	close(sock);
 	return 0;
