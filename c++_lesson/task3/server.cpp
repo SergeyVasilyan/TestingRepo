@@ -8,7 +8,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <csignal>
-#define PORT 6113
+#define PORT 6813
 
 /*
    Checks path validity.
@@ -164,6 +164,7 @@ void communicate_with_client(int new_sock, struct sockaddr_in addr_remote)
 	std::cout << "Client IP- " << cl_ip << std::endl;
 	std::string file_path = "";
 	receive_file_path(new_sock,file_path);
+	sleep(5);
 	receive_file_data(new_sock, file_path);
 	std::cout << "Client connection ended." << std::endl;
 }
