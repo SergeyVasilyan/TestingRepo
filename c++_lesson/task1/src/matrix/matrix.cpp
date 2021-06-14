@@ -89,7 +89,7 @@ bool Matrix::operator == (const Matrix& mat) const
 		return false;
 	}
 	for (int i = 0; i < rows; i++) {
-		for (int j=0; j<cols; j++) {
+		for (int j = 0; j < cols; j++) {
 			if ( data[i][j] != mat.data[i][j]) {
 				return false;
 			}
