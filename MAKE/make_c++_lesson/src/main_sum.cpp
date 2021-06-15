@@ -4,8 +4,9 @@ int main()
 {
     int number,sum=0;
     std::cout<<"Enter number in range of [1-1000]."<<std::endl;
-    std::cin>>number;
+    //std::cin>>number;
     while(true){
+    std::cin>>number;
     if(number>=1 && number<= 1000){
         for(int i=0; i<=number; i++){
             if (i%3==0 || i%5==0)

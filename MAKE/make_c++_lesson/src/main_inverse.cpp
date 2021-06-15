@@ -6,8 +6,8 @@ int main()
 	std::cin>>number;
 	while(number)
 	{
-	 number1=(number1*i) + number%10 ;
-	 number/=10;
+	 number1=(number1*i) + number%i ;
+	 number/=i;
 	}
 	std::cout<<number1<<std::endl;
 	return 0;
