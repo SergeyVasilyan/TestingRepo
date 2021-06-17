@@ -179,9 +179,9 @@ void check_cin_operator_failure()
 void test()
 {
 	test_subscription_operator();
-    test_subscription_operator_int();
-    test_subscription_operator_char();//FAIL gnac
-    //test_subscription_operator_string();
+	test_subscription_operator_int();
+	test_subscription_operator_char();//FAIL gnac
+	//test_subscription_operator_string();
 	test_assignment_operator();
 	test_equality_operator();
 	test_sum_operator();
@@ -196,6 +196,7 @@ void test()
 }
 int main()
 {
+
 	signal(SIGABRT, signal_handel);
 	test();
 	return 0;

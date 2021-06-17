@@ -1,0 +1,2 @@
+Error messa55ge
+a.out: q.cpp:15: int main(): Assertion `1 + 1 == 3' failed.
