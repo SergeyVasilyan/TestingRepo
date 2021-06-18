@@ -3,7 +3,8 @@
 #include <bits/stdc++.h>
 using std::filesystem::directory_iterator;
 
-inline std::string get_current_datetime(){
+std::string get_current_datetime()
+{
 	time_t now = time(0);
 	struct tm  tstruct;
 	char  buf[80];
@@ -20,7 +21,7 @@ bool find_word (char* filename)
 	}
 	std::string str = "";
 	while (getline(file_input, str)) {
-		size_t found = str.find("Test result - FAIL.");
+		size_t found = str.find("FAIL");
 		if (found != std::string::npos){
 			file_input.close();
 			return true;
@@ -31,9 +32,8 @@ bool find_word (char* filename)
 }
 void log_add(char* filename) 
 {
-	std::string now = get_current_datetime();
 	std::cout << "DATE: " << std::endl;
-	std::cout << now << std::endl;
+	std::cout << get_current_datetime() << std::endl;
 	std::cout << "Started test" << std::endl;
 	std::cout << filename << " - ";
 	if (find_word(filename)) {
@@ -46,10 +46,10 @@ void log_add(char* filename)
 void execute_cpp(char* filename)
 {
 	std::string str = "g++ ";
-        str = str + filename + " -o a.out ";
-        const char *command = str.c_str();
-        system(command);
-        system("./a.out");
+	str = str + filename + " -o a.out ";
+	const char *command = str.c_str();
+	system(command);
+	system("./a.out");
 }
 
 int main (int argc,char** argv)

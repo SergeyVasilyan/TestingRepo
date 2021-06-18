@@ -1,29 +1,42 @@
+#include <stdlib.h>
+#include <stdio.h>
 #include <unistd.h>
-#include <cstdio>
+#include <fcntl.h>
+#include<cassert>
 #include <iostream>
-#include <cstring>
 
-using namespace std;
+int redirectOutputs();
+void p(){
+ redirectOutputs();
+}
+int main()
+{
+    p();
+    printf("OUT : test\n");
+    perror("ERR : test");
+    printf("OUT : test 2\n");
+	std::cout << "AAAAAA" << std::endl;
+assert(1 + 1 == 5);
+    int t = 23;
+    printf("OUT : again\n");
+    perror("ERR : again");
 
-int main() {
-  // unbuffered system-call level write() access:
-  ::fclose(stderr);
-  if (::dup2(STDOUT_FILENO, STDERR_FILENO) == -1) {
-    cout << "dup2() failed!" << endl;
-    return -1;
-  }
-  char msg_err[] = "write(STDERR_FILENO) OK.\n";
-  char msg_out[] = "write(STDOUT_FILENO) still OK.\n";
-  write(STDERR_FILENO, msg_err, strlen(msg_err));
-  write(STDOUT_FILENO, msg_out, strlen(msg_out));
+	return 0;
+}
 
-  // buffered C-style access: (ordering may be weird w/o fflush())
-  stderr = ::fdopen(STDOUT_FILENO, "a");
-  fprintf(stderr, "fprintf(stderr) OK.\n");
-  fprintf(stdout, "fprintf(stdout) still OK.\n");
-
-  // buffered C++ access:
-  std::cerr.rdbuf(std::cout.rdbuf());
-  cerr << "cerr << OK.\n";
-  cout << "cout << still OK.\n";
+int redirectOutputs()
+{
+    int log = open("ERR.log", O_RDWR|O_CREAT|O_APPEND, 0600);
+    if (log == -1)
+    {
+        perror("opening err.log");
+        return -1;
+    }
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+    dup2(log, STDOUT_FILENO);
+    dup2(log, STDERR_FILENO);
+    close(log);
+	return 0;
 }
