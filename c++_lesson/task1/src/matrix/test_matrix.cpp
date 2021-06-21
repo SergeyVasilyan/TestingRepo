@@ -9,7 +9,8 @@
 
 void signal_handel(int signum)
 {
-	std::cout << "Interrupt signal (" << signum << ") received." << std::endl;
+	std::cout << "Crashed out of assert." << std::endl;
+	//std::cout << "Interrupt signal (" << signum << ") received." << std::endl;
 	//exit(signum);
 }
 
@@ -26,17 +27,19 @@ std::string get_current_datetime()
 int redirectOutputs(std::string test_name)
 {
     std::string test_path = "../../test_results/";
-    test_path += test_name;
+	test_path += test_name;
 	test_path += ".log";
-    int log = open(test_path.c_str(), O_RDWR|O_CREAT|O_APPEND, 0600);
-    if (log == -1)
-    {
+    int log = open(test_path.c_str(), O_RDWR|O_CREAT, 0600);
+	std::cout << log;
+    if (log == -1) {
         perror("opening test_***.log");
         return -1;
     }
+	/*
     close(STDIN_FILENO);
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
+	*/
     dup2(log, STDOUT_FILENO);
     dup2(log, STDERR_FILENO);
     close(log);
@@ -51,6 +54,33 @@ void print(std::string test_name)
     std::cout << "Test: " << test_name << std::endl;
 	std::cout << "Test output: " << std::endl;
 }
+
+bool find_fail(std::string filename)
+{
+    std::ifstream file_input(filename);
+    if ( ! file_input.is_open()) {
+        throw std::ifstream::failure {"File isn't open."};
+    }
+    std::string str = "";
+    while (getline(file_input, str)) {
+        size_t found = str.find("Crashed out of assert.");
+        if (found != std::string::npos){
+            file_input.close();
+            return true;
+        }
+    }
+    file_input.close();
+    return false;
+
+}
+void mess(std::string filename)
+{
+	if (find_fail(filename)) {
+		std::cout << "Test - FAIL." << std::endl;
+	}
+	std::cout << "Test - PASS." << std::endl;
+}
+
 void test_assignment_operator()
 {
 	print("test_assignment_operator");
@@ -67,8 +97,6 @@ void test_equality_operator()
 	print("test_equality_operator");
 	Matrix mat1(3, 2);
 	Matrix mat2(3, 2);
-	assert(mat1 == mat2);
-	mat1[1][1] = 5;
 	assert(mat1 == mat2);
 }
 
@@ -160,7 +188,7 @@ void test_scalar_with_assignment_operator()
 //log generacnel u stugel assertov trela te che 
 void test_scalar_with_assignment_operator_failure()
 {
-	print( "test_scalar_with_assignment_operator_failure");
+	print("test_scalar_with_assignment_operator_failure");
     Matrix mat1(3,2);
 	mat1[2][0] = 8;
 	mat1[1][1] = 10;
@@ -246,13 +274,7 @@ void test()
 	test_multiplication_char_number();
 	//check_cin_operator_failure();
 }
-/*
-void log_file()
-{
-	//	std::cout << "Test result - FAIL." << std::endl;
-	//	std::cout << "Test result - PASS." << std::endl;
-}
-*/
+
 int main()
 {
 	signal(SIGABRT, signal_handel);
