@@ -1,0 +1,6 @@
+3DATE: 2021-06-27 16:37:22
+Test: test_scalar_with_assignment_operator_failure
+Test output: 
+terminate called after throwing an instance of 'std::logic_error'
+  what():  The dimensions of the matrix are incorrect.
+Crashed out of assert.

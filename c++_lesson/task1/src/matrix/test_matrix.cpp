@@ -6,6 +6,7 @@
 #include<stdio.h>
 #include<unistd.h>
 #include<fcntl.h>
+#include <fstream>
 
 void signal_handel(int signum)
 {
@@ -16,143 +17,160 @@ void signal_handel(int signum)
 
 std::string get_current_datetime()
 {
-    time_t now = time(0);
-    struct tm  tstruct;
-    char  buf[80];
-    tstruct = *localtime(&now);
-    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
-    return std::string(buf);
+	time_t now = time(0);
+	struct tm  tstruct;
+	char  buf[80];
+	tstruct = *localtime(&now);
+	strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+	return std::string(buf);
 }
 
 int redirectOutputs(std::string test_name)
 {
-    std::string test_path = "../../test_results/";
+	std::string test_path = "../../test_results/";
 	test_path += test_name;
 	test_path += ".log";
-    int log = open(test_path.c_str(), O_RDWR|O_CREAT, 0600);
+	int log = open(test_path.c_str(), O_RDWR|O_CREAT, 0600);
 	std::cout << log;
-    if (log == -1) {
-        perror("opening test_***.log");
-        return -1;
-    }
+	if (log == -1) {
+		perror("opening test_***.log");
+		return -1;
+	}
 	/*
-    close(STDIN_FILENO);
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-	*/
-    dup2(log, STDOUT_FILENO);
-    dup2(log, STDERR_FILENO);
-    close(log);
-    return 0;
+	   close(STDIN_FILENO);
+	   close(STDOUT_FILENO);
+	   close(STDERR_FILENO);
+	   */
+	dup2(log, STDOUT_FILENO);
+	dup2(log, STDERR_FILENO);
+	close(log);
+	return 0;
 }
 
 void print(std::string test_name)
 {
 	redirectOutputs(test_name);
 	std::cout << "DATE: ";
-    std::cout << get_current_datetime() << std::endl;
-    std::cout << "Test: " << test_name << std::endl;
+	std::cout << get_current_datetime() << std::endl;
+	std::cout << "Test: " << test_name << std::endl;
 	std::cout << "Test output: " << std::endl;
 }
 
 bool find_fail(std::string filename)
 {
-    std::ifstream file_input(filename);
-    if ( ! file_input.is_open()) {
-        throw std::ifstream::failure {"File isn't open."};
-    }
-    std::string str = "";
-    while (getline(file_input, str)) {
-        size_t found = str.find("Crashed out of assert.");
-        if (found != std::string::npos){
-            file_input.close();
-            return true;
-        }
-    }
-    file_input.close();
-    return false;
+	std::ifstream file_input(filename);
+	if ( ! file_input.is_open()) {
+		throw std::ifstream::failure {"File isn't open."};
+	}
+	std::string str = "";
+	while (getline(file_input, str)) {
+		size_t found = str.find("Crashed out of assert.");
+		if (found != std::string::npos){
+			file_input.close();
+			return true;
+		}
+	}
+	file_input.close();
+	return false;
 
 }
 void mess(std::string filename)
 {
-	if (find_fail(filename)) {
-		std::cout << "Test - FAIL." << std::endl;
+	std::string path = "../../test_results/";
+	path += filename + ".log";
+	if (find_fail(path)) {
+		std::cout << "Test - Fail." << std::endl;
+	} else {
+		std::cout << "Test - Pass." << std::endl;
 	}
-	std::cout << "Test - PASS." << std::endl;
 }
-
 void test_assignment_operator()
 {
-	print("test_assignment_operator");
+	std::string filename = "test_assignment_operator";
+	print(filename);
 	Matrix mat1(3, 2);
 	Matrix mat2(3, 2);
 	mat2[2][1] = 10;
 	mat1 = mat2;
 	assert(mat1 == mat2 && "Mat1 is not equal to Mat2");
+	mess(filename);
 	//stugel failla te che ,vor hamapatasxan haxordagrutyunny tpvi
 }
 
 void test_equality_operator()
 {
-	print("test_equality_operator");
+	std::string filename = "test_equality_operator";
+	print(filename);
 	Matrix mat1(3, 2);
 	Matrix mat2(3, 2);
 	assert(mat1 == mat2);
+	mess(filename);
 }
 
 void test_subscription_operator()
 {
-	print("test_subscription_operator");
-    double value = 2;
+	std::string filename = "test_subscription_operator";
+	print(filename);
+	double value = 2;
 	Matrix mat1(3, 2);
 	mat1[1][1] = value;
 	assert(mat1[1][1] == value);
+	mess(filename);
 }
 
 void test_subscription_operator_int()
 {
-	print("test_subscription_operator_int");
-    int value = 55;
+	std::string filename = "test_subscription_operator_int";
+	print(filename);
+	int value = 55;
 	Matrix mat1(3, 2);
 	mat1[1][1] = value;
 	assert(mat1[1][1] == value);
+	mess(filename);
 }
 
 void test_subscription_operator_char()
 {
-	print("test_subscription_operator_char");
-    char value = 'a';
+	std::string filename = "test_subscription_operator_char";
+	print(filename);
+	char value = 'a';
 	Matrix mat1(3, 2);
 	mat1[1][1] = value;
 	assert(mat1[1][1] == value);
+	mess(filename);
 }
 /*
    void test_subscription_operator_string()
    {
-   std::string value = "455445g";
+   std::string filename = "test_subscription_operator_string";
+   print(filename);
    Matrix mat1(3, 2);
    mat1[1][1] = value;
    std::cout << mat1 << std::endl;
    assert(mat1[1][1] == value);
+   mess(filename);
    }//stugel erb int,char,string depqery;
  */
 
 void test_sum_operator()
 {
-	print("test_sum_operator");
-   	Matrix mat1(3, 2);
+	std::string filename = "test_sum_operator";
+	print(filename);
+	Matrix mat1(3, 2);
 	mat1[2][1] = 9;
 	Matrix mat2(3, 2);
 	mat2[2][1] = 10;
 	Matrix mat3(3, 2);
 	mat3[2][1] = 19;
 	assert(mat3 == mat1 + mat2);
+	mess(filename);
 }
 
 void  test_sub_operator()
 {
-	print("test_sub_operator");
-    Matrix mat1(3, 2);
+	std::string filename = "test_sub_operator";
+	print(filename);
+	Matrix mat1(3, 2);
 	Matrix mat2(3, 2);
 	mat1[0][0] = 3;
 	mat1[2][1] = 5;
@@ -165,13 +183,14 @@ void  test_sub_operator()
 	Matrix mat4 = mat1 - mat2;
 	std::cout << mat4 << std::endl;
 	assert(mat3 == mat4);
-	//	assert(mat3 == mat1 - mat2);
+	mess(filename);
 }
 
 void test_scalar_with_assignment_operator()
 {
-	print("test_scalar_with_assignment_operator");
-  	Matrix mat1(2,2);
+	std::string filename = "test_scalar_with_assignment_operator";
+	print(filename);
+	Matrix mat1(2,2);
 	mat1[0][0] = 5;
 	mat1[0][1] = 1;
 	mat1[1][0] = 2;
@@ -183,22 +202,25 @@ void test_scalar_with_assignment_operator()
 	mat2[1][0] = 24;
 	mat2[1][1] = 51;
 	assert(mat2 == mat1);
+	mess(filename);
 }
 
-//log generacnel u stugel assertov trela te che 
 void test_scalar_with_assignment_operator_failure()
 {
-	print("test_scalar_with_assignment_operator_failure");
-    Matrix mat1(3,2);
+	std::string filename = "test_scalar_with_assignment_operator_failure";
+        print(filename);
+	Matrix mat1(3,2);
 	mat1[2][0] = 8;
 	mat1[1][1] = 10;
 	mat1[1][0] = 4;
 	mat1 *= mat1;
+	mess(filename);
 }
 
 void test_multiplication_number()
 {
-	print("test_multiplication_number");
+	std::string filename = "test_multiplication_number";
+	print(filename);
 	int matrix_size = 2;
 	int init_value = 1;
 	double multiplicator = 6;
@@ -211,13 +233,13 @@ void test_multiplication_number()
 		}
 	}
 	assert(mat2 == multiplicator * mat1);
+	mess(filename);
 }
-
-//stugel en depqy erb matrixy bazmapatlaca  char ,string(voch double)
 
 void test_multiplication_int_number()
 {
-	print("test_multiplication_int_number");
+	std::string filename = "test_multiplication_number";
+	print(filename);
 	int matrix_size = 2;
 	int init_value = 1;
 	int multiplicator = 6;
@@ -230,12 +252,14 @@ void test_multiplication_int_number()
 		}
 	}
 	assert(mat2 == multiplicator * mat1);
+	mess(filename);
 }
 
 void test_multiplication_char_number()
 {
-	print("test_multiplication_char_number");
-  	int matrix_size = 2;
+	std::string filename = "test_multiplication_char_number";
+        print(filename);
+	int matrix_size = 2;
 	int init_value = 1;
 	char multiplicator = 'a';
 	Matrix mat1(matrix_size, matrix_size);
@@ -247,14 +271,17 @@ void test_multiplication_char_number()
 		}
 	}
 	assert(mat2 == multiplicator * mat1);
+	mess(filename);
 }
 
 void check_cin_operator_failure()
 {//faili matrici chaperi anhapatasxanutyun ev double tipi poxaren string piti element
-	print("check_cin_operator_failure");
-   	Matrix mat1(3,3);
+	std::string filename = "check_cin_operator_failure";
+        print(filename);
+	Matrix mat1(3,3);
 	std::cout << "object created." << std::endl;
 	std::cin >> mat1;
+	mess(filename);
 }
 
 void test()
