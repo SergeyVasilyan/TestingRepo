@@ -1,24 +1,30 @@
-#include"/***/***/project.hpp"
-#include<iostream>
+#include "/***/***/project.hpp"
+#include <cassert>
 
 int main()
 {
-	project pro;
-	pro.get();
-	property_box_specification pro_spec1;
-	property_box_specification pro_spec2;
-        pro_spec1 = pro.add_property_box_specification("a_00");
-	pro_spec2 = pro.add_property_box_specification("a_01");
-	pro_spec1.set_description() = "*****";
-	pro_spec1.set_shape() = "rectangle";
-	//dzevy tal;
-	assert(pro_spec1 == get_property_box_specification("a_00"));
-	assert(pro_spec1.get_description() == "*****");
+	using project = nisseki::puente::db::project;
+	project& pro = project::get();
+	property_box_specification *pro_b_spec1;
+	*pro_b_spec1 = pro.add_property_box_specification("IfcFooting");
+	pro_b_spec1->set_name("Foundation Symbol");
+	pro_b_spec1-set_description("Description of the Foundation Symbol");
+	pro_b_spec1.set_shape("rectangle");
+	property_specification *pro_b1 = pro_b_spec1.add_property("Name");
+	pro_b1.set_description("Object Name");
+	pro_b1.set_cell(0,0);
+	pro_b1.set_row_span(2);
+	pro_b1.set_column_span(1);
+
+
+
+
+	assert(pro_b_spec1 == get_property_box_specification("a_00"));
+	assert(pro_b_spec1.get_description() == "*****");
 	//...
-	property_box pro_b1;
-        property_box pro_b2;
-	pro_b1 = pro.add_property_box("p_00", pro_spec1);
-	pro_b2 = pro.add_property_box("p_01", pro_spec2);
+	
+	property_box *pro_b1;
+	*pro_b1 = pro.add_property_box("p_00", pro_b_spec1);
 	pro_b1.set_width() = 30;
 	pro_b1.set_height() = 10;
 	//....
