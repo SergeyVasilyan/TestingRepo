@@ -9,6 +9,7 @@ import argparse
 from imutils.video import FPS
 from imutils.video import VideoStream
 from Xlib.display import Display
+from src import config_parser
 
 RUNNING_ON_RPI = False
 os_info = os.uname()
@@ -27,7 +28,7 @@ class text_colors:
     RED = '\033[31m'
     END = '\033[0m'
 
-log_level = None
+log_level = 1
 log_levels = {
                 'CRITICAL' : 4,
                 'ERROR' : 3,
@@ -36,7 +37,7 @@ log_levels = {
                 'DEBUG' : 0
              }
 
-WINDOW_NAME = "Traffic Control"
+WINDOW_NAME = "Traffic Control."
 
 def colorize_text(log_level):
     """
@@ -84,8 +85,14 @@ def predict(frame, net, confidence):
     '''
     Prepare input blob and perform an inference
     '''
-    input_width = 512
-    input_height = 512
+    try:
+        input_width = int(cp.get_value_from_config('Accelerator', 'model_detect_width'))
+    except:
+        input_width = 512
+    try:
+        input_height = int(cp.get_value_from_config('Accelerator', 'model_detect_height'))
+    except:
+        input_height = 512
     blob = cv2.dnn.blobFromImage(frame,
                                  size = (input_width,
                                          input_height),
@@ -93,6 +100,12 @@ def predict(frame, net, confidence):
     net.setInput(blob)
     out = net.forward()
     predictions = []
+    counters = {
+                "Car" : 0,
+                "Bike" : 0,
+                "Person" : 0,
+                "Other" : 0
+               }
     # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
     # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
     for detection in out.reshape(-1, 7):
@@ -101,7 +114,16 @@ def predict(frame, net, confidence):
             box_points = ((x_min, y_min), (x_max, y_max))
             prediction = (label, conf, box_points)
             predictions.append(prediction)
-    return predictions
+            if label == 0:
+                label = "Bike"
+            elif label == 1.0:
+                label = "Car"
+            elif label == 2.0:
+                label = "Person"
+            else:
+                label = "Other"
+            counters[label] += 1
+    return predictions, counters
 
 def draw_on_frame(label, image_for_result, x, y, frame_shape, prediction_confidence):
         height = frame_shape[0]
@@ -134,19 +156,33 @@ def draw_on_frame(label, image_for_result, x, y, frame_shape, prediction_confide
                     label,
                     (x_min, y),
                     cv2.FONT_HERSHEY_SIMPLEX,
-                    1,
+                    0.75,
                     color,
                     2)
+
+def draw_counters(image_for_result, counters):
+    x = 0
+    y = 25
+    step = 20
+    for counter in counters:
+        cv2.putText(image_for_result,
+                    "%s: %s" % (counter, counters[counter]),
+                    (x, y),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.75,
+                    (0, 0, 0),
+                    2)
+        y += step
 
 def get_screen_size():
     screen = Display(os.environ["DISPLAY"]).screen()
     screen_width, screen_height = screen.width_in_pixels, screen.height_in_pixels
     return screen_width, screen_height
 
-def start_process(args, net, stream, fps, show_flag, input_file, fullscreen_mode):
+def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode, overlay_mode):
     writer = None
     confidence = args['confidence']
-    output_flag = args['output']
+    output_file = args['output_file']
     if fullscreen_mode:
         screen_width, screen_height = get_screen_size()
     while True:
@@ -155,33 +191,35 @@ def start_process(args, net, stream, fps, show_flag, input_file, fullscreen_mode
             frame = frame[1] if input_file else frame
             frame_height, frame_width, _ = frame.shape
             image_for_result = frame.copy()
-            if output_flag and isinstance(writer, type(None)):
+            if output_file and isinstance(writer, type(None)):
                 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-                writer = cv2.VideoWriter("Output.mp4",
+                writer = cv2.VideoWriter(output_file,
                                          fourcc,
                                          30,
                                          (frame.shape[1],
                                           frame.shape[0]),
                                          True)
-            predictions = predict(frame, net, confidence)
+            predictions, counters = predict(frame, net, confidence)
             for index, predictions in enumerate(predictions):
                 label, prediction_confidence, box_points = predictions
                 ((x_min, y_min), (x_max, y_max)) = box_points
-                log("DEBUG", "Prediction #%s: confidence: %s, boxpoints: %s" %\
+                log("DEBUG", "Prediction #%s: confidence: %s, box_points: %s" %\
                              (index, prediction_confidence, box_points))
                 if prediction_confidence > confidence:
-                    log("DEBUG", "Prediction #%s: confidence: %s, boxpoint: %s" %\
+                    log("DEBUG", "Prediction #%s: confidence: %s, box_point: %s" %\
                                  (index, prediction_confidence, box_points))
-                    if show_flag:
+                    if show_mode and overlay_mode:
                         draw_on_frame(label,
                                       image_for_result,
                                       (x_min, x_max),
                                       (y_min, y_max),
                                       (frame_height, frame_width),
                                       prediction_confidence)
+            if overlay_mode:
+                draw_counters(image_for_result, counters)
             if not isinstance(writer, type(None)):
                 writer.write(image_for_result)
-            if show_flag:
+            if show_mode:
                 if fullscreen_mode:
                     image_for_result = cv2.resize(image_for_result,
                                                   (screen_width, screen_height),
@@ -232,41 +270,44 @@ def check_app_mode(fullscreen_mode):
         cv2.namedWindow(WINDOW_NAME, cv2.WND_PROP_FULLSCREEN)
         cv2.setWindowProperty(WINDOW_NAME,cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
-def parse_arguments():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--confidence",
-                        default = .6,
-                        help = "Confidence threshold value. Default is '0.6'.")
-    parser.add_argument("-s", "--show",
-                        type = int,
-                        default = 0,
-                        help = "Switch to display image on screen. Default is set 0 aka no-display mode.")
-    parser.add_argument("-d", "--debug",
-                        type = int,
-                        default = 1,
-                        help = "Log message level. Default is set to 1, i.e. no 'DEBUG' level.")
-    parser.add_argument("-i", "--input",
-                        type = str,
-                        default = "",
-                        help = "Path to optional input video file.")
-    parser.add_argument("-o", "--output",
-                        type = str,
-                        default = 0,
-                        help = "Path to optional output video file.")
-    parser.add_argument("-f", "--fullscreen",
-                        type = int,
-                        default = 0,
-                        help = "Show frame in fullscreen. Default value is set to 0, i.e. not fullscreen.")
-    args = vars(parser.parse_args())
+def parse_arguments(cp):
+    global log_level
+    show_mode = eval(cp.get_value_from_config('Features', 'show_mode'))
+    try:
+        log_level = int(cp.get_value_from_config('General', 'log_level'))
+    except:
+        pass
+    try:
+        confidence = int(cp.get_value_from_config('Accelerator', 'confidence'))
+    except:
+        confidence = 0.75
+    try:
+        fullscreen_mode = eval(cp.get_value_from_config('Features', 'fullscreen_mode'))
+    except:
+        fullscreen_mode = False
+    try:
+        overlay_mode = eval(cp.get_value_from_config('Features', 'overlay_mode'))
+    except:
+        overlay_mode = True
+    input_file = cp.get_value_from_config('General', 'input_video_file_path')
+    output_file = cp.get_value_from_config('General', 'output_file')
+    args = {
+            'show_mode' : show_mode,
+            'log_level' : log_level,
+            'input_file' : input_file,
+            'output_file' : output_file,
+            'fullscreen_mode' : fullscreen_mode,
+            'overlay_mode' : overlay_mode,
+            'confidence' : confidence
+           }
     return args
 
 def main():
-    global log_level
-    args = parse_arguments()
-    show_flag = args['show']
-    log_level = args['debug']
-    input_file = args['input']
-    fullscreen_mode = args['fullscreen']
+    cp = config_parser.configParser(log)
+    args = parse_arguments(cp)
+    show_mode = args['show_mode']
+    input_file = args['input_file']
+    fullscreen_mode = args['fullscreen_mode']
     check_optimization()
     check_app_mode(fullscreen_mode)
     net = load_model()
@@ -276,11 +317,12 @@ def main():
                   net,
                   stream,
                   fps,
-                  show_flag,
+                  show_mode,
                   input_file,
-                  fullscreen_mode)
+                  fullscreen_mode,
+                  args['overlay_mode'])
     fps.stop()
-    if show_flag:
+    if show_mode:
         cv2.destroyAllWindows()
     if not input_file:
         stream.stop()
