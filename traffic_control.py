@@ -40,8 +40,6 @@ log_levels = {
 
 WINDOW_NAME = "Traffic Control."
 
-db = []
-
 def colorize_text(log_level):
     """
     Functionality that colorizes message log level.
@@ -84,7 +82,7 @@ def log(level, message):
         current_date = text_colors.HEADER + current_date + text_colors.END
         print("[%s] [%s]: %s" % (current_date, level, message))
 
-def predict(frame, net, confidence):
+def predict(frame, net, confidence, DB):
     '''
     Prepare input blob and perform an inference
     '''
@@ -111,7 +109,7 @@ def predict(frame, net, confidence):
     # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
     # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
     frame_height, frame_width, _ = frame.shape
-    db.clear()
+    DB.clear()
     for detection in out.reshape(-1, 7):
         image_id, label, conf, x_min, y_min, x_max, y_max = detection
         if conf > confidence:
@@ -134,15 +132,15 @@ def predict(frame, net, confidence):
             new_entity.set_center_point(center_x, center_y)
             new_entity.set_confidence(conf)
             new_entity.set_bounding_box(bounding_box)
-            db.append(new_entity)
+            DB.append(new_entity)
     return counters
 
-def draw_on_frame(image_for_result):
-    for entity in db:
-        bounding_box = entity.get_bounding_box()
-        confidence = entity.get_confidence()
-        label = entity.get_type()
-        direction = entity.get_direction()
+def draw_on_frame(image_for_result, DB):
+    for new_entity in DB:
+        bounding_box = new_entity.get_bounding_box()
+        confidence = new_entity.get_confidence()
+        label = new_entity.get_type()
+        direction = new_entity.get_direction()
         top_left = bounding_box[0]
         bottom_right = bounding_box[1]
         x_min = top_left[0]
@@ -164,7 +162,7 @@ def draw_on_frame(image_for_result):
                       color,
                       2)
         cv2.putText(image_for_result,
-                    label + ':' + direction,
+                    label + direction,
                     (x_min, y),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.75,
@@ -190,40 +188,48 @@ def get_screen_size():
     screen_width, screen_height = screen.width_in_pixels, screen.height_in_pixels
     return screen_width, screen_height
 
-def check_direction(p_db):
-    for entity in db:
-        label = entity.get_type()
-        bounding_box = entity.get_bounding_box()
-        confidence = entity.get_confidence()
-        center_point = entity.get_center_point()
-        found_car = False
-        if p_db:
-            n_x = center_point.x()
-            n_y = center_point.y()
-            for p_e in p_db:
-                if found_car:
+def check_direction(previous_DB, DB):
+    try:
+        direction_detection_difference = int(cp.get_value_from_config('General', 'direction_detection_difference'))
+    except:
+        direction_detection_difference = 5
+    try:
+        movement_detection_radius = int(cp.get_value_from_config('General', 'movement_detection_radius'))
+    except:
+        movement_detection_radius = 10
+    for new_entity in DB:
+        label = new_entity.get_type()
+        bounding_box = new_entity.get_bounding_box()
+        confidence = new_entity.get_confidence()
+        center_point = new_entity.get_center_point()
+        found_flag = False
+        if previous_DB:
+            new_x = center_point.x()
+            new_y = center_point.y()
+            for previous_entity in previous_DB:
+                if found_flag:
                     break
-                p_center = p_e.get_center_point()
-                p_x = p_center.x()
-                p_y = p_center.y()
-                d_x = n_x - p_x
-                d_y = n_y - p_y
-                log("DEBUG", "DX : %s DY: %s" % (d_x, d_y))
-                log("DEBUG", "NX : %s NY: %s" % (n_x, n_y))
-                log("DEBUG", "PX : %s PY: %s" % (p_x, p_y))
-                offset = 5
-                if abs(d_x) < 10 and abs(d_y) < 10:
-                    direction = entity.get_direction()
-                    if d_x > offset:
-                        direction += "RIGHT"
-                    elif d_x < -1*offset:
-                        direction += "LEFT"
-                    if d_y > offset:
-                        direction += "DOWN"
-                    elif d_y < -1*offset:
-                        direction += "UP"
-                    found_car = True
-                    entity.set_direction(direction)
+                previous_center = previous_entity.get_center_point()
+                previous_x = previous_center.x()
+                previous_y = previous_center.y()
+                difference_x = new_x - previous_x
+                difference_y = new_y - previous_y
+                log("DEBUG", "DX : %s DY: %s" % (difference_x, difference_y))
+                log("DEBUG", "NX : %s NY: %s" % (new_x, new_y))
+                log("DEBUG", "PX : %s PY: %s" % (previous_x, previous_y))
+                if abs(difference_x) < movement_detection_radius\
+                   and abs(difference_y) < movement_detection_radius:
+                    direction = new_entity.get_direction()
+                    if difference_x > direction_detection_difference:
+                        direction += ":RIGHT"
+                    elif difference_x < -1 * direction_detection_difference:
+                        direction += ":LEFT"
+                    if difference_y > direction_detection_difference:
+                        direction += ":DOWN"
+                    elif difference_y < -1 * direction_detection_difference:
+                        direction += ":UP"
+                    found_flag = True
+                    new_entity.set_direction(direction)
                     break
 
 def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode, overlay_mode):
@@ -232,7 +238,8 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
     output_file = args['output_file']
     if fullscreen_mode:
         screen_width, screen_height = get_screen_size()
-    p_db = []
+    DB = []
+    previous_DB = []
     while True:
         try:
             frame = stream.read()
@@ -246,12 +253,12 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
                                          (frame.shape[1],
                                           frame.shape[0]),
                                          True)
-            counters = predict(frame, net, confidence)
-            check_direction(p_db)
+            counters = predict(frame, net, confidence, DB)
+            check_direction(previous_DB, DB)
             if show_mode and overlay_mode:
-                draw_on_frame(image_for_result)
+                draw_on_frame(image_for_result, DB)
                 draw_counters(image_for_result, counters)
-            p_db = copy.deepcopy(db)
+            previous_DB = copy.deepcopy(DB)
             if not isinstance(writer, type(None)):
                 writer.write(image_for_result)
             if show_mode:
@@ -273,8 +280,10 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
 
 def load_model():
     MODEL_NAME = "person-vehicle-bike-detection-crossroad-1016"
-    MODEL_PATH = "/opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader/intel"
-    MODEL_PATH = "./models"
+    try:
+        MODEL_PATH = cp.get_value_from_config('General', 'models_path')
+    except:
+        MODEL_PATH = "./models"
     GRAPH_FILENAME = MODEL_PATH + "/" + MODEL_NAME
     if RUNNING_ON_RPI:
         GRAPH_FILENAME += "/FP16/"
