@@ -4,12 +4,13 @@ import os
 import sys
 import cv2
 import time
-import glob
-import argparse
+import copy
+import numpy as np
 from imutils.video import FPS
 from imutils.video import VideoStream
 from Xlib.display import Display
-from src import config_parser
+from src.config_parser import configParser
+from src.entity import entity
 
 RUNNING_ON_RPI = False
 os_info = os.uname()
@@ -38,6 +39,8 @@ log_levels = {
              }
 
 WINDOW_NAME = "Traffic Control."
+
+db = []
 
 def colorize_text(log_level):
     """
@@ -104,56 +107,64 @@ def predict(frame, net, confidence):
                 "Car" : 0,
                 "Bike" : 0,
                 "Person" : 0,
-                "Other" : 0
                }
     # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
     # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
+    frame_height, frame_width, _ = frame.shape
+    db.clear()
     for detection in out.reshape(-1, 7):
         image_id, label, conf, x_min, y_min, x_max, y_max = detection
         if conf > confidence:
-            box_points = ((x_min, y_min), (x_max, y_max))
-            prediction = (label, conf, box_points)
-            predictions.append(prediction)
-            if label == 0:
-                label = "Bike"
-            elif label == 1.0:
+            x_min = int(x_min * frame_width)
+            y_min = int(y_min * frame_height)
+            x_max = int(x_max * frame_width)
+            y_max = int(y_max * frame_height)
+            center_x = int((x_max - x_min) / 2) + x_min
+            center_y = int((y_min - y_max) / 2) + y_min
+            bounding_box = ((x_min, y_min), (x_max, y_max))
+            if label == 1.0:
                 label = "Car"
             elif label == 2.0:
                 label = "Person"
-            else:
-                label = "Other"
+            elif label == 3.0:
+                label = "Bike"
             counters[label] += 1
-    return predictions, counters
+            new_entity = entity()
+            new_entity.set_type(label)
+            new_entity.set_center_point(center_x, center_y)
+            new_entity.set_confidence(conf)
+            new_entity.set_bounding_box(bounding_box)
+            db.append(new_entity)
+    return counters
 
-def draw_on_frame(label, image_for_result, x, y, frame_shape, prediction_confidence):
-        height = frame_shape[0]
-        width = frame_shape[1]
-        x_min = int(x[0] * width)
-        y_min = int(y[0] * height)
-        x_max = int(x[1] * width)
-        y_max = int(y[1] * height)
+def draw_on_frame(image_for_result):
+    for entity in db:
+        bounding_box = entity.get_bounding_box()
+        confidence = entity.get_confidence()
+        label = entity.get_type()
+        direction = entity.get_direction()
+        top_left = bounding_box[0]
+        bottom_right = bounding_box[1]
+        x_min = top_left[0]
+        y_min = top_left[1]
+        x_max = bottom_right[0]
+        y_max = bottom_right[1]
         offset = 15
         y = y_min - offset if y_min - offset > offset else y_min + offset
-        if label == 0:
-            label = "Bike"
+        if label == "Bike":
             color = (255, 0, 0)
-        elif label == 1.0:
-            label = "Car"
+        elif label == "Car":
             color = (0, 0, 255)
-        elif label == 2.0:
-            label = "Person"
+        elif label == "Person":
             color = (0, 255, 0)
-        else:
-            label = "Other"
-            color = (0, 255, 0)
-        label += ": {:.2f}%".format(prediction_confidence * 100)
+        label += ": {:.2f}%".format(confidence * 100)
         cv2.rectangle(image_for_result,
                       (x_min, y_min),
                       (x_max, y_max),
                       color,
                       2)
         cv2.putText(image_for_result,
-                    label,
+                    label + ':' + direction,
                     (x_min, y),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.75,
@@ -179,17 +190,53 @@ def get_screen_size():
     screen_width, screen_height = screen.width_in_pixels, screen.height_in_pixels
     return screen_width, screen_height
 
+def check_direction(p_db):
+    for entity in db:
+        label = entity.get_type()
+        bounding_box = entity.get_bounding_box()
+        confidence = entity.get_confidence()
+        center_point = entity.get_center_point()
+        found_car = False
+        if p_db:
+            n_x = center_point.x()
+            n_y = center_point.y()
+            for p_e in p_db:
+                if found_car:
+                    break
+                p_center = p_e.get_center_point()
+                p_x = p_center.x()
+                p_y = p_center.y()
+                d_x = n_x - p_x
+                d_y = n_y - p_y
+                log("DEBUG", "DX : %s DY: %s" % (d_x, d_y))
+                log("DEBUG", "NX : %s NY: %s" % (n_x, n_y))
+                log("DEBUG", "PX : %s PY: %s" % (p_x, p_y))
+                offset = 5
+                if abs(d_x) < 10 and abs(d_y) < 10:
+                    direction = entity.get_direction()
+                    if d_x > offset:
+                        direction += "RIGHT"
+                    elif d_x < -1*offset:
+                        direction += "LEFT"
+                    if d_y > offset:
+                        direction += "DOWN"
+                    elif d_y < -1*offset:
+                        direction += "UP"
+                    found_car = True
+                    entity.set_direction(direction)
+                    break
+
 def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode, overlay_mode):
     writer = None
     confidence = args['confidence']
     output_file = args['output_file']
     if fullscreen_mode:
         screen_width, screen_height = get_screen_size()
+    p_db = []
     while True:
         try:
             frame = stream.read()
             frame = frame[1] if input_file else frame
-            frame_height, frame_width, _ = frame.shape
             image_for_result = frame.copy()
             if output_file and isinstance(writer, type(None)):
                 fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -199,24 +246,12 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
                                          (frame.shape[1],
                                           frame.shape[0]),
                                          True)
-            predictions, counters = predict(frame, net, confidence)
-            for index, predictions in enumerate(predictions):
-                label, prediction_confidence, box_points = predictions
-                ((x_min, y_min), (x_max, y_max)) = box_points
-                log("DEBUG", "Prediction #%s: confidence: %s, box_points: %s" %\
-                             (index, prediction_confidence, box_points))
-                if prediction_confidence > confidence:
-                    log("DEBUG", "Prediction #%s: confidence: %s, box_point: %s" %\
-                                 (index, prediction_confidence, box_points))
-                    if show_mode and overlay_mode:
-                        draw_on_frame(label,
-                                      image_for_result,
-                                      (x_min, x_max),
-                                      (y_min, y_max),
-                                      (frame_height, frame_width),
-                                      prediction_confidence)
-            if overlay_mode:
+            counters = predict(frame, net, confidence)
+            check_direction(p_db)
+            if show_mode and overlay_mode:
+                draw_on_frame(image_for_result)
                 draw_counters(image_for_result, counters)
+            p_db = copy.deepcopy(db)
             if not isinstance(writer, type(None)):
                 writer.write(image_for_result)
             if show_mode:
@@ -303,7 +338,7 @@ def parse_arguments(cp):
     return args
 
 def main():
-    cp = config_parser.configParser(log)
+    cp = configParser(log)
     args = parse_arguments(cp)
     show_mode = args['show_mode']
     input_file = args['input_file']
