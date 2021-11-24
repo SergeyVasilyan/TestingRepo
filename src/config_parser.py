@@ -1,7 +1,14 @@
+'''
+A module containing configuration parsing related class.
+'''
+
 import os
 import configparser
 
 class configParser():
+'''
+Custom class for parsing arguments from configuration file.
+'''
 
     def __init__(self, log):
         self.config = configparser.ConfigParser()
@@ -9,9 +16,17 @@ class configParser():
         self.log = log
 
     def check_config(self):
+        '''
+        Functionality that checks configuration file existence.
+        '''
         return os.path.exists(self.filename)
 
     def get_value_from_config(self, section, key):
+        '''
+        Functionality that gets corresponding value from the configuration file.
+        First argument - section name.
+        Second argument - key name.
+        '''
         if(self.check_config()):
             self.config.read(self.filename)
             try:
@@ -24,6 +39,12 @@ class configParser():
         return ""
 
     def set_config_value(self, section, key, value):
+        '''
+        Functionality that sets corresponding value in the configuration file.
+        First argument - section name.
+        Second argument - key name.
+        Third argument - new value.
+        '''
         if(self.check_config()):
             self.config.read(self.filename)
             try:

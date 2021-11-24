@@ -1,23 +1,33 @@
 #!/usr/bin/env python3
 
+'''
+A utility to track real-time and make optimal decision how long enable
+green/red light on crossroads based on the traffic.
+'''
+
 import os
 import sys
 import cv2
 import time
 import copy
 import numpy as np
+from datetime import datetime
 from imutils.video import FPS
 from imutils.video import VideoStream
 from Xlib.display import Display
 from src.config_parser import configParser
 from src.entity import entity
 
+# Check if machine is Rasberry PI.
 RUNNING_ON_RPI = False
 os_info = os.uname()
 if os_info[4][:3] == 'arm':
     RUNNING_ON_RPI = True
 
 class text_colors:
+    '''
+    Class holding ASCII color codes as members.
+    '''
     UNDERLINE = '\033[4m'
     WARNING = '\033[33m'
     HEADER = '\033[95m'
@@ -29,6 +39,7 @@ class text_colors:
     RED = '\033[31m'
     END = '\033[0m'
 
+# Custom log message configuration.
 log_level = 1
 log_levels = {
                 'CRITICAL' : 4,
@@ -38,13 +49,14 @@ log_levels = {
                 'DEBUG' : 0
              }
 
+# Utility window name.
 WINDOW_NAME = "Traffic Control."
 
 def colorize_text(log_level):
-    """
+    '''
     Functionality that colorizes message log level.
     First argument - log level of the message.
-    """
+    '''
     if log_level == "CRITICAL":
         log_level = text_colors.UNDERLINE\
                     + text_colors.BOLD\
@@ -70,21 +82,52 @@ def colorize_text(log_level):
     return log_level
 
 def log(level, message):
-    """
+    '''
     Functionality that validates all given arguments and outputs corresponding message.
-    First argument - sub class of the message.
-    Second argument - level of the message.
-    Third argument - message body.
-    """
+    First argument - level of the message.
+    Second argument - message body.
+    '''
     if log_levels[level.upper()] >= log_level:
         current_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         level = colorize_text(level)
         current_date = text_colors.HEADER + current_date + text_colors.END
         print("[%s] [%s]: %s" % (current_date, level, message))
 
+def get_frame(stream, input_file):
+    '''
+    Functionality that return a copy of the frame based on the stream base,
+    i.e. from camera or video.
+    First argument - stream object.
+    Second argument - input file path.
+    '''
+    frame = stream.read()
+    frame = frame[1] if input_file else frame
+    image_for_result = frame.copy()
+    return image_for_result
+
+def configure_output_writer(output_file, frame, writer):
+    '''
+    Functionality that configures output video writer.
+    First argument - output video filename,
+    Second argument - frame,
+    Third argument - writer object.
+    '''
+    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    writer = cv2.VideoWriter(output_file,
+                             fourcc,
+                             30,
+                             (frame.shape[1],
+                              frame.shape[0]),
+                             True)
+    return writer
+
 def predict(frame, net, confidence, DB):
     '''
-    Prepare input blob and perform an inference
+    Functionality that predicts and returns detected object DB.
+    First argument - frame.
+    Second argument - model network.
+    Third argument - model confidence.
+    Fourth argument - DB object.
     '''
     try:
         input_width = int(cp.get_value_from_config('Accelerator', 'model_detect_width'))
@@ -135,7 +178,13 @@ def predict(frame, net, confidence, DB):
             DB.append(new_entity)
     return counters
 
-def draw_on_frame(image_for_result, DB):
+def draw_on_frame(frame, DB, counters):
+    '''
+    Functionality that draws rectangles and real-time counters.
+    First argument - frame.
+    Second argument - DB object.
+    Third argument - counters object.
+    '''
     for new_entity in DB:
         bounding_box = new_entity.get_bounding_box()
         confidence = new_entity.get_confidence()
@@ -156,25 +205,31 @@ def draw_on_frame(image_for_result, DB):
         elif label == "Person":
             color = (0, 255, 0)
         label += ": {:.2f}%".format(confidence * 100)
-        cv2.rectangle(image_for_result,
+        cv2.rectangle(frame,
                       (x_min, y_min),
                       (x_max, y_max),
                       color,
                       2)
-        cv2.putText(image_for_result,
+        cv2.putText(frame,
                     label + direction,
                     (x_min, y),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.75,
                     color,
                     2)
+    draw_counters(frame, counters)
 
-def draw_counters(image_for_result, counters):
+def draw_counters(frame, counters):
+    '''
+    Functionality draws counters on the frame.
+    First argument - frame.
+    Second argument - counters object.
+    '''
     x = 0
     y = 25
     step = 20
     for counter in counters:
-        cv2.putText(image_for_result,
+        cv2.putText(frame,
                     "%s: %s" % (counter, counters[counter]),
                     (x, y),
                     cv2.FONT_HERSHEY_SIMPLEX,
@@ -184,11 +239,19 @@ def draw_counters(image_for_result, counters):
         y += step
 
 def get_screen_size():
+    '''
+    Functionality that gets and returns screen size in pixels.
+    '''
     screen = Display(os.environ["DISPLAY"]).screen()
     screen_width, screen_height = screen.width_in_pixels, screen.height_in_pixels
     return screen_width, screen_height
 
 def check_direction(previous_DB, DB):
+    '''
+    Functionality that check every entities movement direction.
+    First argument - previous DB object.
+    Second argument - DB object.
+    '''
     try:
         direction_detection_difference = int(cp.get_value_from_config('General', 'direction_detection_difference'))
     except:
@@ -232,46 +295,128 @@ def check_direction(previous_DB, DB):
                     new_entity.set_direction(direction)
                     break
 
-def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode, overlay_mode):
-    writer = None
-    confidence = args['confidence']
-    output_file = args['output_file']
+def write_data(counters, start_time, end_time):
+    '''
+    Functionality that writes collected data into the log file.
+    First argument - counters object.
+    Second argument - collecting start time.
+    Third argument - collecting end time.
+    '''
+    data = "%s - %s | " % (start_time, end_time)
+    for field in counters:
+        data += "%ss: %s " % (field, counters[field])
+    data += "\n"
+    with open("data.log", "a") as f:
+        f.write(data)
+
+def get_average_data(average_counters, counters):
+    '''
+    Functionality that calculates average counter.
+    First argument - average counter object.
+    Second argument - counters object.
+    '''
+    if not average_counters:
+        average_counters = counters
+    else:
+        for field in counters:
+            average_counters[field] += counters[field]
+    return average_counters
+
+def check_quanity(end_time, start_time_check, average_counters, counters):
+    '''
+    Functionality that checks quantity of the entities in the frame.
+    First argument - end time of checking.
+    Second argument - start time of the checking.
+    Third argument - average counters object.
+    Fourth argument - counters object.
+    '''
+    difference_time_check = (end_time - start_time_check).seconds / 60
+    if difference_time_check >= 0.1:
+        average_counters = get_average_data(average_counters, counters)
+        start_time_check = end_time
+    return start_time_check, average_counters
+
+def check_write_data(end_time, start_time_write, data_collecting_time, average_counters):
+    '''
+    Functionality that checks if it is time to write collected data into log.
+    First argument - end time of the checking.
+    Second argument - start time of the checking.
+    Third argument - period in minutes of time to collect data and write into the log.
+    Fourth argument - average counters object.
+    '''
+    difference_time_write = (end_time - start_time_write).seconds / 60
+    if difference_time_write >= 0.2:#data_collecting_time:
+        write_data(average_counters, start_time_write, end_time)
+        start_time_write = end_time
+        average_counters = {}
+    return start_time_write, average_counters
+
+def show_frame(fullscreen_mode, frame):
+    '''
+    Functionality that show frame.
+    First argument - full-screen mode flag.
+    Second argument - frame.
+    '''
     if fullscreen_mode:
         screen_width, screen_height = get_screen_size()
+        frame = cv2.resize(frame,
+                                      (screen_width, screen_height),
+                                      interpolation = cv2.INTER_AREA)
+    cv2.imshow(WINDOW_NAME, frame)
+
+def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode, overlay_mode):
+    '''
+    Functionality that run the main process of detection and decision.
+    First argument - configuration arguments object.
+    Second argument - model network.
+    Third argument - FPS counting object.
+    Fourth argument - show mode flag.
+    Fifth argument - input filename.
+    Sixth argument - full-screen mode flag.
+    Seventh argument - overlay mode flag.
+    '''
     DB = []
     previous_DB = []
+    average_counters = {}
+    confidence = args['confidence']
+    output_file = args['output_file']
+    try:
+        data_collecting_time = int(cp.get_value_from_config('General', 'data_collecting_time'))
+    except:
+        data_collecting_time = 1
+    date_format = "%Y-%m-%d %H:%M:%S"
+    current_date = time.strftime(date_format, time.localtime())
+    start_time_check = datetime.strptime(current_date, date_format)
+    start_time_write = datetime.strptime(current_date, date_format)
     while True:
         try:
-            frame = stream.read()
-            frame = frame[1] if input_file else frame
-            image_for_result = frame.copy()
-            if output_file and isinstance(writer, type(None)):
-                fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-                writer = cv2.VideoWriter(output_file,
-                                         fourcc,
-                                         30,
-                                         (frame.shape[1],
-                                          frame.shape[0]),
-                                         True)
+            frame = get_frame(stream, input_file)
             counters = predict(frame, net, confidence, DB)
             check_direction(previous_DB, DB)
-            if show_mode and overlay_mode:
-                draw_on_frame(image_for_result, DB)
-                draw_counters(image_for_result, counters)
             previous_DB = copy.deepcopy(DB)
-            if not isinstance(writer, type(None)):
-                writer.write(image_for_result)
+            if output_file:
+                writer = configure_output_writer(output_file, frame, writer)
+                if not isinstance(writer, type(None)):
+                    writer.write(frame)
+            current_date = time.strftime(date_format, time.localtime())
+            end_time = datetime.strptime(current_date, date_format)
+            start_time_check, average_counters = check_quanity(end_time,
+                                                           start_time_check,
+                                                           average_counters,
+                                                           counters)
+            start_time_write, average_counters = check_write_data(end_time,
+                                                              start_time_write,
+                                                              data_collecting_time,
+                                                              average_counters)
             if show_mode:
-                if fullscreen_mode:
-                    image_for_result = cv2.resize(image_for_result,
-                                                  (screen_width, screen_height),
-                                                  interpolation = cv2.INTER_AREA)
-                cv2.imshow(WINDOW_NAME, image_for_result)
-                key = cv2.waitKey(1) & 0xFF
-                if key == ord("q"):
-                    break
+                if overlay_mode:
+                    draw_on_frame(frame, DB, counters)
+                show_frame(fullscreen_mode, frame)
                 if cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO) < 0:
                     break
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord("q"):
+                break
             fps.update()
         except KeyboardInterrupt:
             break
@@ -279,7 +424,13 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
             break
 
 def load_model():
-    MODEL_NAME = "person-vehicle-bike-detection-crossroad-1016"
+    '''
+    Functionality that load model and returns model network.
+    '''
+    try:
+        MODEL_NAME = cp.get_value_from_config('General', 'model_name')
+    except:
+        MODEL_NAME = "person-vehicle-bike-detection-crossroad-1016"
     try:
         MODEL_PATH = cp.get_value_from_config('General', 'models_path')
     except:
@@ -296,10 +447,17 @@ def load_model():
     return net
 
 def check_optimization():
+    '''
+    Functionality that checks if OpenCV optimization is being enabled or not.
+    '''
     if not cv2.useOptimized():
         cv2.setUseOptimized(True)
 
 def get_input(input_file):
+    '''
+    Functionality that gets input file data.
+    First argument - input filename.
+    '''
     if not input_file:
         camera_index = 6
         log("WARNING", "starting video stream.")
@@ -308,6 +466,10 @@ def get_input(input_file):
     return cv2.VideoCapture(input_file)
 
 def check_app_mode(fullscreen_mode):
+    '''
+    Functionality that checks application window mode.
+    First argument - full-screen mode flag..
+    '''
     if not fullscreen_mode:
         cv2.namedWindow(WINDOW_NAME)
     else:
@@ -315,6 +477,10 @@ def check_app_mode(fullscreen_mode):
         cv2.setWindowProperty(WINDOW_NAME,cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN)
 
 def parse_arguments(cp):
+    '''
+    Functionality that parses argument from from configuration file.
+    First argument configuration parser.
+    '''
     global log_level
     show_mode = eval(cp.get_value_from_config('Features', 'show_mode'))
     try:
@@ -347,6 +513,9 @@ def parse_arguments(cp):
     return args
 
 def main():
+    '''
+    Application start point.
+    '''
     cp = configParser(log)
     args = parse_arguments(cp)
     show_mode = args['show_mode']
