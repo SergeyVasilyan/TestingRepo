@@ -105,12 +105,11 @@ def get_frame(stream, input_file):
     image_for_result = frame.copy()
     return image_for_result
 
-def configure_output_writer(output_file, frame, writer):
+def configure_output_writer(output_file, frame):
     '''
     Functionality that configures output video writer.
     First argument - output video filename,
     Second argument - frame,
-    Third argument - writer object.
     '''
     fourcc = cv2.VideoWriter_fourcc(*"mp4v")
     writer = cv2.VideoWriter(output_file,
@@ -375,6 +374,7 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
     Sixth argument - full-screen mode flag.
     Seventh argument - overlay mode flag.
     '''
+    writer = None
     DB = []
     previous_DB = []
     average_counters = {}
@@ -394,10 +394,17 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
             counters = predict(frame, net, confidence, DB)
             check_direction(previous_DB, DB)
             previous_DB = copy.deepcopy(DB)
+            if show_mode:
+                if overlay_mode:
+                    draw_on_frame(frame, DB, counters)
+                show_frame(fullscreen_mode, frame)
+                if cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO) < 0:
+                    break
             if output_file:
-                writer = configure_output_writer(output_file, frame, writer)
                 if not isinstance(writer, type(None)):
                     writer.write(frame)
+                else:
+                    writer = configure_output_writer(output_file, frame)
             current_date = time.strftime(date_format, time.localtime())
             end_time = datetime.strptime(current_date, date_format)
             start_time_check, average_counters = check_quanity(end_time,
@@ -408,12 +415,6 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
                                                               start_time_write,
                                                               data_collecting_time,
                                                               average_counters)
-            if show_mode:
-                if overlay_mode:
-                    draw_on_frame(frame, DB, counters)
-                show_frame(fullscreen_mode, frame)
-                if cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO) < 0:
-                    break
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q"):
                 break
