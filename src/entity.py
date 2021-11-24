@@ -3,9 +3,9 @@ Custom module that contains entity related information.
 '''
 
 class centerPoint:
-'''
-Custom center point class.
-'''
+    '''
+    Custom center point class.
+    '''
 
     def __init__(self, x = None, y = None):
         self.__x = x
@@ -38,9 +38,9 @@ Custom center point class.
             self.__y = new_y
 
 class entity:
-'''
-Custom entity class which will hold detection object related information.
-'''
+    '''
+    Custom entity class which will hold detection object related information.
+    '''
 
     def __init__(self):
         self.__id = None

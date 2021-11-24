@@ -6,9 +6,9 @@ import os
 import configparser
 
 class configParser():
-'''
-Custom class for parsing arguments from configuration file.
-'''
+    '''
+    Custom class for parsing arguments from configuration file.
+    '''
 
     def __init__(self, log):
         self.config = configparser.ConfigParser()
