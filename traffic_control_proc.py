@@ -18,7 +18,7 @@ from imutils.video import VideoStream
 from Xlib.display import Display
 from src.config_parser import configParser
 from src.entity import entity
-from multiprocessing import Value, Process
+from multiprocessing import Value, Process, Array
 
 # Check if machine is Rasberry PI.
 RUNNING_ON_RPI = False
@@ -255,12 +255,15 @@ def draw_reset_light(frame, radius, padding, step, x, y):
                (0, 0, 0),
                -1)
 
-def draw_traffic_light(frame, end_time, start_time_light):
+def draw_traffic_light():
     '''
     Functionality draws counters on the frame.
     First argument - frame.
     '''
-    difference_time_light = (end_time - start_time_light).seconds
+    date_format = "%Y-%m-%d %H:%M:%S"
+    current_date = time.strftime(date_format, time.localtime())
+    start_time_light = datetime.strptime(current_date, date_format)
+    end_time = datetime.strptime(current_date, date_format)
     light_timer = 2
     yellow_light_timer = 1
     green_light_timer = light_timer
@@ -270,20 +273,29 @@ def draw_traffic_light(frame, end_time, start_time_light):
     radius = 20
     padding = int(radius * 1.5)
     step = int(padding * 1.5)
-    x = frame.shape[1] - padding
     y = padding
-    if difference_time_light <= green_light_timer:
-        draw_green_light(frame, radius, padding, step, x, y)
-    elif difference_time_light <= first_yellow_light_timer:
-        draw_yellow_light(frame, radius, padding, step, x, y)
-    elif difference_time_light <= red_light_timer:
-        draw_red_light(frame, radius, padding, step, x, y)
-    elif difference_time_light <= second_yellow_light_timer:
-        draw_yellow_light(frame, radius, padding, step, x, y)
-    else:
-        draw_reset_light(frame, radius, padding, step, x, y)
-        start_time_light = end_time
-    return start_time_light
+    while True:
+        try:
+            frame = sa.attach("Frame")
+        except:
+            time.sleep(0.1)
+            continue
+        x = frame.shape[1] - padding
+        current_date = time.strftime(date_format, time.localtime())
+        end_time = datetime.strptime(current_date, date_format)
+        difference_time_light = (end_time - start_time_light).seconds
+        if difference_time_light <= green_light_timer:
+            draw_green_light(frame, radius, padding, step, x, y)
+        elif difference_time_light <= first_yellow_light_timer:
+            draw_yellow_light(frame, radius, padding, step, x, y)
+        elif difference_time_light <= red_light_timer:
+            draw_red_light(frame, radius, padding, step, x, y)
+        elif difference_time_light <= second_yellow_light_timer:
+            draw_yellow_light(frame, radius, padding, step, x, y)
+        else:
+            draw_reset_light(frame, radius, padding, step, x, y)
+            start_time_light = end_time
+        time.sleep(0.01)
 
 def draw_counters(frame, counters):
     '''
@@ -304,7 +316,7 @@ def draw_counters(frame, counters):
                     2)
         y += step
 
-def draw_on_frame(frame, DB, counters, end_time, start_time_light):
+def draw_on_frame(frame, DB, counters):
     '''
     Functionality that draws rectangles and real-time counters.
     First argument - frame.
@@ -344,8 +356,6 @@ def draw_on_frame(frame, DB, counters, end_time, start_time_light):
                     color,
                     2)
     draw_counters(frame, counters)
-    start_time_light = draw_traffic_light(frame, end_time, start_time_light)
-    return start_time_light
 
 def get_screen_size():
     '''
@@ -485,6 +495,7 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
     Seventh argument - overlay mode flag.
     '''
     writer = None
+    shared_frame = None
     DB = []
     previous_DB = []
     average_counters = {}
@@ -498,30 +509,37 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
     current_date = time.strftime(date_format, time.localtime())
     start_time_check = datetime.strptime(current_date, date_format)
     start_time_write = datetime.strptime(current_date, date_format)
-    start_time_light = datetime.strptime(current_date, date_format)
+    traffic_light_thread = Process(target = draw_traffic_light)
+    traffic_light_thread.start()
     while True:
         try:
             frame = get_frame(stream, input_file)
+            print(frame)
+            if isinstance(shared_frame, type(None)):
+                try:
+                    sa.delete("Frame")
+                    shared_frame = sa.create("Frame", frame.shape)
+                except:
+                    pass
+            shared_frame[:] = frame[:]
             counters = predict(frame, net, confidence, DB)
             check_direction(previous_DB, DB)
             previous_DB = copy.deepcopy(DB)
-            current_date = time.strftime(date_format, time.localtime())
-            end_time = datetime.strptime(current_date, date_format)
             if show_mode:
                 if overlay_mode:
-                    start_time_light = draw_on_frame(frame,
-                                                     DB,
-                                                     counters,
-                                                     end_time,
-                                                     start_time_light)
-                show_frame(fullscreen_mode, frame)
+                    draw_on_frame(shared_frame,
+                                  DB,
+                                  counters)
+                show_frame(fullscreen_mode, shared_frame)
                 if cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO) < 0:
                     break
             if output_file:
                 if not isinstance(writer, type(None)):
-                    writer.write(frame)
+                    writer.write(shared_frame)
                 else:
-                    writer = configure_output_writer(output_file, frame)
+                    writer = configure_output_writer(output_file, shared_frame)
+            current_date = time.strftime(date_format, time.localtime())
+            end_time = datetime.strptime(current_date, date_format)
             start_time_check, average_counters = check_quanity(end_time,
                                                                start_time_check,
                                                                average_counters,
