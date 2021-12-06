@@ -533,14 +533,11 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q"):
                 break
-                traffic_light_thread.join()
             fps.update()
         except KeyboardInterrupt:
-            traffic_light_thread.join()
             break
-        except AttributeError:
-            traffic_light_thread.join()
-            break
+#       except AttributeError:
+#           break
 
 def load_model():
     '''
