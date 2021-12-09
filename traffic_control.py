@@ -179,80 +179,35 @@ def predict(frame, net, confidence, DB):
             DB.append(new_entity)
     return counters
 
-def draw_green_light(frame, radius, padding, step, x, y):
+def draw_light(frame, colors, difference_time_light):
+    radius = 20
+    padding = int(radius * 1.5)
+    step = int(padding * 1.5)
+    x = frame.shape[1] - padding
+    y = padding
     cv2.circle(frame,
                (x, y),
                radius,
-               (0, 255, 0),
+               colors['green'],
                -1)
     y += step
     cv2.circle(frame,
                (x, y),
                radius,
-               (0, 0, 0),
+               colors['yellow'],
                -1)
+    cv2.putText(frame,
+                str(difference_time_light),
+                (int(x - radius / 2), int(y + radius /2)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                1,
+                (0, 0, 255),
+                2)
     y += step
     cv2.circle(frame,
                (x, y),
                radius,
-               (0, 0, 0),
-               -1)
-
-def draw_yellow_light(frame, radius, padding, step, x, y):
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 0, 0),
-               -1)
-    y += step
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 255, 255),
-               -1)
-    y += step
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 0, 0),
-               -1)
-
-def draw_red_light(frame, radius, padding, step, x, y):
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 0, 0),
-               -1)
-    y += step
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 0, 0),
-               -1)
-    y += step
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 0, 255),
-               -1)
-
-def draw_reset_light(frame, radius, padding, step, x, y):
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 0, 0),
-               -1)
-    y += step
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 0, 0),
-               -1)
-    y += step
-    cv2.circle(frame,
-               (x, y),
-               radius,
-               (0, 0, 0),
+               colors['red'],
                -1)
 
 def draw_traffic_light(frame, end_time, start_time_light):
@@ -261,28 +216,33 @@ def draw_traffic_light(frame, end_time, start_time_light):
     First argument - frame.
     '''
     difference_time_light = (end_time - start_time_light).seconds
-    light_timer = 2
+    light_timer = 4
     yellow_light_timer = 1
-    green_light_timer = light_timer
+    green_light_timer = light_timer - 1
     first_yellow_light_timer = green_light_timer + yellow_light_timer
     red_light_timer = first_yellow_light_timer +  light_timer
     second_yellow_light_timer = red_light_timer + yellow_light_timer
-    radius = 20
-    padding = int(radius * 1.5)
-    step = int(padding * 1.5)
-    x = frame.shape[1] - padding
-    y = padding
+    colors = {
+              'green' : (0, 0, 0),
+              'yellow' : (0, 0, 0),
+              'red' : (0, 0, 0)
+             }
     if difference_time_light <= green_light_timer:
-        draw_green_light(frame, radius, padding, step, x, y)
+        colors['green'] = (0, 255, 0)
+        diff_time = green_light_timer - difference_time_light
     elif difference_time_light <= first_yellow_light_timer:
-        draw_yellow_light(frame, radius, padding, step, x, y)
+        colors['yellow'] = (0, 255, 255)
+        diff_time = first_yellow_light_timer - difference_time_light
     elif difference_time_light <= red_light_timer:
-        draw_red_light(frame, radius, padding, step, x, y)
+        colors['red'] = (0, 0, 255)
+        diff_time = red_light_timer - difference_time_light
     elif difference_time_light <= second_yellow_light_timer:
-        draw_yellow_light(frame, radius, padding, step, x, y)
+        colors['yellow'] = (0, 255, 255)
+        diff_time = second_yellow_light_timer - difference_time_light
     else:
-        draw_reset_light(frame, radius, padding, step, x, y)
         start_time_light = end_time
+        diff_time = 0
+    draw_light(frame, colors, diff_time + 1)
     return start_time_light
 
 def draw_counters(frame, counters):
