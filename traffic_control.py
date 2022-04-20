@@ -11,16 +11,15 @@ import cv2
 import time
 import copy
 import numpy as np
-import SharedArray as sa
 from datetime import datetime
 from imutils.video import FPS
 from imutils.video import VideoStream
 from Xlib.display import Display
 from src.config_parser import configParser
 from src.entity import entity
-from multiprocessing import Value, Process
+from multiprocessing import Process
 
-# Check if machine is Rasberry PI.
+# Check if machine is Raspberry PI.
 RUNNING_ON_RPI = False
 os_info = os.uname()
 if os_info[4][:3] == 'arm':
@@ -44,15 +43,75 @@ class text_colors:
 # Custom log message configuration.
 log_level = 1
 log_levels = {
-                'CRITICAL' : 4,
-                'ERROR' : 3,
-                'WARNING' : 2,
-                'INFO' : 1,
-                'DEBUG' : 0
+              'CRITICAL': 4,
+              'ERROR': 3,
+              'WARNING': 2,
+              'INFO': 1,
+              'DEBUG': 0
              }
 
 # Utility window name.
 WINDOW_NAME = "Traffic Control."
+
+class trafficLight(Process):
+    def __init__(self):
+        self.state = ""
+        self.green_time = 0
+        self.red_time = 0
+        self.yellow_time = 1
+        self.end_flag = False
+        self.worker_process = Process(target = self.do_work)
+
+    def update_green_time(self, new_time):
+        if not self.green_time == new_time:
+            self.green_time = new_time
+
+    def update_red_time(self, new_time):
+        if not self.red_time == new_time:
+            self.red_time = new_time
+
+    def get_state(self):
+        return self.state
+
+    def start_processing(self):
+        """
+        Starts process execution.
+        """
+        self.worker_process.start()
+
+    def stop_processing(self):
+        """
+        Stops process execution, joins to the main process.
+        """
+        self.worker_process.join()
+
+    def close(self):
+        """
+        Terminate the process.
+        """
+        self.worker_process.terminate()
+
+    def do_work(self):
+        """
+        Simulates traffic light.
+        """
+        while not self.end_flag:
+            start_time = time.time()
+            while time.time() - start_time < self.green_time:
+                self.state = "green"
+                time.sleep(1)
+            start_time = time.time()
+            while time.time() - start_time < self.yellow_time:
+                self.state = "yellow"
+                time.sleep(1)
+            start_time = time.time()
+            while time.time() - start_time < self.red_time:
+                self.state = "red"
+                time.sleep(1)
+            start_time = time.time()
+            while time.time() - start_time < self.yellow_time:
+                self.state = "yellow"
+                time.sleep(1)
 
 def colorize_text(log_level):
     '''
@@ -93,7 +152,7 @@ def log(level, message):
         current_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
         level = colorize_text(level)
         current_date = text_colors.HEADER + current_date + text_colors.END
-        print("[%s] [%s]: %s" % (current_date, level, message))
+        print(f"[{current_date}] [{level}]: {message}")
 
 def get_frame(stream, input_file):
     '''
@@ -146,9 +205,9 @@ def predict(frame, net, confidence, DB):
     out = net.forward()
     predictions = []
     counters = {
-                "Car" : 0,
-                "Bike" : 0,
-                "Person" : 0,
+                "Car": 0,
+                "Bike": 0,
+                "Person": 0,
                }
     # The net outputs a blob with the shape: [1, 1, N, 7], where N is the number of detected bounding boxes.
     # For each detection, the description has the format: [image_id, label, conf, x_min, y_min, x_max, y_max]
@@ -179,8 +238,17 @@ def predict(frame, net, confidence, DB):
             DB.append(new_entity)
     return counters
 
-def draw_light(frame, colors, difference_time_light):
+def draw_light(frame, colors, timer):
+    '''
+    Functionality that draws traffic light with timer.
+    First argument - frame.
+    Second argument - traffic light colors.
+    Third argument - timer.
+    '''
     radius = 20
+    font_size = 1
+    font_weight = 2
+    font_family = cv2.FONT_HERSHEY_SIMPLEX
     padding = int(radius * 1.5)
     step = int(padding * 1.5)
     x = frame.shape[1] - padding
@@ -196,13 +264,20 @@ def draw_light(frame, colors, difference_time_light):
                radius,
                colors['yellow'],
                -1)
+    if len(timer) > 1:
+        font_size = 0.75
+    size = cv2.getTextSize(timer,
+                           font_family,
+                           font_size,
+                           font_weight)[0]
+    text_x = int(x - size[0] / 2)
     cv2.putText(frame,
-                str(difference_time_light),
-                (int(x - radius / 2), int(y + radius /2)),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                1,
+                timer,
+                (text_x, int(y + size[1] / 2)),
+                font_family,
+                font_size,
                 (0, 0, 255),
-                2)
+                font_weight)
     y += step
     cv2.circle(frame,
                (x, y),
@@ -210,39 +285,52 @@ def draw_light(frame, colors, difference_time_light):
                colors['red'],
                -1)
 
-def draw_traffic_light(frame, end_time, start_time_light):
+def draw_traffic_light(frame, end_time, start_time_light, lights_info):
     '''
-    Functionality draws counters on the frame.
+    Functionality that calculates timer and draws traffic light with timer on
+    the frame.
     First argument - frame.
+    Second argument - current time.
+    Third argument - timer start time.
     '''
+    green_time = lights_info['green']['timer']
+    red_time = lights_info['red']['timer']
     difference_time_light = (end_time - start_time_light).seconds
-    light_timer = 4
+    light_timer = 12
     yellow_light_timer = 1
-    green_light_timer = light_timer - 1
-    first_yellow_light_timer = green_light_timer + yellow_light_timer
-    red_light_timer = first_yellow_light_timer +  light_timer
+    green_light_timer = green_time - 1
+    first_yellow_light_timer = green_light_timer - 1 + yellow_light_timer
+    red_light_timer = first_yellow_light_timer + red_time
     second_yellow_light_timer = red_light_timer + yellow_light_timer
     colors = {
-              'green' : (0, 0, 0),
-              'yellow' : (0, 0, 0),
-              'red' : (0, 0, 0)
+              'green': (0, 0, 0),
+              'yellow': (0, 0, 0),
+              'red': (0, 0, 0)
              }
     if difference_time_light <= green_light_timer:
         colors['green'] = (0, 255, 0)
+        lights_info['red']['enabled'] = False
+        lights_info['green']['enabled'] = True
         diff_time = green_light_timer - difference_time_light
     elif difference_time_light <= first_yellow_light_timer:
         colors['yellow'] = (0, 255, 255)
+        lights_info['red']['enabled'] = False
+        lights_info['green']['enabled'] = False
         diff_time = first_yellow_light_timer - difference_time_light
     elif difference_time_light <= red_light_timer:
         colors['red'] = (0, 0, 255)
+        lights_info['red']['enabled'] = True
+        lights_info['green']['enabled'] = False
         diff_time = red_light_timer - difference_time_light
     elif difference_time_light <= second_yellow_light_timer:
         colors['yellow'] = (0, 255, 255)
+        lights_info['red']['enabled'] = False
+        lights_info['green']['enabled'] = False
         diff_time = second_yellow_light_timer - difference_time_light
     else:
         start_time_light = end_time
         diff_time = 0
-    draw_light(frame, colors, diff_time + 1)
+    draw_light(frame, colors, str(diff_time + 1))
     return start_time_light
 
 def draw_counters(frame, counters):
@@ -264,7 +352,25 @@ def draw_counters(frame, counters):
                     2)
         y += step
 
-def draw_on_frame(frame, DB, counters, end_time, start_time_light):
+def calculate_time(counters, lights_info):
+    '''
+    Functionality that calculates approximate time for green and red time.
+    First argument - overall counters.
+    '''
+    red_enabled = lights_info['red']['enabled']
+    green_enabled = lights_info['green']['enabled']
+    if counters['Car'] > 3:
+        if not red_enabled:
+            lights_info['red']['timer'] = 5
+        if not green_enabled:
+            lights_info['green']['timer'] = 3
+    else:
+        if not red_enabled:
+            lights_info['red']['timer'] = 3
+        if not green_enabled:
+            lights_info['green']['timer'] = 2
+
+def draw_on_frame(frame, DB, counters, lights_info, end_time, start_time_light):
     '''
     Functionality that draws rectangles and real-time counters.
     First argument - frame.
@@ -304,7 +410,11 @@ def draw_on_frame(frame, DB, counters, end_time, start_time_light):
                     color,
                     2)
     draw_counters(frame, counters)
-    start_time_light = draw_traffic_light(frame, end_time, start_time_light)
+    calculate_time(counters, lights_info)
+    start_time_light = draw_traffic_light(frame,
+                                          end_time,
+                                          start_time_light,
+                                          lights_info)
     return start_time_light
 
 def get_screen_size():
@@ -346,9 +456,9 @@ def check_direction(previous_DB, DB):
                 previous_y = previous_center.y()
                 difference_x = new_x - previous_x
                 difference_y = new_y - previous_y
-                log("DEBUG", "DX : %s DY: %s" % (difference_x, difference_y))
-                log("DEBUG", "NX : %s NY: %s" % (new_x, new_y))
-                log("DEBUG", "PX : %s PY: %s" % (previous_x, previous_y))
+                log("DEBUG", f"DX : {difference_x} DY: {difference_y}")
+                log("DEBUG", f"NX : {new_x} NY: {new_y}")
+                log("DEBUG", f"PX : {previous_x} PY: {previous_y}")
                 if abs(difference_x) < movement_detection_radius\
                    and abs(difference_y) < movement_detection_radius:
                     direction = new_entity.get_direction()
@@ -433,7 +543,8 @@ def show_frame(fullscreen_mode, frame):
                                       interpolation = cv2.INTER_AREA)
     cv2.imshow(WINDOW_NAME, frame)
 
-def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode, overlay_mode):
+def start_process(args, net, stream, fps, show_mode, input_file,\
+                  fullscreen_mode, overlay_mode, traffic_light):
     '''
     Functionality that run the main process of detection and decision.
     First argument - configuration arguments object.
@@ -448,6 +559,16 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
     DB = []
     previous_DB = []
     average_counters = {}
+    lights_info = {
+                   'red': {
+                           'timer': 5,
+                           'enabled': False
+                          },
+                   'green': {
+                             'timer': 5,
+                             'enabled': False
+                            }
+                   }
     confidence = args['confidence']
     output_file = args['output_file']
     try:
@@ -472,10 +593,12 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
                     start_time_light = draw_on_frame(frame,
                                                      DB,
                                                      counters,
+                                                     lights_info,
                                                      end_time,
                                                      start_time_light)
                 show_frame(fullscreen_mode, frame)
-                if cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO) < 0:
+                prop_val = cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO)
+                if prop_val < 0:
                     break
             if output_file:
                 if not isinstance(writer, type(None)):
@@ -496,8 +619,9 @@ def start_process(args, net, stream, fps, show_mode, input_file, fullscreen_mode
             fps.update()
         except KeyboardInterrupt:
             break
-#       except AttributeError:
-#           break
+        except AttributeError as e:
+            log("CRITICAL", e)
+            break
 
 def load_model():
     '''
@@ -535,9 +659,31 @@ def get_input(input_file):
     First argument - input filename.
     '''
     if not input_file:
-        camera_index = 6
-        log("WARNING", "starting video stream.")
-        return VideoStream(src = camera_index).start()
+        dev_filenames = next(os.walk('/dev'), (None, None, []))[2]
+        capture_devices = [video for video in dev_filenames if 'video' in video]
+        stream = None
+        log("INFO", f"found {text_colors.UNDERLINE+text_colors.GREEN}"\
+                    f"{len(capture_devices)}{text_colors.END} connected video devices.\n")
+        for device in capture_devices:
+            device_id = ''.join([n for n in device if n.isdigit()])
+            log("WARNING", f"trying to get stream from device with ID: "\
+                           f"{text_colors.GREEN+text_colors.BOLD}{device_id}"\
+                           f"{text_colors.END}.")
+            stream = VideoStream(src = int(device_id)).start()
+            try:
+                get_frame(stream, None)
+                log("INFO", f"starting video stream from device with ID: "\
+                            f"{text_colors.GREEN+text_colors.BOLD}{device_id}"\
+                            f"{text_colors.END}.\n")
+                break
+            except AttributeError:
+                log("ERROR", f"{text_colors.RED}device with ID: {device_id} "\
+                             f"is not streamable{text_colors.END}.\n")
+                continue
+        if not stream:
+            log("CRITICAL", "no streamable device found. Terminating.")
+            exit()
+        return stream
     log("WARNING", "opening video file.")
     return cv2.VideoCapture(input_file)
 
@@ -601,6 +747,7 @@ def main():
     check_app_mode(fullscreen_mode)
     net = load_model()
     stream = get_input(input_file)
+    traffic_light = trafficLight()
     fps = FPS().start()
     start_process(args,
                   net,
@@ -609,7 +756,9 @@ def main():
                   show_mode,
                   input_file,
                   fullscreen_mode,
-                  args['overlay_mode'])
+                  args['overlay_mode'],
+                  traffic_light)
+    log("WARNING", f"{text_colors.UNDERLINE}exiting the utility{text_colors.END}.\n")
     fps.stop()
     if show_mode:
         cv2.destroyAllWindows()
@@ -617,8 +766,10 @@ def main():
         stream.stop()
     else:
         stream.release()
-    log("INFO", "Elapsed time: {:.2f}".format(fps.elapsed()))
-    log("INFO", "Approximate FPS: {:.2f}".format(fps.fps()))
+    log("INFO", f"Elapsed time: {text_colors.GREEN}{round(fps.elapsed(), 2)}"\
+                f"{text_colors.END}")
+    log("INFO", f"Approximate FPS: {text_colors.GREEN}{round(fps.fps(), 2)}"\
+                f"{text_colors.END}")
 
 if __name__ == "__main__":
     sys.exit(main())
