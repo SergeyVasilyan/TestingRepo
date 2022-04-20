@@ -17,7 +17,7 @@ from imutils.video import VideoStream
 from Xlib.display import Display
 from src.config_parser import configParser
 from src.entity import entity
-from multiprocessing import Process
+from multiprocessing import Process, Value
 
 # Check if machine is Raspberry PI.
 RUNNING_ON_RPI = False
@@ -54,24 +54,15 @@ log_levels = {
 WINDOW_NAME = "Traffic Control."
 
 class trafficLight(Process):
-    def __init__(self):
-        self.state = ""
-        self.green_time = 0
-        self.red_time = 0
+
+    def __init__(self, light_state, light_timer, red_time, green_time):
+        self.state = light_state
+        self.green_time = green_time
+        self.red_time = red_time
         self.yellow_time = 1
         self.end_flag = False
+        self.timer = light_timer
         self.worker_process = Process(target = self.do_work)
-
-    def update_green_time(self, new_time):
-        if not self.green_time == new_time:
-            self.green_time = new_time
-
-    def update_red_time(self, new_time):
-        if not self.red_time == new_time:
-            self.red_time = new_time
-
-    def get_state(self):
-        return self.state
 
     def start_processing(self):
         """
@@ -83,12 +74,7 @@ class trafficLight(Process):
         """
         Stops process execution, joins to the main process.
         """
-        self.worker_process.join()
-
-    def close(self):
-        """
-        Terminate the process.
-        """
+        self.end_flag = True
         self.worker_process.terminate()
 
     def do_work(self):
@@ -97,20 +83,26 @@ class trafficLight(Process):
         """
         while not self.end_flag:
             start_time = time.time()
-            while time.time() - start_time < self.green_time:
-                self.state = "green"
+            green_time = self.green_time.value
+            while not self.end_flag and time.time() - start_time < green_time:
+                self.timer.value = int(green_time - (time.time() - start_time))
+                self.state.value = 0
                 time.sleep(1)
             start_time = time.time()
-            while time.time() - start_time < self.yellow_time:
-                self.state = "yellow"
+            while not self.end_flag and time.time() - start_time < self.yellow_time:
+                self.timer.value = int(self.yellow_time - (time.time() - start_time))
+                self.state.value = 1
                 time.sleep(1)
             start_time = time.time()
-            while time.time() - start_time < self.red_time:
-                self.state = "red"
+            red_time = self.red_time.value
+            while not self.end_flag and time.time() - start_time < red_time:
+                self.timer.value = int(red_time - (time.time() - start_time))
+                self.state.value = 2
                 time.sleep(1)
             start_time = time.time()
-            while time.time() - start_time < self.yellow_time:
-                self.state = "yellow"
+            while not self.end_flag and time.time() - start_time < self.yellow_time:
+                self.timer.value = int(self.yellow_time - (time.time() - start_time))
+                self.state.value = 1
                 time.sleep(1)
 
 def colorize_text(log_level):
@@ -285,7 +277,7 @@ def draw_light(frame, colors, timer):
                colors['red'],
                -1)
 
-def draw_traffic_light(frame, end_time, start_time_light, lights_info):
+def draw_traffic_light(frame, light_state, light_timer):
     '''
     Functionality that calculates timer and draws traffic light with timer on
     the frame.
@@ -293,45 +285,19 @@ def draw_traffic_light(frame, end_time, start_time_light, lights_info):
     Second argument - current time.
     Third argument - timer start time.
     '''
-    green_time = lights_info['green']['timer']
-    red_time = lights_info['red']['timer']
-    difference_time_light = (end_time - start_time_light).seconds
-    light_timer = 12
-    yellow_light_timer = 1
-    green_light_timer = green_time - 1
-    first_yellow_light_timer = green_light_timer - 1 + yellow_light_timer
-    red_light_timer = first_yellow_light_timer + red_time
-    second_yellow_light_timer = red_light_timer + yellow_light_timer
     colors = {
               'green': (0, 0, 0),
               'yellow': (0, 0, 0),
               'red': (0, 0, 0)
              }
-    if difference_time_light <= green_light_timer:
+    light_state_value = light_state.value
+    if light_state_value == 0:
         colors['green'] = (0, 255, 0)
-        lights_info['red']['enabled'] = False
-        lights_info['green']['enabled'] = True
-        diff_time = green_light_timer - difference_time_light
-    elif difference_time_light <= first_yellow_light_timer:
+    elif light_state_value == 1:
         colors['yellow'] = (0, 255, 255)
-        lights_info['red']['enabled'] = False
-        lights_info['green']['enabled'] = False
-        diff_time = first_yellow_light_timer - difference_time_light
-    elif difference_time_light <= red_light_timer:
+    elif light_state_value == 2:
         colors['red'] = (0, 0, 255)
-        lights_info['red']['enabled'] = True
-        lights_info['green']['enabled'] = False
-        diff_time = red_light_timer - difference_time_light
-    elif difference_time_light <= second_yellow_light_timer:
-        colors['yellow'] = (0, 255, 255)
-        lights_info['red']['enabled'] = False
-        lights_info['green']['enabled'] = False
-        diff_time = second_yellow_light_timer - difference_time_light
-    else:
-        start_time_light = end_time
-        diff_time = 0
-    draw_light(frame, colors, str(diff_time + 1))
-    return start_time_light
+    draw_light(frame, colors, str(light_timer.value + 1))
 
 def draw_counters(frame, counters):
     '''
@@ -352,25 +318,19 @@ def draw_counters(frame, counters):
                     2)
         y += step
 
-def calculate_time(counters, lights_info):
+def calculate_time(counters, red_time, green_time):
     '''
     Functionality that calculates approximate time for green and red time.
     First argument - overall counters.
     '''
-    red_enabled = lights_info['red']['enabled']
-    green_enabled = lights_info['green']['enabled']
     if counters['Car'] > 3:
-        if not red_enabled:
-            lights_info['red']['timer'] = 5
-        if not green_enabled:
-            lights_info['green']['timer'] = 3
+        red_time.value = 5
+        green_time.value = 5
     else:
-        if not red_enabled:
-            lights_info['red']['timer'] = 3
-        if not green_enabled:
-            lights_info['green']['timer'] = 2
+        red_time.value = 3
+        green_time.value = 2
 
-def draw_on_frame(frame, DB, counters, lights_info, end_time, start_time_light):
+def draw_on_frame(frame, DB, counters, light_state, light_timer, red_time, green_time):
     '''
     Functionality that draws rectangles and real-time counters.
     First argument - frame.
@@ -410,12 +370,8 @@ def draw_on_frame(frame, DB, counters, lights_info, end_time, start_time_light):
                     color,
                     2)
     draw_counters(frame, counters)
-    calculate_time(counters, lights_info)
-    start_time_light = draw_traffic_light(frame,
-                                          end_time,
-                                          start_time_light,
-                                          lights_info)
-    return start_time_light
+    calculate_time(counters, red_time, green_time)
+    draw_traffic_light(frame, light_state, light_timer)
 
 def get_screen_size():
     '''
@@ -544,7 +500,7 @@ def show_frame(fullscreen_mode, frame):
     cv2.imshow(WINDOW_NAME, frame)
 
 def start_process(args, net, stream, fps, show_mode, input_file,\
-                  fullscreen_mode, overlay_mode, traffic_light):
+                  fullscreen_mode, overlay_mode):
     '''
     Functionality that run the main process of detection and decision.
     First argument - configuration arguments object.
@@ -559,27 +515,25 @@ def start_process(args, net, stream, fps, show_mode, input_file,\
     DB = []
     previous_DB = []
     average_counters = {}
-    lights_info = {
-                   'red': {
-                           'timer': 5,
-                           'enabled': False
-                          },
-                   'green': {
-                             'timer': 5,
-                             'enabled': False
-                            }
-                   }
     confidence = args['confidence']
     output_file = args['output_file']
     try:
         data_collecting_time = int(cp.get_value_from_config('General', 'data_collecting_time'))
     except:
         data_collecting_time = 1
+    light_state = Value('i',0)
+    light_timer = Value('i',0)
+    red_time = Value('i',5)
+    green_time = Value('i',5)
+    traffic_light = trafficLight(light_state,
+                                 light_timer,
+                                 red_time,
+                                 green_time)
+    traffic_light.start_processing()
     date_format = "%Y-%m-%d %H:%M:%S"
     current_date = time.strftime(date_format, time.localtime())
     start_time_check = datetime.strptime(current_date, date_format)
     start_time_write = datetime.strptime(current_date, date_format)
-    start_time_light = datetime.strptime(current_date, date_format)
     while True:
         try:
             frame = get_frame(stream, input_file)
@@ -590,12 +544,13 @@ def start_process(args, net, stream, fps, show_mode, input_file,\
             end_time = datetime.strptime(current_date, date_format)
             if show_mode:
                 if overlay_mode:
-                    start_time_light = draw_on_frame(frame,
-                                                     DB,
-                                                     counters,
-                                                     lights_info,
-                                                     end_time,
-                                                     start_time_light)
+                    draw_on_frame(frame,
+                                  DB,
+                                  counters,
+                                  light_state,
+                                  light_timer,
+                                  red_time,
+                                  green_time)
                 show_frame(fullscreen_mode, frame)
                 prop_val = cv2.getWindowProperty(WINDOW_NAME, cv2.WND_PROP_ASPECT_RATIO)
                 if prop_val < 0:
@@ -622,6 +577,7 @@ def start_process(args, net, stream, fps, show_mode, input_file,\
         except AttributeError as e:
             log("CRITICAL", e)
             break
+    traffic_light.stop_processing()
 
 def load_model():
     '''
@@ -747,7 +703,6 @@ def main():
     check_app_mode(fullscreen_mode)
     net = load_model()
     stream = get_input(input_file)
-    traffic_light = trafficLight()
     fps = FPS().start()
     start_process(args,
                   net,
@@ -756,8 +711,7 @@ def main():
                   show_mode,
                   input_file,
                   fullscreen_mode,
-                  args['overlay_mode'],
-                  traffic_light)
+                  args['overlay_mode'])
     log("WARNING", f"{text_colors.UNDERLINE}exiting the utility{text_colors.END}.\n")
     fps.stop()
     if show_mode:
