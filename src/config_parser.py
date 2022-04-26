@@ -10,10 +10,10 @@ class configParser():
     Custom class for parsing arguments from configuration file.
     '''
 
-    def __init__(self, log):
+    def __init__(self, logging):
         self.config = configparser.ConfigParser()
         self.filename = "./.config.ini"
-        self.log = log
+        self.logging = logging
 
     def check_config(self):
         '''
@@ -33,8 +33,7 @@ class configParser():
                 value = self.config[section][key]
                 return value
             except:
-                self.log("ERROR", "Wrong/missing section/key (\033[31;1m%s\033[0m/\033[31;1m%s\033[0m)" %\
-                                  (section, key))
+                self.logging.error(f"wrong/missing section/key (\033[31;1m{section}\033[0m/\033[31;1m{key}\033[0m)")
                 return ""
         return ""
 
@@ -52,5 +51,4 @@ class configParser():
                 with open(self.filename, 'w') as config_file:
                     self.config.write(config_file)
             except:
-                self.log("ERROR", "wrong section/key (\033[31;1m%s\033[0m/\033[31;1m%s\033[0m)" %\
-                                  (section, key))
+                self.logging.error(f"wrong section/key (\033[31;1m{section}\033[0m/\033[31;1m{key}\033[0m)")

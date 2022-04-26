@@ -10,14 +10,16 @@ import sys
 import cv2
 import time
 import copy
-import numpy as np
 from datetime import datetime
 from imutils.video import FPS
 from imutils.video import VideoStream
 from Xlib.display import Display
 from src.config_parser import configParser
 from src.entity import entity
-from multiprocessing import Process, Value
+from src.traffic_light import trafficLight
+from src.log import logger
+from src.log import text_colors
+from multiprocessing import Value
 
 # Check if machine is Raspberry PI.
 RUNNING_ON_RPI = False
@@ -25,126 +27,11 @@ os_info = os.uname()
 if os_info[4][:3] == 'arm':
     RUNNING_ON_RPI = True
 
-class text_colors:
-    '''
-    Class holding ASCII color codes as members.
-    '''
-    UNDERLINE = '\033[4m'
-    WARNING = '\033[33m'
-    HEADER = '\033[95m'
-    BOLD = '\033[1m'
-    BLUE = '\033[94m'
-    STRONG_BLUE = '\033[38;5;21m'
-    CYAN = '\033[36m'
-    GREEN = '\033[32m'
-    RED = '\033[31m'
-    END = '\033[0m'
-
-# Custom log message configuration.
-log_level = 1
-log_levels = {
-              'CRITICAL': 4,
-              'ERROR': 3,
-              'WARNING': 2,
-              'INFO': 1,
-              'DEBUG': 0
-             }
+# Logger initialization.
+LOGGING = logger()
 
 # Utility window name.
 WINDOW_NAME = "Traffic Control."
-
-class trafficLight(Process):
-
-    def __init__(self, light_state, light_timer, red_time, green_time):
-        self.state = light_state
-        self.green_time = green_time
-        self.red_time = red_time
-        self.yellow_time = 1
-        self.end_flag = False
-        self.timer = light_timer
-        self.worker_process = Process(target = self.do_work)
-
-    def start_processing(self):
-        """
-        Starts process execution.
-        """
-        self.worker_process.start()
-
-    def stop_processing(self):
-        """
-        Stops process execution, joins to the main process.
-        """
-        self.end_flag = True
-        self.worker_process.terminate()
-
-    def do_work(self):
-        """
-        Simulates traffic light.
-        """
-        while not self.end_flag:
-            start_time = time.time()
-            green_time = self.green_time.value
-            while not self.end_flag and time.time() - start_time < green_time:
-                self.timer.value = int(green_time - (time.time() - start_time))
-                self.state.value = 0
-                time.sleep(1)
-            start_time = time.time()
-            while not self.end_flag and time.time() - start_time < self.yellow_time:
-                self.timer.value = int(self.yellow_time - (time.time() - start_time))
-                self.state.value = 1
-                time.sleep(1)
-            start_time = time.time()
-            red_time = self.red_time.value
-            while not self.end_flag and time.time() - start_time < red_time:
-                self.timer.value = int(red_time - (time.time() - start_time))
-                self.state.value = 2
-                time.sleep(1)
-            start_time = time.time()
-            while not self.end_flag and time.time() - start_time < self.yellow_time:
-                self.timer.value = int(self.yellow_time - (time.time() - start_time))
-                self.state.value = 1
-                time.sleep(1)
-
-def colorize_text(log_level):
-    '''
-    Functionality that colorizes message log level.
-    First argument - log level of the message.
-    '''
-    if log_level == "CRITICAL":
-        log_level = text_colors.UNDERLINE\
-                    + text_colors.BOLD\
-                    + text_colors.RED\
-                    + log_level\
-                    + text_colors.END
-    elif log_level == "ERROR":
-        log_level = text_colors.RED\
-                    + log_level\
-                    + text_colors.END
-    elif log_level == "WARNING":
-        log_level = text_colors.WARNING\
-                    + log_level\
-                    + text_colors.END
-    elif log_level == "INFO":
-        log_level = text_colors.GREEN\
-                    + log_level\
-                    + text_colors.END
-    elif log_level == "DEBUG":
-        log_level = text_colors.CYAN\
-                    + log_level\
-                    + text_colors.END
-    return log_level
-
-def log(level, message):
-    '''
-    Functionality that validates all given arguments and outputs corresponding message.
-    First argument - level of the message.
-    Second argument - message body.
-    '''
-    if log_levels[level.upper()] >= log_level:
-        current_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        level = colorize_text(level)
-        current_date = text_colors.HEADER + current_date + text_colors.END
-        print(f"[{current_date}] [{level}]: {message}")
 
 def get_frame(stream, input_file):
     '''
@@ -173,7 +60,7 @@ def configure_output_writer(output_file, frame):
                              True)
     return writer
 
-def predict(frame, net, confidence, DB):
+def predict(cp, frame, net, confidence, DB):
     '''
     Functionality that predicts and returns detected object DB.
     First argument - frame.
@@ -310,7 +197,7 @@ def draw_counters(frame, counters):
     step = 20
     for counter in counters:
         cv2.putText(frame,
-                    "%s: %s" % (counter, counters[counter]),
+                    f"{counter}: {counters[counter]}",
                     (x, y),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.75,
@@ -363,7 +250,7 @@ def draw_on_frame(frame, DB, counters, light_state, light_timer, red_time, green
                       color,
                       2)
         cv2.putText(frame,
-                    label + direction,
+                    label+direction,
                     (x_min, y),
                     cv2.FONT_HERSHEY_SIMPLEX,
                     0.75,
@@ -381,7 +268,7 @@ def get_screen_size():
     screen_width, screen_height = screen.width_in_pixels, screen.height_in_pixels
     return screen_width, screen_height
 
-def check_direction(previous_DB, DB):
+def check_direction(cp, previous_DB, DB):
     '''
     Functionality that check every entities movement direction.
     First argument - previous DB object.
@@ -412,9 +299,9 @@ def check_direction(previous_DB, DB):
                 previous_y = previous_center.y()
                 difference_x = new_x - previous_x
                 difference_y = new_y - previous_y
-                log("DEBUG", f"DX : {difference_x} DY: {difference_y}")
-                log("DEBUG", f"NX : {new_x} NY: {new_y}")
-                log("DEBUG", f"PX : {previous_x} PY: {previous_y}")
+                LOGGING.debug(f"DX: {difference_x} DY: {difference_y}")
+                LOGGING.debug(f"NX: {new_x} NY: {new_y}")
+                LOGGING.debug(f"PX: {previous_x} PY: {previous_y}")
                 if abs(difference_x) < movement_detection_radius\
                    and abs(difference_y) < movement_detection_radius:
                     direction = new_entity.get_direction()
@@ -437,9 +324,9 @@ def write_data(counters, start_time, end_time):
     Second argument - collecting start time.
     Third argument - collecting end time.
     '''
-    data = "%s - %s | " % (start_time, end_time)
+    data = f"{start_time} - {end_time} | "
     for field in counters:
-        data += "%ss: %s " % (field, counters[field])
+        data += f"{field}s: {counters[field]} "
     data += "\n"
     with open("data.log", "a") as f:
         f.write(data)
@@ -499,7 +386,7 @@ def show_frame(fullscreen_mode, frame):
                                       interpolation = cv2.INTER_AREA)
     cv2.imshow(WINDOW_NAME, frame)
 
-def start_process(args, net, stream, fps, show_mode, input_file,\
+def start_process(args, cp, net, stream, fps, show_mode, input_file,\
                   fullscreen_mode, overlay_mode):
     '''
     Functionality that run the main process of detection and decision.
@@ -537,8 +424,8 @@ def start_process(args, net, stream, fps, show_mode, input_file,\
     while True:
         try:
             frame = get_frame(stream, input_file)
-            counters = predict(frame, net, confidence, DB)
-            check_direction(previous_DB, DB)
+            counters = predict(cp, frame, net, confidence, DB)
+            check_direction(cp, previous_DB, DB)
             previous_DB = copy.deepcopy(DB)
             current_date = time.strftime(date_format, time.localtime())
             end_time = datetime.strptime(current_date, date_format)
@@ -575,11 +462,11 @@ def start_process(args, net, stream, fps, show_mode, input_file,\
         except KeyboardInterrupt:
             break
         except AttributeError as e:
-            log("CRITICAL", e)
+            LOGGING.critical(e)
             break
     traffic_light.stop_processing()
 
-def load_model():
+def load_model(cp):
     '''
     Functionality that load model and returns model network.
     '''
@@ -592,12 +479,11 @@ def load_model():
     except:
         MODEL_PATH = "./models"
     GRAPH_FILENAME = MODEL_PATH + "/" + MODEL_NAME
+    GRAPH_PRECISION = "FP32"
     if RUNNING_ON_RPI:
-        GRAPH_FILENAME += "/FP16/"
-    else:
-        GRAPH_FILENAME += "/FP32/"
-    GRAPH_XML = GRAPH_FILENAME + MODEL_NAME + ".xml"
-    GRAPH_BIN = GRAPH_FILENAME + MODEL_NAME + ".bin"
+        GRAPH_PRECISION += "FP16"
+    GRAPH_XML = f"{GRAPH_FILENAME}/{GRAPH_PRECISION}/{MODEL_NAME}.xml"
+    GRAPH_BIN = f"{GRAPH_FILENAME}/{GRAPH_PRECISION}/{MODEL_NAME}.bin"
     net = cv2.dnn.readNet(GRAPH_XML, GRAPH_BIN)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CPU)
     return net
@@ -618,29 +504,29 @@ def get_input(input_file):
         dev_filenames = next(os.walk('/dev'), (None, None, []))[2]
         capture_devices = [video for video in dev_filenames if 'video' in video]
         stream = None
-        log("INFO", f"found {text_colors.UNDERLINE+text_colors.GREEN}"\
+        LOGGING.info(f"found {text_colors.UNDERLINE+text_colors.GREEN}"\
                     f"{len(capture_devices)}{text_colors.END} connected video devices.\n")
         for device in capture_devices:
             device_id = ''.join([n for n in device if n.isdigit()])
-            log("WARNING", f"trying to get stream from device with ID: "\
-                           f"{text_colors.GREEN+text_colors.BOLD}{device_id}"\
-                           f"{text_colors.END}.")
+            LOGGING.warning(f"trying to get stream from device with ID: "\
+                            f"{text_colors.GREEN+text_colors.BOLD}{device_id}"\
+                            f"{text_colors.END}.")
             stream = VideoStream(src = int(device_id)).start()
             try:
                 get_frame(stream, None)
-                log("INFO", f"starting video stream from device with ID: "\
-                            f"{text_colors.GREEN+text_colors.BOLD}{device_id}"\
-                            f"{text_colors.END}.\n")
+                LOGGING.info(f"starting video stream from device with ID: "\
+                             f"{text_colors.GREEN+text_colors.BOLD}{device_id}"\
+                             f"{text_colors.END}.\n")
                 break
             except AttributeError:
-                log("ERROR", f"{text_colors.RED}device with ID: {device_id} "\
-                             f"is not streamable{text_colors.END}.\n")
+                LOGGING.error(f"{text_colors.RED}device with ID: {device_id} "\
+                              f"is not streamable{text_colors.END}.\n")
                 continue
         if not stream:
-            log("CRITICAL", "no streamable device found. Terminating.")
+            LOGGING.critical("no streamable device found. Terminating.")
             exit()
         return stream
-    log("WARNING", "opening video file.")
+    LOGGING.warning("opening video file.")
     return cv2.VideoCapture(input_file)
 
 def check_app_mode(fullscreen_mode):
@@ -659,10 +545,9 @@ def parse_arguments(cp):
     Functionality that parses argument from from configuration file.
     First argument configuration parser.
     '''
-    global log_level
     show_mode = eval(cp.get_value_from_config('Features', 'show_mode'))
     try:
-        log_level = int(cp.get_value_from_config('General', 'log_level'))
+        LOGGING.set_log_level(int(cp.get_value_from_config('General', 'log_level')))
     except:
         pass
     try:
@@ -680,13 +565,12 @@ def parse_arguments(cp):
     input_file = cp.get_value_from_config('General', 'input_video_file_path')
     output_file = cp.get_value_from_config('General', 'output_file')
     args = {
-            'show_mode' : show_mode,
-            'log_level' : log_level,
-            'input_file' : input_file,
-            'output_file' : output_file,
-            'fullscreen_mode' : fullscreen_mode,
-            'overlay_mode' : overlay_mode,
-            'confidence' : confidence
+            'show_mode': show_mode,
+            'input_file': input_file,
+            'output_file': output_file,
+            'fullscreen_mode': fullscreen_mode,
+            'overlay_mode': overlay_mode,
+            'confidence': confidence
            }
     return args
 
@@ -694,17 +578,18 @@ def main():
     '''
     Application start point.
     '''
-    cp = configParser(log)
+    cp = configParser(LOGGING)
     args = parse_arguments(cp)
     show_mode = args['show_mode']
     input_file = args['input_file']
     fullscreen_mode = args['fullscreen_mode']
     check_optimization()
     check_app_mode(fullscreen_mode)
-    net = load_model()
+    net = load_model(cp)
     stream = get_input(input_file)
     fps = FPS().start()
     start_process(args,
+                  cp,
                   net,
                   stream,
                   fps,
@@ -712,7 +597,7 @@ def main():
                   input_file,
                   fullscreen_mode,
                   args['overlay_mode'])
-    log("WARNING", f"{text_colors.UNDERLINE}exiting the utility{text_colors.END}.\n")
+    LOGGING.warning(f"{text_colors.UNDERLINE}exiting the utility{text_colors.END}.\n")
     fps.stop()
     if show_mode:
         cv2.destroyAllWindows()
@@ -720,10 +605,10 @@ def main():
         stream.stop()
     else:
         stream.release()
-    log("INFO", f"Elapsed time: {text_colors.GREEN}{round(fps.elapsed(), 2)}"\
-                f"{text_colors.END}")
-    log("INFO", f"Approximate FPS: {text_colors.GREEN}{round(fps.fps(), 2)}"\
-                f"{text_colors.END}")
+    LOGGING.info(f"Elapsed time: {text_colors.GREEN}{round(fps.elapsed(), 2)}"\
+                 f"{text_colors.END}")
+    LOGGING.info(f"Approximate FPS: {text_colors.GREEN}{round(fps.fps(), 2)}"\
+                 f"{text_colors.END}")
 
 if __name__ == "__main__":
     sys.exit(main())
