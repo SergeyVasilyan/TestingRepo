@@ -1,0 +1,4 @@
+imutils
+xlib
+configparser
+opencv-python
