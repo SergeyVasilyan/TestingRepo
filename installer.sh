@@ -6,3 +6,4 @@ echo "deb https://apt.repos.intel.com/openvino/2022 focal main" | sudo tee /etc/
 sudo apt update
 sudo apt install openvino
 sudo apt install openvino-opencv
+echo "source /opt/intel/openvino_2022/setupvars.sh" >> ~/.bashrc
